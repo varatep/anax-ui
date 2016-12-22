@@ -99,7 +99,7 @@ export function citygramService(description, email, name, password, ram) {
           MTN_CG_RSDDESC: description,
         }
       },
-      {...computeAttrs('NYU Citygram (noise pollution analsis)', ram)}
+      {...computeAttrs('NYU Citygram (noise pollution analysis)', ram)}
     ]
   };
 }
