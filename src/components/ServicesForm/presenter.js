@@ -283,7 +283,7 @@ class ServicesForm extends Component {
           <Checkbox style={{"marginBottom": ".75em"}} toggle label={servicesForm.fields.pws.enabled ? 'enabled' : 'disabled'} name='pws.enabled' defaultChecked={servicesForm.fields.pws.enabled} onChange={this.handleSegmentToggle} />
           <p><strong>Hardware required</strong>: A personal weather station. Supported models are listed in <a href="http://www.weewx.com/docs/usersguide.htm#hardware">WeeWX documentation</a>.</p>
           <Divider horizontal>Detail</Divider>
-          <p>Weather data from your device will be published on the <a href="http://bluehorizeon.network/map">Blue Horizon map</a> and at <a href="http://www.wunderground.com">weatherunderground.com</a>.</p>
+          <p>Weather data from your device will be published on the <a href="http://bluehorizon.network/map">Blue Horizon map</a> and at <a href="http://www.wunderground.com">weatherunderground.com</a>.</p>
           <ShowHide visibility={servicesForm.fields.pws.enabled}>
             <Form className='attached fluid segment' id='pws' onSubmit={(event) => {event.preventDefault();}}>
               <Form.Input fluid icon='circle thin' loading={this.state.ephemeral.geo_fetching} name='pws.wugname' defaultValue={servicesForm.fields.pws.wugname} placeholder='PWS Name' disabled={true} />
