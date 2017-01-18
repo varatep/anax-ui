@@ -4,6 +4,7 @@ import { Button, Dimmer, Container, Header, Segment, Label, Loader, Progress, Li
 import {services} from '../../actions/services';
 import * as _ from 'lodash';
 import {mergeState, mgrUpdateGen} from '../../util/localStateOperations';
+import moment from 'moment';
 
 class Dashboard extends Component {
 
@@ -54,8 +55,8 @@ class Dashboard extends Component {
 
         // TODO: expand to accommodate more sensor urls and more applicable enrichments
         const policy = _.filter(serviceData, (d) => { return compute.sensor_urls[0] === d.policy.apiSpec[0].specRef;});
-        const active = _.filter(agreementData.agreements.active, (a) => { return compute.sensor_urls[0] === a.sensor_url});
-        const archived = _.filter(agreementData.agreements.archived, (a) => { return compute.sensor_urls[0] === a.sensor_url});
+        const active = _.filter(agreementData.agreements.active, (a) => { return compute.sensor_urls[0] === a.sensor_url;});
+        const archived = _.filter(agreementData.agreements.archived, (a) => { return compute.sensor_urls[0] === a.sensor_url;});
 
         return {...compute, ...policy[0], agreements: {active, archived}};
       });
@@ -79,6 +80,13 @@ class Dashboard extends Component {
   render() {
     const { attributes, device, router } = this.props;
 
+    let prettyTime = (stamp) => {
+      const d = new Date(0);
+      d.setUTCSeconds(stamp);
+
+      return moment(d).format('MMMM DD, hh:mm A');
+    }
+
     let view;
     if (_.isEmpty(this.state.services)) {
       view = (
@@ -88,29 +96,84 @@ class Dashboard extends Component {
         </Segment>
       );
     } else {
-      view = (
-        _.map(_.sortBy(this.state.services, (serv) => { return ('agreements' in serv && serv.agreements.active.length === 0);}), (it) => {
+      const reduceNum = (n) => {
+        return n > 0 ? 1 : 0;
+      }
+
+      const sVal = (serv) => {
+        if ('agreements' in serv && serv.agreements.active.length > 0) {
+          const ag = serv.agreements.active[0];
+
+          return reduceNum(ag.agreement_finalized_time) +
+                 reduceNum(ag.agreement_accepted_time) +
+                 reduceNum(ag.agreement_data_received_time) +
+                 reduceNum(ag.agreement_execution_start_time) +
+                 reduceNum(ag.agreement_created_time);
+        } else {
+          return 0;
+        }
+      }
+
+      const sortedServ = this.state.services.slice(0).sort((o, o2) => {
+        const s = sVal(o);
+        const s2 = sVal(o2);
+
+        // reverse sort
+        if (s > s2) {
+          return -1;
+        } else if (s < s2) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+
+      view = (_.map(sortedServ, (it) => {
+
+          // can't assume there is one
+          var newestArch = null;
           let color, percent, tag;
+
           if (!'policy' in it) {
-            color = 'orange';
-            percent = 10;
-            tag = 'Registering';
-          } else if ('agreements' in it && it.agreements.active.length > 0) {
-            color = 'green';
-            percent = 100;
-            tag = 'In Agreement';
-          } else {
-            color = 'blue';
-            percent = 60;
-            tag = 'Registered';
+            color = 'yellow';
+            percent = 0;
+            tag = 'Initializing';
+          } else if ('agreements' in it) {
+            // assume only a single agreement here, this may change in the future
+
+            if (it.agreements.active.length > 0) {
+              const ag = it.agreements.active[0];
+
+              if (ag.agreement_execution_start_time > 0) {
+                color = 'blue';
+                percent = 100;
+                tag = 'Executing';
+              } else if (ag.agreement_accepted_time > 0) {
+                color = 'teal';
+                percent = 70;
+                tag = 'In Agreement';
+              } else {
+                color = 'orange';
+                percent = 50;
+                tag = 'Agreement Proposed';
+              }
+            } else {
+              color = 'grey';
+              percent = 40;
+              tag = 'Available for Agreement';
+            }
+
+            if (it.agreements.archived.length > 0) {
+              newestArch = _.sortBy(it.agreements.archived, 'agreement_terminated_time')[it.agreements.archived.length-1];
+            }
           }
 
           return (
             <Segment key={it.sensor_urls.join('/')}>
 
               <Header size="medium">{it.label}</Header>
-              <Progress percent={percent} attached='top' color={color} />
-              <Label as='a' color={color} attached="top right">{tag}</Label>
+              <Progress percent={percent} attached="top" color={color} />
+              <Label as="a" color={color} attached="top right">{tag}</Label>
 
               <List divided relaxed>
                 <List.Item>
@@ -122,20 +185,43 @@ class Dashboard extends Component {
                 {'agreements' in it ?
                 <List.Item>
                   <List.Content>
-                    <List.Header>Agreements</List.Header>
                     {it.agreements.active.length > 0 ?
-                        <div>
-                          <List.Description><strong>Counterparty</strong>: {it.agreements.active[0].consumer_id}</List.Description>
-                          <List.Description><strong>Id</strong>: <span style={{fontFamily: 'mono'}}>{it.agreements.active[0].current_agreement_id}</span></List.Description>
-                        </div>
+                      <span>
+                        <List.Header>Active Agreement</List.Header>
+                          <div style={{"paddingLeft": "2%"}}>
+                            <List.Description><strong>Id</strong>: <span style={{fontFamily: 'mono'}}>{it.agreements.active[0].current_agreement_id}</span></List.Description>
+                            <br />
+                            <List.Description><strong>Counterparty</strong>: {it.agreements.active[0].consumer_id}</List.Description>
+                            {it.agreements.active[0].agreement_accepted_time > 0 ?
+                                <List.Description><strong>Counterparty accepted at</strong>: {prettyTime(it.agreements.active[0].agreement_accepted_time)}</List.Description>
+                                :
+                                <span></span>
+                            }
+                            {it.agreements.active[0].agreement_execution_start_time > 0 ?
+                                <List.Description><strong>Workload pattern deployed at</strong>: {prettyTime(it.agreements.active[0].agreement_execution_start_time)}</List.Description>
+                                :
+                                <span></span>
+                            }
+                            {it.agreements.active[0].agreement_data_received_time > 0 ?
+                                <List.Description><strong>Agreement data received by counterparty at</strong>: {prettyTime(it.agreements.active[0].greement_data_received_time)}</List.Description>
+                                :
+                                <span></span>
+                            }
+                            {it.agreements.active[0].agreement_finalized_time > 0 ?
+                                <List.Description><strong>Agreement finalized at</strong>: {prettyTime(it.agreements.active[0].agreement_finalized_time)}</List.Description>
+                                :
+                                <span></span>
+                            }
+                          </div>
+                        </span>
                         :
                         <span></span>
                     }
                     <br />
-                    <List.Description><strong>Archived</strong>: {it.agreements.archived.length}</List.Description>
-                    {it.agreements.archived.length > 0 ?
+                    <List.Description><strong>Archived Agreements</strong>: {it.agreements.archived.length}</List.Description>
+                    {newestArch !== null ?
                         <div>
-                          <List.Description><strong>Terminated Time</strong>: {it.agreements.archived[0].agreement_terminated_time}, <strong>Terminated Reason</strong>: {it.agreements.archived[0].terminated_reason}, <strong>Terminated Description</strong>: {it.agreements.archived[0].terminated_description}</List.Description>
+                          <List.Description><strong>Terminated Time</strong>: {prettyTime(newestArch.agreement_terminated_time)}, <strong>Terminated Reason</strong>: {newestArch.terminated_reason}, <strong>Terminated Description</strong>: {newestArch.terminated_description}</List.Description>
                         </div>
                         :
                         <span></span>
@@ -149,7 +235,7 @@ class Dashboard extends Component {
             </Segment>
           );
         })
-      )
+      );
     }
 
     return (
