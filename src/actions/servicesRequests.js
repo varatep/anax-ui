@@ -35,7 +35,7 @@ export function purpleairService(deviceHostname, ram) {
 
 // this is a compatibility thing
 export function locationService(usegps, ram) {
-  return {
+  const obj = {
     sensor_url: 'https://bluehorizon.network/documentation/location-device-api',
     sensor_name: 'location',
     attributes: [
@@ -45,13 +45,19 @@ export function locationService(usegps, ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_GPS: 'true',
-          MTN_GPS_DEVICE: usegps
+          MTN_GPS: 'true'
         }
       },
       {...computeAttrs('Device location', ram)}
     ]
   };
+
+  // compatibility: this envvar needs to be set only if the usegps is true and the value doesn't matter, the envvar is merely tested for existence
+  if (usegps) {
+    obj.attributes[0].mappings['MTN_GPSDEVICE'] = 'true';
+  }
+
+  return obj;
 }
 
 export function cputempService(ram) {
