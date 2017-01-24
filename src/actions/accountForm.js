@@ -53,22 +53,22 @@ export function accountFormMultiFieldChange(segment, updateObj) {
 
 export function accountFormDataSubmit(deviceId, accountForm, expectExistingAccount) {
 
-	let registerExchangeAccount = () => {
-		// TODO: expected that we're creating a new account here; use GET first to check (since existing is 400, not 409) and create a visible error
+  let registerExchangeAccount = () => {
+    // TODO: expected that we're creating a new account here; use GET first to check (since existing is 400, not 409) and create a visible error
 
-		// return promise
-		return fetch(`${EXCHANGE_URL_BASE}/users/${encodeURIComponent(accountForm.fields.account.username)}`,
+    // return promise
+    return fetch(`${EXCHANGE_URL_BASE}/users/${encodeURIComponent(accountForm.fields.account.username)}`,
       {
         method: 'POST',
         headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					'password': accountForm.fields.account.password,
-					'email': accountForm.fields.account.email
-				})
-			}
-		)
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          'password': accountForm.fields.account.password,
+          'email': accountForm.fields.account.email
+        })
+      }
+    )
     .then((response) => {
       if (!response.ok) {
         if (response.status === 400) {
@@ -81,37 +81,74 @@ export function accountFormDataSubmit(deviceId, accountForm, expectExistingAccou
         return response.json();
       }
     });
-	}
+  }
 
-	let registerExchangeDevice = (token) => {
-		const url = `${EXCHANGE_URL_BASE}/devices/${encodeURIComponent(deviceId)}`;
+  let registerExchangeDevice = (token) => {
 
-		return fetch(url, {
-				method: 'PUT',
-				headers: {
-					'Authorization': authHeaderValue(accountForm.fields.account.username, accountForm.fields.account.password),
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					'token': token,
-					'name': accountForm.fields.account.devicename,
-					'registeredMicroservices': [],
-					'msgEndPoint': '',
-					'softwareVersions': {}
-				})
-			}
-		)
-    .then((response) => {
+    const getUrl = `${EXCHANGE_URL_BASE}/devices`;
+    const regUrl = `${EXCHANGE_URL_BASE}/devices/${encodeURIComponent(deviceId)}`;
+
+    const authHeaders = {
+      'Authorization': authHeaderValue(accountForm.fields.account.username, accountForm.fields.account.password),
+      'Content-Type': 'application/json'
+    };
+
+    let regNew = () => {
+      return fetch(regUrl, {
+          method: 'PUT',
+          headers: authHeaders,
+          body: JSON.stringify({
+            'token': token,
+            'name': accountForm.fields.account.devicename,
+            'registeredMicroservices': [],
+            'msgEndPoint': '',
+            'softwareVersions': {}
+          })
+        }
+      )
+      .then((response) => {
+        if (!response.ok) {
+          throw error(response, `Error associating device in Exchange with account "${accountForm.fields.account.username}". Please check your credentials and try again or create a new account if you don't already have one.`);
+        } else {
+          return response.json();
+        }
+      });
+    };
+
+    return fetch(getUrl, {
+      method: 'GET',
+      headers: authHeaders
+    })
+    .then(response => {
       if (!response.ok) {
-        throw error(response, `Error associating device in Exchange with account "${accountForm.fields.account.username}". Please check your credentials and try again or create a new account if you don't already have one.`);
+        throw error(response, `Error associating device in Exchange with account "${accountForm.fields.account.username}". Please try again.`);
       } else {
         return response.json();
       }
-    });
-	}
+    }).then(json => {
+      if (_.includes(_.keys(json.devices), deviceId)) {
 
-	// anax operation
-	let retrieveToken = () => {
+        // do delete first then regNew()
+        return Promise.all([
+        // delete first
+        fetch(regUrl, {
+          method: 'DELETE',
+          headers: authHeaders
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw error(response, `Error removing existing device before re-association. Please try again.`);
+          }
+        }), regNew()]);
+      } else {
+        // just do regNew
+        return regNew();
+      }
+    });
+  };
+
+  // anax operation
+  let retrieveToken = () => {
     return fetch(`${ANAX_URL_BASE}/token/random`)
       .then((response) => {
         if (!response.ok) {
@@ -120,28 +157,28 @@ export function accountFormDataSubmit(deviceId, accountForm, expectExistingAccou
           return response.json();
         }
       })
-		.then((data) => data.token);
-	}
+    .then((data) => data.token);
+  }
 
-	// anax operation; TODO: perhaps handle the 409 more gently
-	let persistExchangeAccount = (token) => {
-		return fetch(`${ANAX_URL_BASE}/horizondevice`,
-			{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					'account': {
-						'id': accountForm.fields.account.username,
-						'email': accountForm.fields.account.email,
-					},
-					'id': deviceId,
-					'name': accountForm.fields.account.devicename,
-					'token': token
-				})
-			}
-		)
+  // anax operation; TODO: perhaps handle the 409 more gently
+  let persistExchangeAccount = (token) => {
+    return fetch(`${ANAX_URL_BASE}/horizondevice`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          'account': {
+            'id': accountForm.fields.account.username,
+            'email': accountForm.fields.account.email,
+          },
+          'id': deviceId,
+          'name': accountForm.fields.account.devicename,
+          'token': token
+        })
+      }
+    )
     .then((response) => {
       if (!response.ok) {
         throw error(response, 'Error persisting exchange account in anax.');
@@ -149,24 +186,24 @@ export function accountFormDataSubmit(deviceId, accountForm, expectExistingAccou
         return response.json();
       }
     });
-	}
+  }
 
   return function(dispatch) {
     let promises = [retrieveToken()];
 
-		if (!expectExistingAccount) {
-			promises.push(registerExchangeAccount());
-		}
+    if (!expectExistingAccount) {
+      promises.push(registerExchangeAccount());
+    }
 
-		return Promise.all(promises)
+    return Promise.all(promises)
       .then((results) => {
-				const token = results[0];
+        const token = results[0];
 
-				// first two necessary AJAX calls done, now register device, send one to local anax to record the doings and fetch the update
+        // first two necessary AJAX calls done, now register device, send one to local anax to record the doings and fetch the update
         return registerExchangeDevice(token)
         .then(() => {
           return persistExchangeAccount(token); // another promise that we only want executed if the exchange reg. succeeded
-				});
+        });
       })
       .then(() => {
         // persisting exchange account worked so do a dispatch of deviceFetch to update our local state
@@ -182,15 +219,15 @@ export function accountFormDataSubmit(deviceId, accountForm, expectExistingAccou
                 });
             });
       })
-			.catch((error) => {
-				// TODO: possible that the registration data b/n the exchange and anax are out of sync so do whatever is necessary to clean up here
+      .catch((error) => {
+        // TODO: possible that the registration data b/n the exchange and anax are out of sync so do whatever is necessary to clean up here
         console.log("Error occurred registering account, device, etc.", error);
         // rethrow
         throw error;
-			});
+      });
   };
 };
 
 function authHeaderValue(username, password) {
-	return `Basic ${username}:${password}`;
+  return `Basic ${username}:${password}`;
 }
