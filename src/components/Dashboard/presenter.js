@@ -104,11 +104,11 @@ class Dashboard extends Component {
         if ('agreements' in serv && serv.agreements.active.length > 0) {
           const ag = serv.agreements.active[0];
 
-          return reduceNum(ag.agreement_finalized_time) +
+          return reduceNum(ag.agreement_creation_time) +
                  reduceNum(ag.agreement_accepted_time) +
-                 reduceNum(ag.agreement_data_received_time) +
+                 reduceNum(ag.agreement_finalized_time) +
                  reduceNum(ag.agreement_execution_start_time) +
-                 reduceNum(ag.agreement_created_time);
+                 reduceNum(ag.agreement_data_received_time);
         } else {
           return 0;
         }
@@ -164,7 +164,7 @@ class Dashboard extends Component {
             }
 
             if (it.agreements.archived.length > 0) {
-              newestArch = _.sortBy(it.agreements.archived, 'agreement_terminated_time')[it.agreements.archived.length-1];
+              newestArch = it.agreements.archived[it.agreements.archived.length-1];
             }
           }
 
@@ -203,7 +203,7 @@ class Dashboard extends Component {
                                 <span></span>
                             }
                             {it.agreements.active[0].agreement_data_received_time > 0 ?
-                                <List.Description><strong>Agreement data received by counterparty at</strong>: {prettyTime(it.agreements.active[0].greement_data_received_time)}</List.Description>
+                                <List.Description><strong>Agreement data received by counterparty at</strong>: {prettyTime(it.agreements.active[0].agreement_data_received_time)}</List.Description>
                                 :
                                 <span></span>
                             }
