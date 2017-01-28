@@ -25,7 +25,9 @@ export function purpleairService(deviceHostname, ram) {
         publishable: true,
         mappings: {
           MTN_AIRPOLLUTION: 'true',
-          MTN_PURPLE_AIR_SENSOR_NAME: deviceHostname
+          MTN_PURPLE_AIR_SENSOR_NAME: deviceHostname,
+          HZN_AIRPOLLUTION: 'true',
+          HZN_PURPLE_AIR_SENSOR_NAME: deviceHostname
         }
       },
       {...computeAttrs('PurpleAir (air pollution sensing)', ram)}
@@ -45,7 +47,8 @@ export function locationService(usegps, ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_GPS: 'true'
+          MTN_GPS: 'true',
+          HZN_GPS: 'true'
         }
       },
       {...computeAttrs('Device location', ram)}
@@ -55,6 +58,7 @@ export function locationService(usegps, ram) {
   // compatibility: this envvar needs to be set only if the usegps is true and the value doesn't matter, the envvar is merely tested for existence
   if (usegps) {
     obj.attributes[0].mappings['MTN_GPSDEVICE'] = 'true';
+    obj.attributes[0].mappings['HZN_GPSDEVICE'] = 'true';
   }
 
   return obj;
@@ -71,7 +75,8 @@ export function cputempService(ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_CPU_TEMP: 'true'
+          MTN_CPU_TEMP: 'true',
+          HZN_CPU_TEMP: 'true'
         }
       },
       {...computeAttrs('CPU temperature', ram)}
@@ -90,7 +95,8 @@ export function citygramService(description, email, name, password, ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_CITYGRAM: 'true'
+          MTN_CITYGRAM: 'true',
+          HZN_CITYGRAM: 'true'
         }
       },
       {
@@ -103,6 +109,10 @@ export function citygramService(description, email, name, password, ram) {
           MTN_CG_PASS: password,
           MTN_CG_NAME: name,
           MTN_CG_RSDDESC: description,
+          HZN_CG_EMAIL: email,
+          HZN_CG_PASS: password,
+          HZN_CG_NAME: name,
+          HZN_CG_RSDDESC: description
         }
       },
       {...computeAttrs('NYU Citygram (noise pollution analysis)', ram)}
@@ -124,7 +134,11 @@ export function pwsService(wugname, model, type, ram) {
           MTN_PWS: 'true',
           MTN_WUGNAME: wugname,
           MTN_PWS_MODEL: model,
-          MTN_PWS_ST_TYPE: type
+          MTN_PWS_ST_TYPE: type,
+          HZN_PWS: 'true',
+          HZN_WUGNAME: wugname,
+          HZN_PWS_MODEL: model,
+          HZN_PWS_ST_TYPE: type
         }
       },
       {...computeAttrs('Personal Weather Station', ram)}
@@ -144,7 +158,9 @@ export function netspeedService(targetServer, ram) {
         publishable: true,
         mappings: {
           MTN_IS_BANDWIDTH_TEST_ENABLED: 'true',
-          MTN_TARGET_SERVER: targetServer
+          MTN_TARGET_SERVER: targetServer,
+          HZN_IS_BANDWIDTH_TEST_ENABLED: 'true',
+          HZN_TARGET_SERVER: targetServer
         }
       },
       {...computeAttrs('Netspeed (network quality testing)', ram)}
@@ -163,7 +179,8 @@ export function sdrService(ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_SDR: true
+          MTN_SDR: true,
+          HZN_SDR: true
         }
       },
       {...computeAttrs('Software Defined Radio', ram)}
