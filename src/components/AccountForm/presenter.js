@@ -143,7 +143,7 @@ class AccountForm extends Component {
 
             <Form.Input fluid label='Username' name='account.username' value={this.state.fields.account.username} placeholder='Username' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.username')} onBlur={this.handleInputBlur} />
             <Button basic onClick={this.handlePasswordReset}>Reset Password</Button><br /><br />
-            <Form.Input fluid label='Password' name='account.password' value={this.state.fields.account.password} placeholder='Password' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.password')}  placeholder="Password" onBlur={this.handleInputBlur} />
+            <Form.Input fluid label='Password' name='account.password' type='password' value={this.state.fields.account.password} placeholder='Password' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.password')}  placeholder="Password" onBlur={this.handleInputBlur} />
             <Form.Input fluid label='Email' name='account.email' value={this.state.fields.account.email} placeholder='Email address' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.email')} placeholder='Email address' onBlur={this.handleInputBlur} />
             <Button fluid primary color="blue" onClick={() => {this.handleSubmit(true);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Associate Device</Button>
             <Divider horizontal>Or</Divider>

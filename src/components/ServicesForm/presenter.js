@@ -260,7 +260,7 @@ class ServicesForm extends Component {
               <br />
               <Form.Input fluid label='Device Name' name="citygram.name" value={this.state.fields.citygram.name} placeholder="Citygram Device Name" onChange={this.handleFieldChange} error={fieldIsInError(this, 'citygram.name')} onBlur={this.handleInputBlur} disabled={servicesForm.fields.citygram.nyu_associated} />
               <Form.Input fluid label='Email' name='citygram.email' value={this.state.fields.citygram.email} placeholder='Citygram Email' onChange={this.handleFieldChange} error={fieldIsInError(this, 'citygram.email')} onBlur={this.handleInputBlur} disabled={servicesForm.fields.citygram.nyu_associated} />
-              <Form.Input fluid label='Password' name='citygram.password' value={this.state.fields.citygram.password} placeholder='Citygram Password' onChange={this.handleFieldChange} error={fieldIsInError(this, 'citygram.password')} onBlur={this.handleInputBlur} disabled={servicesForm.fields.citygram.nyu_associated} />
+              <Form.Input fluid label='Password' name='citygram.password' type='password' value={this.state.fields.citygram.password} placeholder='Citygram Password' onChange={this.handleFieldChange} error={fieldIsInError(this, 'citygram.password')} onBlur={this.handleInputBlur} disabled={servicesForm.fields.citygram.nyu_associated} />
               {!servicesForm.fields.citygram.nyu_associated ? <Button basic color="blue" onClick={this.handleCitygramAccount}>Associate Device</Button> : <span></span>}
             </Form>
           </ShowHide>
