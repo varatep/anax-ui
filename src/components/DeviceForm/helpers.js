@@ -17,7 +17,7 @@ export function doValidation(segment, fieldName, text) {
 
 export function referrerDomain() {
   const reg = /^https?:\/\/(.*):\d+/g;
-  const match = reg.exec(document.referrer);
+  const match = reg.exec(window.location.href);
 
   if (match === null || match.length < 2) {
     console.log('failed to determine referrer domain, got', match);
