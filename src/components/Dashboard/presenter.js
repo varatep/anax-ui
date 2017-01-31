@@ -173,7 +173,7 @@ class Dashboard extends Component {
 
               <Header size="medium">{it.label}</Header>
               <Progress percent={percent} attached="top" color={color} />
-              <Label as="a" color={color} attached="top right">{tag}</Label>
+              <Label as="span" color={color} attached="top right">{tag}</Label>
 
               <List divided relaxed>
                 <List.Item>
