@@ -18,8 +18,9 @@ class Main extends Component {
   }
 
   componentDidMount() {
-    const {onDeviceGet} = this.props;
+    const {onDeviceGet, onConfigurationGet} = this.props;
 
+    onConfigurationGet();
     onDeviceGet();
   }
 

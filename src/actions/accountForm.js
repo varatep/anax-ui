@@ -1,12 +1,12 @@
 import {error} from '../util/msgs.js';
 import * as actionTypes from '../constants/actionTypes';
-import { ANAX_URL_BASE, EXCHANGE_URL_BASE } from '../constants/configuration';
+import { ANAX_URL_BASE } from '../constants/configuration';
 
 import {device as deviceFetch} from './device';
 
-export function accountFormPasswordReset(username) {
+export function accountFormPasswordReset(exchange_url_base, username) {
   return function(dispatch) {
-    return fetch(`${EXCHANGE_URL_BASE}/users/${encodeURIComponent(username)}/reset`,
+    return fetch(`${exchange_url_base}/users/${encodeURIComponent(username)}/reset`,
       {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -51,13 +51,13 @@ export function accountFormMultiFieldChange(segment, updateObj) {
 
 // TODO: factor out duplicate handling of response.ok in fetch handlers below
 
-export function accountFormDataSubmit(deviceId, accountForm, expectExistingAccount) {
+export function accountFormDataSubmit(exchange_url_base, deviceId, accountForm, expectExistingAccount) {
 
   let registerExchangeAccount = () => {
     // TODO: expected that we're creating a new account here; use GET first to check (since existing is 400, not 409) and create a visible error
 
     // return promise
-    return fetch(`${EXCHANGE_URL_BASE}/users/${encodeURIComponent(accountForm.fields.account.username)}`,
+    return fetch(`${exchange_url_base}/users/${encodeURIComponent(accountForm.fields.account.username)}`,
       {
         method: 'POST',
         headers: {
@@ -85,8 +85,8 @@ export function accountFormDataSubmit(deviceId, accountForm, expectExistingAccou
 
   let registerExchangeDevice = (token) => {
 
-    const getUrl = `${EXCHANGE_URL_BASE}/devices`;
-    const regUrl = `${EXCHANGE_URL_BASE}/devices/${encodeURIComponent(deviceId)}`;
+    const getUrl = `${exchange_url_base}/devices`;
+    const regUrl = `${exchange_url_base}/devices/${encodeURIComponent(deviceId)}`;
 
     const authHeaders = {
       'Authorization': authHeaderValue(accountForm.fields.account.username, accountForm.fields.account.password),
