@@ -240,7 +240,7 @@ class Dashboard extends Component {
 
     return (
       <div>
-        <Header size="large"><em>{'name' in device ? `${device.name} ` : '' }</em></Header>
+        <Header size="large">{'name' in device ? `${device.name} ` : '' }</Header>
         {!this.state.ephemeral.fetching ? view : ''}
       </div>
     );
