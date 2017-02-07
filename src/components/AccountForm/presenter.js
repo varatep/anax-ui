@@ -80,7 +80,7 @@ class AccountForm extends Component {
       const newMgr = submitMgr.fns.error('submit', 'Please resolve field errors and submit again.');
       this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
     } else {
-      accountFormDataSubmit(configuration.exchange, device.id, accountForm, expectExistingAccount).then((success) => {
+      accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, expectExistingAccount).then((success) => {
 				accountFormFieldChange('account', 'password', '');
         router.push('/setup');
       }).catch((err) => {
@@ -101,7 +101,7 @@ class AccountForm extends Component {
 			const newMgr = mgr.fns.error('account', 'Form incomplete.');
 			this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
     } else {
-			accountFormPasswordReset(configuration.exchange, accountForm.fields.account.username)
+			accountFormPasswordReset(configuration.exchange_api, accountForm.fields.account.username)
 				.then(() => {
 					const newMgr = mgr.fns.notification('account', 'Succeeded issuing password reset, please check your email inbox for a password reset message.');
 					this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));

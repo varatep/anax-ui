@@ -1,4 +1,5 @@
 import {error} from '../util/msgs';
+import {normalize} from '../util/url';
 
 import * as actionTypes from '../constants/actionTypes';
 import { ANAX_URL_BASE } from '../constants/configuration';
@@ -15,6 +16,10 @@ export function configuration() {
       })
       .then((data) => {
         const {configuration} = data;
+
+        console.log(configuration);
+        // normalize url
+        configuration.exchange_api = normalize(configuration.exchange_api);
 
         dispatch(
           {
