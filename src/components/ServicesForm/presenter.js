@@ -7,7 +7,7 @@ import {mergeState, mgrUpdateGen} from '../../util/localStateOperations';
 import * as note from '../../util/notificationManagement';
 import * as validator from '../../util/validation';
 import {doValidation, checkCitygramAccount} from './helpers';
-import {pwsModels, modelFromValue, typeFromValue} from './pwsModels';
+import {pwsModels} from './pwsModels';
 import {latLonFetch, fieldIsInError} from '../../util/commonComponentHelpers';
 import * as cg from './citygram';
 import {error} from '../../util/msgs.js';

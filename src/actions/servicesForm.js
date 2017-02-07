@@ -54,8 +54,9 @@ export function servicesFormSubmit(attributes, servicesForm) {
 				case 'purpleair':
 					return doFetch(pays.purpleairService(wl.devicehostname, 128));
 					break;
-				case 'pws':
-					return doFetch(pays.pwsService(wl.wugname, wl.model, wl.type, 128));
+        case 'pws':
+          const modelType = wl.modelType.split(',');
+					return doFetch(pays.pwsService(wl.wugname, modelType[0], modelType[1], 128));
 					break;
 				case 'sdr':
 					return doFetch(pays.sdrService(128));

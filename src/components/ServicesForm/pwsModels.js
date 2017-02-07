@@ -154,11 +154,3 @@ export const pwsModels = [
     text: 'Velleman WS3080* (FineOffsetUSB)'
   }
 ]
-
-export function modelFromOption(option) {
-	return option.value.split(',')[0];
-}
-
-export function typeFromOption(option) {
-	return option.value.split(',')[1];
-}
