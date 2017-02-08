@@ -7,7 +7,8 @@ import AccountForm from './presenter';
 function mapStateToProps(state) {
   return {
     accountForm: state.accountForm,
-    device: state.device
+    device: state.device,
+    configuration: state.configuration
   };
 }
 

@@ -4,6 +4,7 @@ import device from './device';
 import agreements from './agreements';
 import services from './services';
 import attributes from './attributes';
+import configuration from './configuration';
 
 import accountForm from './accountForm';
 import deviceForm from './deviceForm';
@@ -14,6 +15,7 @@ export default combineReducers({
   services,
   agreements,
   attributes,
+  configuration,
   accountForm,
   deviceForm,
   servicesForm,

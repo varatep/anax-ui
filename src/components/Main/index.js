@@ -12,7 +12,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    onDeviceGet: bindActionCreators(actions.device, dispatch)
+    onDeviceGet: bindActionCreators(actions.device, dispatch),
+    onConfigurationGet: bindActionCreators(actions.configuration, dispatch)
   };
 }
 
