@@ -16,7 +16,7 @@ export function doValidation(segment, fieldName, text) {
 }
 
 export function referrerDomain() {
-  const reg = /^https?:\/\/(.*):\d+/g;
+  const reg = /https?:\/\/([^:\/]+)(:\d+)?/g;
   const match = reg.exec(window.location.href);
 
   if (match === null || match.length < 2) {
