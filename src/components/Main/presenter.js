@@ -39,7 +39,7 @@ class Main extends Component {
           </Container>
 
           <br />
-          <div style={{"padding": "8%", "padding-top": "2%"}}>
+          <div style={{"padding": "8%", "paddingTop": "2%"}}>
             {children}
           </div>
         </section>
