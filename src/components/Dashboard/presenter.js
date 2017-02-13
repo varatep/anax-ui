@@ -220,7 +220,7 @@ class Dashboard extends Component {
                     <br />
                     <List.Description><strong>Archived Agreements</strong>: {it.agreements.archived.length}</List.Description>
                     {newestArch !== null ?
-                        <div>
+                        <div style={{"paddingLeft": "2%"}}>
                           <List.Description><strong>Terminated Time</strong>: {prettyTime(newestArch.agreement_terminated_time)}, <strong>Terminated Reason</strong>: {newestArch.terminated_reason}, <strong>Terminated Description</strong>: {newestArch.terminated_description}</List.Description>
                         </div>
                         :
