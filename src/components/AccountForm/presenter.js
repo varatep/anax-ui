@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { Button, Header, Form, Input, Divider, Segment, Message, List} from 'semantic-ui-react';
+import {
+  Button, Header, Form, Input, Divider, Segment,
+  Message, List, Checkbox, Grid, Icon, Label,
+} from 'semantic-ui-react';
 import * as _ from 'lodash';
 import * as note from '../../util/notificationManagement';
 import {mergeState, mgrUpdateGen} from '../../util/localStateOperations';
