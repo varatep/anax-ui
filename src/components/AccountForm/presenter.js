@@ -22,9 +22,10 @@ class AccountForm extends Component {
 
     const init = {
       ephemeral: {
-        submitting: false
+        submitting: false,
+        accountExists: false,
       },
-      fields: {...accountForm.fields}
+      fields: {...accountForm.fields},
     };
     this.state = note.newManagers(init, ['account']);
 
