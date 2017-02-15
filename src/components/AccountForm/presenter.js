@@ -118,6 +118,12 @@ class AccountForm extends Component {
 			}
   }
 
+  // handler for semantic checkbox toggle between new account and
+  //  existing account
+  handleAccountToggle = (event, checkboxProps) => {
+    this.setState(mergeState(this.state, {ephemeral: { accountExists: checkboxProps.checked }}));
+  }
+
   componentWillMount() {
     document.title += ' - Account Setup';
 
