@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { Button, Header, Form, Input, Divider, Segment, Message, List} from 'semantic-ui-react';
+import {
+  Button, Header, Form, Input, Divider, Segment,
+  Message, List, Checkbox, Grid, Icon, Label,
+} from 'semantic-ui-react';
 import * as _ from 'lodash';
 import * as note from '../../util/notificationManagement';
 import {mergeState, mgrUpdateGen} from '../../util/localStateOperations';
@@ -19,9 +22,10 @@ class AccountForm extends Component {
 
     const init = {
       ephemeral: {
-        submitting: false
+        submitting: false,
+        accountExists: false,
       },
-      fields: {...accountForm.fields}
+      fields: {...accountForm.fields},
     };
     this.state = note.newManagers(init, ['account']);
 
@@ -114,6 +118,12 @@ class AccountForm extends Component {
 			}
   }
 
+  // handler for semantic checkbox toggle between new account and
+  //  existing account
+  handleAccountToggle = (event, checkboxProps) => {
+    this.setState(mergeState(this.state, {ephemeral: { accountExists: checkboxProps.checked }}));
+  }
+
   componentWillMount() {
     document.title += ' - Account Setup';
 
@@ -129,26 +139,54 @@ class AccountForm extends Component {
   render() {
     // TODO: make sure returning to this page after reg (like if user hits the back button), causes redirection to dashboard
 
+    let accountForm;
+
+    !this.state.ephemeral.accountExists ? accountForm =
+      <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();} } id='account'>
+        <Form.Input fluid focus label='Username' name='account.username' value={this.state.fields.account.username} placeholder='Username' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.username')} onBlur={this.handleInputBlur} />
+        <Form.Input fluid label='Password' name='account.password' type='password' value={this.state.fields.account.password} placeholder='Password' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.password')}  placeholder="Password" onBlur={this.handleInputBlur} />
+        <Form.Input fluid label='Email' name='account.email' value={this.state.fields.account.email} placeholder='Email address' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.email')} placeholder='Email address' onBlur={this.handleInputBlur} />
+        <Form.Input fluid focus
+          label={<label>Device Name - <small>Enter a name for device {this.props.device.id} that you will easily recognize.</small></label>}
+          name='account.devicename'
+          value={this.state.fields.account.devicename}
+          placeholder='Device Name'
+          onChange={this.handleFieldChange}
+          error={fieldIsInError(this, 'account.devicename')}
+          onBlur={this.handleInputBlur}
+        />
+        <Button primary color="blue" onClick={() => {this.handleSubmit(false);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Register Device with New Account</Button>
+      </Form>
+      : accountForm =
+      <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();} } id='account'>
+        <Form.Input fluid focus label='Username' name='account.username' value={this.state.fields.account.username} placeholder='Username' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.username')} onBlur={this.handleInputBlur} />
+        <Form.Input fluid label='Password' name='account.password' type='password' value={this.state.fields.account.password} placeholder='Password' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.password')}  placeholder="Password" onBlur={this.handleInputBlur} />
+        <Form.Input fluid focus
+          label={<label>Device Name - <small>Enter a name for device {this.props.device.id} that you will easily recognize.</small></label>}
+          name='account.devicename'
+          value={this.state.fields.account.devicename}
+          placeholder='Device Name'
+          onChange={this.handleFieldChange}
+          error={fieldIsInError(this, 'account.devicename')}
+          onBlur={this.handleInputBlur}
+        />
+        <Button primary color="blue" onClick={() => {this.handleSubmit(true);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Register Device with Existing Account</Button>
+        <Button basic onClick={this.handlePasswordReset}>Reset Password</Button>
+      </Form>;
     return (
       <div>
         <Header size="large">Account Setup</Header>
         <Segment padded raised>
-          <p>Associate this device with an existing Blue Horizon Exchange user account or create a new account and associate it with this device.</p>
-          <p><strong>Note</strong>: If you have already registered this device with the exchange you cannot register it again with a new account.</p>
+          <p>Register this device with an existing Blue Horizon Exchange user account or create a new account and register this device to it.</p>
+          <Checkbox
+            toggle
+            onChange={this.handleAccountToggle}
+            label={<label>I have an account with Horizon.</label>}
+          />
+          <br /><br />
 
 					<NotificationList attached={true} mgr={note.segmentMgr(this.state.notificationMgrs, 'account')} notificationHeader='Account Setup' errHeader='Account Data Error' />
-          <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();} } id='account'>
-
-            <Form.Input fluid focus label='Device Name' name='account.devicename' value={this.state.fields.account.devicename} placeholder='Device Name' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.devicename')} onBlur={this.handleInputBlur} />
-
-            <Form.Input fluid label='Username' name='account.username' value={this.state.fields.account.username} placeholder='Username' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.username')} onBlur={this.handleInputBlur} />
-            <Button basic onClick={this.handlePasswordReset}>Reset Password</Button><br /><br />
-            <Form.Input fluid label='Password' name='account.password' value={this.state.fields.account.password} placeholder='Password' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.password')}  placeholder="Password" onBlur={this.handleInputBlur} />
-            <Form.Input fluid label='Email' name='account.email' value={this.state.fields.account.email} placeholder='Email address' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.email')} placeholder='Email address' onBlur={this.handleInputBlur} />
-            <Button fluid primary color="blue" onClick={() => {this.handleSubmit(true);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Associate Device</Button>
-            <Divider horizontal>Or</Divider>
-            <Button fluid basic color="blue" onClick={() => {this.handleSubmit(false);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Create Account</Button>
-          </Form>
+          {accountForm}
         </Segment>
       </div>
     );
