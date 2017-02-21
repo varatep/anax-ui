@@ -137,7 +137,7 @@ export function accountFormDataSubmit(exchange_url_base, deviceId, accountForm, 
         })
         .then(response => {
           if (!response.ok) {
-            throw error(response, `Error removing existing device before re-association. Please try again.`);
+            throw error(response, `You can not register a device that is already linked to another account. Please try again.`);
           }
         }), regNew()]);
       } else {
