@@ -34,9 +34,14 @@ class AccountForm extends Component {
   }
 
   handleFieldChange = (event) => {
+    // N.B. this function *must* be quick and early so that user doesn't get laggy input
     const [segment, fieldName] = fieldSplit(event.target.name);
 
-    // N.B. this function *must* be quick and early so that user doesn't get laggy input
+    let fieldType = event.target.name.split('.')[event.target.name.split('.').length - 1];
+    let fieldValue = event.target.value;
+    const accountFormTemplate = `{"fields":{"account":{"${fieldType}":"${fieldValue}"}}}`;
+    this.setState(mergeState(this.state, JSON.parse(accountFormTemplate)));
+
     // TODO: instead of waiting on validation here to set the input text state, return a validationResult immediately with the 'input' field set to the updated value and then have a promise resolution entail updating the validation result with other detail
 
     doValidation(segment, fieldName, event.target.value)
