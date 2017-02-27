@@ -293,17 +293,6 @@ class ServicesForm extends Component {
         </Segment>
 
         <Segment padded raised>
-          <Header size="medium">CPU Temperature Sharing</Header>
-          <Image src='/images/cputemp.svg' size='tiny' spaced floated='left' />
-          <Checkbox style={{"marginBottom": ".75em"}} toggle label={servicesForm.fields.cputemp.enabled ? 'enabled' : 'disabled'} name='cputemp.enabled' defaultChecked={servicesForm.fields.cputemp.enabled} onChange={this.handleSegmentToggle} />
-          <p><strong>Hardware Required: </strong>Pi</p>
-          <Divider horizontal>Detail</Divider>
-          <p>The CPU Temperature application shares the current temperature of the device’s CPU. This application is intended primarily as an example data source for application developers. Interested developers can follow the instructions in <a href="https://bluehorizon.network/documentation/developer-guide">the Blue Horizon Developers Guide</a> to rapidly develop an application that will send this CPU temperature data to a cloud service for visualization.</p>
-          <ShowHide visibility={servicesForm.fields.cputemp.enabled}>
-          </ShowHide>
-        </Segment>
-
-        <Segment padded raised>
           <Header size="medium">Air Pollution Monitoring</Header>
           <Image src='/images/purpleair.svg' size='tiny' spaced floated='left' />
           <Checkbox style={{"marginBottom": ".75em"}} toggle label={servicesForm.fields.purpleair.enabled ? 'enabled' : 'disabled'} name='purpleair.enabled' defaultChecked={servicesForm.fields.purpleair.enabled} onChange={this.handleSegmentToggle} />
