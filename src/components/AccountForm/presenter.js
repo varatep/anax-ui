@@ -24,11 +24,12 @@ class AccountForm extends Component {
       ephemeral: {
         submitting: false,
         accountExists: false,
+        passwordType: 'password',
       },
       fields: {...accountForm.fields},
     };
     this.state = note.newManagers(init, ['account']);
-
+    this.handlePasswordVisibility = this.handlePasswordVisibility.bind(this);
 		console.log('state', this.state);
 		console.log('accountForm', accountForm);
   }
@@ -127,6 +128,24 @@ class AccountForm extends Component {
   //  existing account
   handleAccountToggle = (event, checkboxProps) => {
     this.setState(mergeState(this.state, {ephemeral: { accountExists: checkboxProps.checked }}));
+  }
+
+  handlePasswordVisibility(evt) {
+    console.log('evt', evt);
+    if (this.state.ephemeral.passwordType === 'password') {
+      this.setState(mergeState(this.state, {
+        ephemeral: {
+          passwordType: 'text',
+        }
+      }));
+    } else {
+      this.setState(mergeState(this.state, {
+        ephemeral: {
+          passwordType: 'password',
+        }
+      }));
+    }
+
   }
 
   componentWillMount() {
