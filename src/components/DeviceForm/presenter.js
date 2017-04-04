@@ -47,7 +47,12 @@ class DeviceForm extends Component {
           preview_loading: true
         }
       };
-      this.setState(mergeState(this.state, update));
+      this.setState(mergeState(this.state, update), console.log('state after change', this.state));
+
+      let fieldType = event.target.name.split('.')[event.target.name.split('.').length - 1];
+      let fieldValue = parseFloat(event.target.value);
+      const deviceFormTemplate = `{"fields":{"location":{"${fieldType}":${fieldValue}}}}`;
+      this.setState(mergeState(this.state, JSON.parse(deviceFormTemplate)));
     }
 
     doValidation(segment, fieldName, event.target.value)
@@ -57,7 +62,6 @@ class DeviceForm extends Component {
           const newMgr = note.segmentMgr(this.state.notificationMgrs, 'submit').fns.clearDs('errors');
           this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
         }
-
         // handleValidationResult always returns a properly-updated state object
         this.setState(note.handleValidationResult(this.state, validationResult));
       });
