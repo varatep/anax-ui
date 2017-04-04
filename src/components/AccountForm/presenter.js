@@ -168,7 +168,22 @@ class AccountForm extends Component {
     !this.state.ephemeral.accountExists ? accountForm =
       <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();} } id='account'>
         <Form.Input fluid focus label='Username' name='account.username' value={this.state.fields.account.username} placeholder='Username' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.username')} onBlur={this.handleInputBlur} />
-        <Form.Input fluid label='Password' name='account.password' type='password' value={this.state.fields.account.password} placeholder='Password' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.password')}  placeholder="Password" onBlur={this.handleInputBlur} />
+        <Form.Input
+          fluid
+          label='Password'
+          name='account.password'
+          type={this.state.ephemeral.passwordType}
+          value={this.state.fields.account.password}
+          placeholder='Password'
+          onChange={this.handleFieldChange}
+          error={fieldIsInError(this, 'account.password')}
+          placeholder="Password" onBlur={this.handleInputBlur}
+          icon={<Icon
+            name="eye"
+            link
+            onClick={this.handlePasswordVisibility}
+          />}
+        />
         <Form.Input fluid label='Email' name='account.email' value={this.state.fields.account.email} placeholder='Email address' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.email')} placeholder='Email address' onBlur={this.handleInputBlur} />
         <Form.Input fluid focus
           label={<label>Device Name - <small>Enter a name for device {this.props.device.id} that you will easily recognize.</small></label>}
