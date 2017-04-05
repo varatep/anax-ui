@@ -24,11 +24,12 @@ class AccountForm extends Component {
       ephemeral: {
         submitting: false,
         accountExists: false,
+        passwordType: 'password',
       },
       fields: {...accountForm.fields},
     };
     this.state = note.newManagers(init, ['account']);
-
+    this.handlePasswordVisibility = this.handlePasswordVisibility.bind(this);
 		console.log('state', this.state);
 		console.log('accountForm', accountForm);
   }
@@ -129,6 +130,24 @@ class AccountForm extends Component {
     this.setState(mergeState(this.state, {ephemeral: { accountExists: checkboxProps.checked }}));
   }
 
+  handlePasswordVisibility(evt) {
+    console.log('evt', evt);
+    if (this.state.ephemeral.passwordType === 'password') {
+      this.setState(mergeState(this.state, {
+        ephemeral: {
+          passwordType: 'text',
+        }
+      }));
+    } else {
+      this.setState(mergeState(this.state, {
+        ephemeral: {
+          passwordType: 'password',
+        }
+      }));
+    }
+
+  }
+
   componentWillMount() {
     document.title += ' - Account Setup';
 
@@ -149,7 +168,22 @@ class AccountForm extends Component {
     !this.state.ephemeral.accountExists ? accountForm =
       <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();} } id='account'>
         <Form.Input fluid focus label='Username' name='account.username' value={this.state.fields.account.username} placeholder='Username' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.username')} onBlur={this.handleInputBlur} />
-        <Form.Input fluid label='Password' name='account.password' type='password' value={this.state.fields.account.password} placeholder='Password' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.password')}  placeholder="Password" onBlur={this.handleInputBlur} />
+        <Form.Input
+          fluid
+          label='Password'
+          name='account.password'
+          type={this.state.ephemeral.passwordType}
+          value={this.state.fields.account.password}
+          placeholder='Password'
+          onChange={this.handleFieldChange}
+          error={fieldIsInError(this, 'account.password')}
+          placeholder="Password" onBlur={this.handleInputBlur}
+          icon={<Icon
+            name="eye"
+            link
+            onClick={this.handlePasswordVisibility}
+          />}
+        />
         <Form.Input fluid label='Email' name='account.email' value={this.state.fields.account.email} placeholder='Email address' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.email')} placeholder='Email address' onBlur={this.handleInputBlur} />
         <Form.Input fluid focus
           label={<label>Device Name - <small>Enter a name for device {this.props.device.id} that you will easily recognize.</small></label>}
