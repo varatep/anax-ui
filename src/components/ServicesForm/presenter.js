@@ -25,6 +25,7 @@ class ServicesForm extends Component {
         geo_fetching: true,
         submitting: false
 			},
+      location: 'servicesForm',
 			fields: _.reduce({...servicesForm.fields}, (result, v, k) => { result[k] = _.omit(v, ['enabled']); return result;}, {})
     }
 
@@ -140,7 +141,24 @@ class ServicesForm extends Component {
     this.setState(mergeState(this.state, {ephemeral: { submitting: true }}));
 
     const submitMgr = note.segmentMgr(this.state.notificationMgrs, 'submit');
-    const allErrors = _.flatMap(_.omit(this.state.notificationMgrs, ['submit']), (mgr) => { return mgr.fns.allErrorMsgs();});
+
+    // get list of disabled services
+    const disabledServices = Object.keys(servicesForm.fields).filter((field) => {
+      if (!servicesForm.fields[field].enabled) {
+        return true
+      } else {
+        return false
+      }
+    }).map((field) => { return field })
+    disabledServices.push('submit')
+
+    const allErrors = _.flatMap(_.omit(this.state.notificationMgrs, ['submit']), (mgr) => {
+      if (_.includes(disabledServices, mgr.segmentName)) {
+        return []
+      } else {
+        return mgr.fns.allErrorMsgs();
+      }
+    });
 
     if (!_.isEmpty(allErrors)) {
       const newMgr = submitMgr.fns.error('submit', 'Please resolve field errors and submit again.');
