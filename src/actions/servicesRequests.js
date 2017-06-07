@@ -106,7 +106,6 @@ export function citygramService(description, email, name, password, ram) {
         mappings: {
           HZN_CG_EMAIL: email,
           HZN_CG_PASS: password,
-          HZN_CG_NAME: name,
           HZN_CG_RSDNAME: name,
           HZN_CG_RSDDESC: description
         }
