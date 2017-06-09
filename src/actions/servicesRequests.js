@@ -51,12 +51,6 @@ export function locationService(usegps, ram) {
     ]
   };
 
-  // compatibility: this envvar needs to be set only if the usegps is true and the value doesn't matter, the envvar is merely tested for existence
-  if (usegps) {
-    obj.attributes[0].mappings['MTN_GPSDEVICE'] = 'true';
-    obj.attributes[0].mappings['HZN_GPSDEVICE'] = 'true';
-  }
-
   return obj;
 }
 
