@@ -28,6 +28,8 @@ export function validText(segment, field, input) {
   return new Promise((resolve, reject) => {
     if (input && input.match(RE_INPUT_CHAR_ILLEGAL) === null) {
       resolve(msgs.validationResult({segment: segment, fieldName: field, input: input}));
+    } else if (input.length === 0) {
+      resolve(msgs.validationResult({segment: segment, fieldName: field, input: input, errorMsg: 'This field is required.'}));
     } else {
       resolve(msgs.validationResult({segment: segment, fieldName: field, input: input, errorMsg: 'Illegal character in input.'}));
     }
