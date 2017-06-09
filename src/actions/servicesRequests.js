@@ -95,7 +95,6 @@ export function citygramService(description, email, name, password, ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_CITYGRAM: 'true',
           HZN_CITYGRAM: 'true'
         }
       },
@@ -105,13 +104,9 @@ export function citygramService(description, email, name, password, ram) {
         label: 'private_data',
         publishable: false,
         mappings: {
-          MTN_CG_EMAIL: email,
-          MTN_CG_PASS: password,
-          MTN_CG_NAME: name,
-          MTN_CG_RSDDESC: description,
           HZN_CG_EMAIL: email,
           HZN_CG_PASS: password,
-          HZN_CG_NAME: name,
+          HZN_CG_RSDNAME: name,
           HZN_CG_RSDDESC: description
         }
       },
