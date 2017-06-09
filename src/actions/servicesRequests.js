@@ -24,9 +24,7 @@ export function purpleairService(deviceHostname, ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_AIRPOLLUTION: 'true',
           MTN_PURPLE_AIR_SENSOR_NAME: deviceHostname,
-          HZN_AIRPOLLUTION: 'true',
           HZN_PURPLE_AIR_SENSOR_NAME: deviceHostname
         }
       },
@@ -47,8 +45,6 @@ export function locationService(usegps, ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_GPS: 'true',
-          HZN_GPS: 'true'
         }
       },
       {...computeAttrs('Device location', ram)}
@@ -95,8 +91,6 @@ export function citygramService(description, email, name, password, ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_CITYGRAM: 'true',
-          HZN_CITYGRAM: 'true'
         }
       },
       {
@@ -131,11 +125,9 @@ export function pwsService(wugname, model, type, ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_PWS: 'true',
           MTN_WUGNAME: wugname,
           MTN_PWS_MODEL: model,
           MTN_PWS_ST_TYPE: type,
-          HZN_PWS: 'true',
           HZN_WUGNAME: wugname,
           HZN_PWS_MODEL: model,
           HZN_PWS_ST_TYPE: type
@@ -157,9 +149,7 @@ export function netspeedService(targetServer, ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_IS_BANDWIDTH_TEST_ENABLED: 'true',
           MTN_TARGET_SERVER: targetServer,
-          HZN_IS_BANDWIDTH_TEST_ENABLED: 'true',
           HZN_TARGET_SERVER: targetServer
         }
       },
@@ -179,8 +169,6 @@ export function sdrService(ram) {
         label: 'app - compat',
         publishable: true,
         mappings: {
-          MTN_SDR: true,
-          HZN_SDR: true
         }
       },
       {...computeAttrs('Software Defined Radio', ram)}
