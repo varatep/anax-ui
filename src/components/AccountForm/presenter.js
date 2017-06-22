@@ -127,7 +127,11 @@ class AccountForm extends Component {
   // handler for semantic checkbox toggle between new account and
   //  existing account
   handleAccountToggle = (event, checkboxProps) => {
-    this.setState(mergeState(this.state, {ephemeral: { accountExists: checkboxProps.checked }}));
+    const newMgr = note.segmentMgr(this.state.notificationMgrs, 'account').fns.clearDs('fieldValidationResults');
+    this.setState(mergeState(this.state, { ephemeral: { accountExists: checkboxProps.checked }}));
+    this.setState(mergeState(this.state, mgrUpdateGen(newMgr)), function() {
+      this.setState(mergeState(this.state, { ephemeral: { accountExists: checkboxProps.checked }}));
+    });
   }
 
   handlePasswordVisibility(evt) {
