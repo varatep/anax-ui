@@ -23,7 +23,7 @@ export default function mainStore(initialState) {
   store.subscribe(() => {
     saveState({
       // allows saving to local storage of passwords from forms; up to the page to hose passwords before route changes
-      accountForm: store.getState().accountForm,
+      // accountForm: store.getState().accountForm,
       deviceForm: store.getState().deviceForm,
       servicesForm: store.getState().servicesForm,
     });
