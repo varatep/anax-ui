@@ -1,10 +1,7 @@
 SHELL := /bin/bash
-NODE_CMD := $(shell which node 2> /dev/null)
 
-# a catch for ubuntu / debian
-ifndef NODE_CMD
-	NODE_CMD = $(shell which nodejs 2> /dev/null)
-endif
+NODE_CMD := $(shell which nodejs || echo "node")
+NPM_CMD := $(shell (PATH=/usr/local/bin:$$PATH; which npm-cache) || echo "npm")
 
 all: build
 
@@ -16,14 +13,17 @@ clean:
 	rm -rf ./build
 	rm -rf ./node_modules
 
-install: build
+install:
 	mkdir -p $(DESTDIR)/web; cp -Rvfap build/. $(DESTDIR)/web/
 
-node_modules:
-	npm install
+node_modules: npmcmd
+	$(NPM_CMD) install
 
 nodecmd:
-	@echo $(NODE_CMD)
+	@echo "Using node command: $(NODE_CMD)"
+
+npmcmd:
+	@echo "Using npm command: $(NPM_CMD)"
 
 deps: node_modules
 pull: deps
