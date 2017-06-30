@@ -187,7 +187,7 @@ class DeviceForm extends Component {
         </Container>
         <Segment padded>
           <Header size='medium'>Device Location</Header>
-          <p>Your device location will be made public by some applications like the <a href='https://bluehorizon.network/map/'>Horizon Map</a>. Many applications (including the Weather Underground Personal Weather Station publisher and NYU Citygram Sound analysis experiment) require accurate location data to produce useful results.</p>
+          <p>Your device location will be made public by some applications like the <a href='https://bluehorizon.network/map/' target='_blank'>Horizon Map</a>. Many applications (including the Weather Underground Personal Weather Station publisher and NYU Citygram Sound analysis experiment) require accurate location data to produce useful results.</p>
 
           <NotificationList attached={true} mgr={note.segmentMgr(this.state.notificationMgrs, 'location')} notificationHeader='Location Setup' errHeader='Location Data Error' />
           <Form className='attached fluid segment' id='location' onSubmit={(event) => {event.preventDefault();}}>
@@ -197,7 +197,7 @@ class DeviceForm extends Component {
 
           <Divider horizontal>Info</Divider>
           <Container fluid>
-            <p>Coordinates are in decimal degrees; <em>South</em> latitudes and <em>West</em> longitudes are expressed as negative values. We've pre-filled the fields with discovered values. If you'd like to correct inaccurate discovered values, you might browse to <a href='http://www.latlong.net/'>LatLong.net</a> to find yourself on a world map.</p>
+            <p>Coordinates are in decimal degrees; <em>South</em> latitudes and <em>West</em> longitudes are expressed as negative values. We've pre-filled the fields with discovered values. If you'd like to correct inaccurate discovered values, you might browse to <a href='http://www.latlong.net/' target='_blank'>LatLong.net</a> to find yourself on a world map.</p>
           </Container>
           <Divider horizontal>Map Preview</Divider>
           <Segment textAlign='center' loading={this.state.fields.location.latitude === '' || this.state.fields.location.latitude === '' || this.state.ephemeral.preview_loading} padded>
@@ -218,7 +218,7 @@ class DeviceForm extends Component {
 
         <Segment padded>
           <Header size='medium'>Project Involvement</Header>
-          <p>This project is under active development and we'd like to hear your feedback in our forum: <a href='https://discourse.bluehorizon.network/'>https://discourse.bluehorizon.network/</a>.</p>
+          <p>This project is under active development and we'd like to hear your feedback in our forum: <a href='https://discourse.bluehorizon.network/' target='_blank'>https://discourse.bluehorizon.network/</a>.</p>
         </Segment>
 
         <NotificationList attached={false} mgr={note.segmentMgr(this.state.notificationMgrs, 'submit')} notificationHeader='Submission' errHeader='Submission Error' />
