@@ -249,7 +249,7 @@ class ServicesForm extends Component {
           <p>Local network monitoring and analysis. Bandwidth, ping, and traceroutes from your device.</p>
           <p><strong>Hardware required</strong>: Internet connectivity</p>
           <Divider horizontal>Detail</Divider>
-          <p><a href='http://dyn.com/'>Dyn</a> has partnered with Blue Horizon to demonstrate Dyn's advanced network monitoring technologies on Horizon. Your device will perform network speed and route testing to internet websites (Facebook, Twitter, Netflix, among others) and statistics will be viewable on Dyn and Horizon webpages. No personal information or personal Internet usage data will be gathered or shared.</p>
+          <p><a href='http://dyn.com/' target='_blank'>Dyn</a> has partnered with Blue Horizon to demonstrate Dyn's advanced network monitoring technologies on Horizon. Your device will perform network speed and route testing to internet websites (Facebook, Twitter, Netflix, among others) and statistics will be viewable on Dyn and Horizon webpages. No personal information or personal Internet usage data will be gathered or shared.</p>
           <ShowHide visibility={servicesForm.fields.netspeed.enabled}>
             <Form className='attached fluid segment' id='netspeed' onSubmit={(event) => {event.preventDefault();}}>
               <Form.Dropdown placeholder='Bandwidth test target server selection algorithm' selection fluid label='Test Algorithm' name='netspeed.testalg' value={servicesForm.fields.netspeed.testalg} onChange={this.handleDropdownChange} options={netspeedTestAlgs} />
@@ -264,11 +264,11 @@ class ServicesForm extends Component {
           <p>Local noise pollution and sound analysis.</p>
           <p><strong>Hardware required</strong>: USB sound card and analog microphone</p>
           <Divider horizontal>Detail</Divider>
-          <p><a href='http://www.nyu.edu/'>NYU</a>’s Steinhardt Music School has partnered with Blue Horizon to demonstrate their Citygram noise pollution and characterization community efforts. Your device will sample ambient noise, run sound analyses, and stream data back to NYU’s and IBM’s cloud endpoints. Voice data is not streamed from the device, only facts gathered through DSP: dB levels, spectral information, etc. No personal information will be gathered or shared, and your voice can’t be reverse-engineered from the data stream.</p>
+          <p><a href='http://www.nyu.edu/' target='_blank'>NYU</a>’s Steinhardt Music School has partnered with Blue Horizon to demonstrate their Citygram noise pollution and characterization community efforts. Your device will sample ambient noise, run sound analyses, and stream data back to NYU’s and IBM’s cloud endpoints. Voice data is not streamed from the device, only facts gathered through DSP: dB levels, spectral information, etc. No personal information will be gathered or shared, and your voice can’t be reverse-engineered from the data stream.</p>
           <ShowHide visibility={servicesForm.fields.citygram.enabled}>
             <Header size='small'>Citygram Account</Header>
             {!servicesForm.fields.citygram.nyu_associated ?
-                <p>To configure your Remote Sensing Device (RSD), enter your credentials for NYU's <a href='https://citygramsound.com:4347/indexA1.html'>Citygram</a> system below. If you do not have an account in the Citygram system, a new account will be created for you with the provided credentials.</p>
+                <p>To configure your Remote Sensing Device (RSD), enter your credentials for NYU's <a href='https://citygramsound.com:4347/indexA1.html' target='_blank'>Citygram</a> system below. If you do not have an account in the Citygram system, a new account will be created for you with the provided credentials.</p>
                 :
                 <p>Your device has been associated with NYU's Citygram services.</p>
             }
@@ -288,7 +288,7 @@ class ServicesForm extends Component {
           <Header size="medium">SDR (Software-Defined Radio)</Header>
           <Image src='/images/sdr.svg' size='tiny' spaced floated='left' />
           <Checkbox style={{"marginBottom": ".75em"}} toggle label={servicesForm.fields.sdr.enabled ? 'enabled' : 'disabled'} name='sdr.enabled' defaultChecked={servicesForm.fields.sdr.enabled} onChange={this.handleSegmentToggle} />
-          <p><strong>Hardware required</strong>: <a href="https://bluehorizon.network/documentation/rpi2">USB RTL-SDR Kit: Dongle and antenna</a></p>
+          <p><strong>Hardware required</strong>: <a href="https://bluehorizon.network/documentation/rpi2" target='_blank'>USB RTL-SDR Kit: Dongle and antenna</a></p>
           <Divider horizontal>Detail</Divider>
           <p>Using the SDR as a sensor, your device will host a radio frequency spectrum analyzer. Users will be able to run waterfall scans from 24Hz-1.8Ghz. The system will gather aircraft data over ADS-B for display on the Horizon website. IBM Watson speech-to-text and sentiment analysis will be run on local radio stations, to show what’s being discussed on airwaves in your area.</p>
           <ShowHide visibility={servicesForm.fields.sdr.enabled}>
@@ -299,9 +299,9 @@ class ServicesForm extends Component {
           <Header size="medium">Personal Weather Station</Header>
           <Image src='/images/pws.svg' size='tiny' spaced floated='left' />
           <Checkbox style={{"marginBottom": ".75em"}} toggle label={servicesForm.fields.pws.enabled ? 'enabled' : 'disabled'} name='pws.enabled' defaultChecked={servicesForm.fields.pws.enabled} onChange={this.handleSegmentToggle} />
-          <p><strong>Hardware required</strong>: A personal weather station. Supported models are listed in <a href="http://www.weewx.com/docs/usersguide.htm#hardware">WeeWX documentation</a>.</p>
+          <p><strong>Hardware required</strong>: A personal weather station. Supported models are listed in <a href="http://www.weewx.com/docs/usersguide.htm#hardware" target='_blank'>WeeWX documentation</a>.</p>
           <Divider horizontal>Detail</Divider>
-          <p>Weather data from your device will be published on the <a href="http://bluehorizon.network/map">Blue Horizon map</a> and at <a href="http://www.wunderground.com">weatherunderground.com</a>.</p>
+          <p>Weather data from your device will be published on the <a href="http://bluehorizon.network/map" target='_blank'>Blue Horizon map</a> and at <a href="http://www.wunderground.com" target='_blank'>weatherunderground.com</a>.</p>
           <ShowHide visibility={servicesForm.fields.pws.enabled}>
             <Form className='attached fluid segment' id='pws' onSubmit={(event) => {event.preventDefault();}}>
               <Form.Input fluid icon='circle thin' loading={this.state.ephemeral.geo_fetching} name='pws.wugname' defaultValue={servicesForm.fields.pws.wugname} placeholder='PWS Name' disabled={true} />
@@ -314,13 +314,13 @@ class ServicesForm extends Component {
           <Header size="medium">Air Pollution Monitoring</Header>
           <Image src='/images/purpleair.svg' size='tiny' spaced floated='left' />
           <Checkbox style={{"marginBottom": ".75em"}} toggle label={servicesForm.fields.purpleair.enabled ? 'enabled' : 'disabled'} name='purpleair.enabled' defaultChecked={servicesForm.fields.purpleair.enabled} onChange={this.handleSegmentToggle} />
-          <p><strong>Hardware Required: </strong>A Purple Air Sensor (cf. <a href="http://www.purpleair.org">purpleair.org</a>)</p>
+          <p><strong>Hardware Required: </strong>A Purple Air Sensor (cf. <a href="http://www.purpleair.org" target='_blank'>purpleair.org</a>)</p>
           <Divider horizontal>Detail</Divider>
-          <p>Horizon has partnered with <a href="http://www.purpleair.org">purpleair.org</a> to foster gathering and analysis of air pollution data around the globe.</p>
+          <p>Horizon has partnered with <a href="http://www.purpleair.org" target='_blank'>purpleair.org</a> to foster gathering and analysis of air pollution data around the globe.</p>
           <ShowHide visibility={servicesForm.fields.purpleair.enabled}>
             <p>To use your PurpleAir pollution sensor on Horizon:</p>
             <List bulleted>
-              <List.Item>Set up the sensor on your home wifi according to the <a href="http://www.purpleair.org/install">installation instructions</a></List.Item>
+              <List.Item>Set up the sensor on your home wifi according to the <a href="http://www.purpleair.org/install" target='_blank'>installation instructions</a></List.Item>
               <List.Item>Record your sensor’s hostname (for example, <strong><em>airmonitor_b15.local</em></strong>) and enter it in the field below</List.Item>
             </List>
 						<NotificationList attached={true} mgr={note.segmentMgr(this.state.notificationMgrs, 'purpleair')} notificationHeader='PurpleAir Service Setup' errHeader='PurpleAir Service Setup Error' />
