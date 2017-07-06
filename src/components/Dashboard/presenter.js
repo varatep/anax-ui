@@ -1,9 +1,24 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import { Button, Dimmer, Container, Header, Segment, Label, Loader, Progress, List } from 'semantic-ui-react';
+import {
+  Button,
+  Dimmer,
+  Container,
+  Header,
+  Segment,
+  Label,
+  Loader,
+  Progress,
+  List,
+  Menu,
+} from 'semantic-ui-react';
+import Highlight from 'react-highlight';
 import {services} from '../../actions/services';
 import * as _ from 'lodash';
-import {mergeState, mgrUpdateGen} from '../../util/localStateOperations';
+import {
+  mergeState,
+  mgrUpdateGen,
+} from '../../util/localStateOperations';
 import moment from 'moment';
 
 class Dashboard extends Component {
@@ -14,12 +29,15 @@ class Dashboard extends Component {
     const init = {
       ephemeral: {
         fetching: true,
-        interval: undefined
+        interval: undefined,
       },
+      activeItem: 'active',
       services: [], // enriched
     };
 
     this.state = init;
+
+    this.handleItemClick = this.handleItemClick.bind(this);
   }
 
   componentWillMount() {
@@ -77,6 +95,14 @@ class Dashboard extends Component {
     };
   }
 
+  handleItemClick(e, {name}) {
+    console.log('activeItem name', name);
+    let that = this;
+    this.setState({ activeItem: name }, () => {
+      console.log('activeItem state', that.state.activeItem);
+    });
+  }
+
   render() {
     const { attributes, device, router } = this.props;
 
@@ -88,6 +114,7 @@ class Dashboard extends Component {
     }
 
     let view;
+
     if (_.isEmpty(this.state.services)) {
       view = (
         <Segment padded>
@@ -99,11 +126,9 @@ class Dashboard extends Component {
       const reduceNum = (n) => {
         return n > 0 ? 1 : 0;
       }
-
       const sVal = (serv) => {
         if ('agreements' in serv && serv.agreements.active.length > 0) {
           const ag = serv.agreements.active[0];
-
           return reduceNum(ag.agreement_creation_time) +
                  reduceNum(ag.agreement_accepted_time) +
                  reduceNum(ag.agreement_finalized_time) +
@@ -238,10 +263,85 @@ class Dashboard extends Component {
       );
     }
 
+    let archivedView;
+
+    if (_.isEmpty(this.state.services)) {
+      view = (
+        <Segment padded>
+          <p>Your device is not configured to execute any services.</p>
+          <Button fluid primary color="blue" onClick={() => {router.push('/setup');}}>Begin Setup</Button>
+        </Segment>
+      );
+    } else {
+      const archivedAgreements = this.props.agreements.archived;
+      let archivedSegments = [];
+
+      archivedView = _.map(archivedAgreements, (ag) => {
+        return (
+          <Segment key={ag.current_agreement_id}>
+            <Header size="medium">{ag.current_agreement_id}</Header>
+            <Progress percent={40} attached="top" color={'grey'} />
+            <Label as="span" color={'grey'} attached="top right">{'Terminated'}</Label>
+
+            <List divided relaxed>
+              <List.Item>
+                <List.Content>
+                  <List.Header>
+                    Agreement Information
+                  </List.Header>
+                  <div style={{'paddingLeft': '2%'}}>
+                    <List.Description><strong>Id</strong>: {ag.current_agreement_id}</List.Description>
+                    <br />
+                    <List.Description><strong>Name</strong>: {ag.name}</List.Description>
+                    <List.Description><strong>Sensor URL</strong>: {ag.sensor_url}</List.Description>
+                    <List.Description><strong>Consumer ID</strong>: {ag.consumer_id}</List.Description>
+                    <List.Description><strong>Counterparty Address</strong>: {ag.counterparty_address}</List.Description>
+                    { ag.agreement_creation_time > 0 &&
+                      <List.Description><strong>Agreement creation time</strong>: {prettyTime(ag.agreement_creation_time)}</List.Description> }
+                    { ag.agreement_accepted_time > 0 &&
+                      <List.Description><strong>Agreement accepted time</strong>: {prettyTime(ag.agreement_accepted_time)}</List.Description> }
+                    { ag.agreement_finalized_time > 0 &&
+                      <List.Description><strong>Agreement finalized time</strong>: {prettyTime(ag.agreement_finalized_time)}</List.Description> }
+                    { ag.agreement_terminated_time > 0 &&
+                      <List.Description><strong>Agreement terminated time</strong>: {prettyTime(ag.agreement_terminated_time)}</List.Description> }
+                    { ag.agreement_force_terminated_time > 0 &&
+                      <List.Description><strong>Agreement force terminated time</strong>: {prettyTime(ag.agreement_force_terminated_time)}</List.Description> }
+                    { ag.agreement_execution_start_time > 0 &&
+                      <List.Description><strong>Agreement execution start time</strong>: {prettyTime(ag.agreement_execution_start_time)}</List.Description> }
+                    { ag.agreement_data_received_time > 0 &&
+                      <List.Description><strong>Agreement data received time</strong>: {prettyTime(ag.agreement_data_received_time)}</List.Description> }
+                    {/* <List.Description><pre>Proposal</pre>: {ag.proposal}</List.Description> */}
+                    <List.Description><strong>Proposal Sig</strong>: <Highlight className='javascript'>{ag.proposal_sig}</Highlight></List.Description>
+                    <List.Description><strong>Agreement Protocol</strong>: {ag.agreement_protocol}</List.Description>
+                    <List.Description><strong>Protocol Version</strong>: {ag.protocol_version}</List.Description>
+                    <List.Description><strong>Terminated Reason</strong>: {ag.terminated_reason}</List.Description>
+                    <List.Description><strong>Terminated Description</strong>: {ag.terminated_description}</List.Description>
+                    { ag.agreement_protocol_terminated_time > 0 &&
+                      <List.Description><strong>Agreement Protocol Terminated Time</strong>: {prettyTime(ag.agreement_protocol_terminated_time)}</List.Description> }
+                    { ag.workload_terminated_time > 0 &&
+                      <List.Description><strong>Workload Terminated Terminated Time</strong>: {prettyTime(ag.workload_terminated_time)}</List.Description> }
+                  </div>
+                </List.Content>
+              </List.Item>
+            </List>
+          </Segment>
+        )
+      });
+    }
+
     return (
       <div>
         <Header size="large">{'name' in device ? `${device.name} ` : '' }</Header>
-        {!this.state.ephemeral.fetching ? view : ''}
+        {!this.state.ephemeral.fetching ?
+          <div>
+            <Menu pointing secondary>
+              <Menu.Item name='active' active={this.state.activeItem === 'active'} onClick={this.handleItemClick} />
+              <Menu.Item name='terminated-agreements' active={this.state.activeItem === 'archived'} onClick={this.handleItemClick} />
+            </Menu>
+            { this.state.activeItem === 'active' && view }
+            { this.state.activeItem === 'terminated-agreements' && archivedView }
+          </div>
+          : ''}
       </div>
     );
   }
