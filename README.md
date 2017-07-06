@@ -7,8 +7,8 @@ This project contains the source code for the Horizon client web UI. To learn mo
 Related Projects:
 
 * `anax` (http://github.com/open-horizon/anax): The client control application in the Horizon system
-* `bluehorizon-snap` (http://github.com/open-horizon/bluehorizon-snap): A Ubuntu Snappy bundling of the complete Horizon client components
-* `ubuntu-classic-image` (http://github.com/open-horizon/ubuntu-classic-image): Produces complete system images
+* `horizon-pkg` (http://github.com/open-horizon/horizon-pkg): A system for packaging Horizon system `deb`s for multiple distributions and architectures. It also produces Ubuntu snaps
+ * `raspbian-image` (http://github.com/open-horizon/raspbian-image): The Raspbian image builder for Raspberry Pi 2 and 3 models dedicated to Horizon
 
 ## Development and production deployment
 
