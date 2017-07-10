@@ -11,6 +11,7 @@ import {
   Message,
 } from 'semantic-ui-react';
 import Highlight from 'react-highlight';
+require('./pagination.css');
 
 const ITEMS_PER_PAGE = 10;
 
