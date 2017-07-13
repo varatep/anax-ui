@@ -52,7 +52,7 @@ class TerminatedAgreements extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.filter !== this.props.filter || nextProps.agreements !== this.props.agreements) {
+    if (nextProps.filter !== this.props.filter) {
       this.updateFilter(nextProps.filter);
     }
   }
@@ -94,7 +94,6 @@ class TerminatedAgreements extends Component {
   }
 
   render() {
-
     let prettyTime = (stamp) => {
       const d = new Date(0);
       d.setUTCSeconds(stamp);
