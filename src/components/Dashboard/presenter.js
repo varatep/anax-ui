@@ -12,6 +12,7 @@ import {
   Progress,
   List,
   Menu,
+  Input,
 } from 'semantic-ui-react';
 import * as _ from 'lodash';
 import Highlight from 'react-highlight';
@@ -34,11 +35,13 @@ class Dashboard extends Component {
       },
       activeItem: 'active',
       services: [], // enriched
+      terminatedAgreementsFilter: '',
     };
 
     this.state = init;
 
     this.handleItemClick = this.handleItemClick.bind(this);
+    this.updateTerminatedAgreementsFilter = this.updateTerminatedAgreementsFilter.bind(this);
   }
 
   componentWillMount() {
@@ -96,13 +99,20 @@ class Dashboard extends Component {
     };
   }
 
+  sortedTerminatedAgreementsByTime() {
+    return _.orderBy(this.props.agreements.archived, (ag) => ag.agreement_terminated_time, ['desc'])
+  }
+
   handleItemClick(e, {name}) {
-    console.log('activeItem name', name);
     let that = this;
     this.setState({ activeItem: name }, () => {
-      console.log('activeItem state', that.state.activeItem);
     });
   }
+
+  updateTerminatedAgreementsFilter = _.debounce((e, data) => {
+    this.setState({terminatedAgreementsFilter: data.value}, () => {
+    });
+  }, 500)
 
   render() {
     const { attributes, device, router } = this.props;
@@ -272,9 +282,16 @@ class Dashboard extends Component {
             <Menu pointing secondary>
               <Menu.Item name='active' active={this.state.activeItem === 'active'} onClick={this.handleItemClick} />
               <Menu.Item name='terminated-agreements' active={this.state.activeItem === 'terminated-agreements'} onClick={this.handleItemClick} />
+              { this.state.activeItem === 'terminated-agreements' &&
+                <Menu.Menu position='right'>
+                  <Menu.Item>
+                    <Input icon='search' placeholder='Search...' onChange={this.updateTerminatedAgreementsFilter} />
+                  </Menu.Item>
+                </Menu.Menu>
+              }
             </Menu>
             { this.state.activeItem === 'active' && view }
-            { this.state.activeItem === 'terminated-agreements' && <TerminatedAgreements agreements={this.props.agreements.archived} /> }
+            { this.state.activeItem === 'terminated-agreements' && <TerminatedAgreements agreements={this.sortedTerminatedAgreementsByTime()} filter={this.state.terminatedAgreementsFilter} /> }
           </div>
           : ''}
       </div>
