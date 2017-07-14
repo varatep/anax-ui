@@ -62,7 +62,7 @@ class TerminatedAgreements extends Component {
 
     let newAgreements;
     newAgreements = _.filter(this.state.unfilteredAgreements, (ag) => {
-      if (_.includes(newFilter, ag.current_agreement_id) ||
+      if (_.includes(ag.current_agreement_id, newFilter) ||
         _.includes(ag.name, newFilter) ||
         _.includes(ag.sensor_url,newFilter) ||
         _.includes(ag.consumer_id,newFilter) ||
