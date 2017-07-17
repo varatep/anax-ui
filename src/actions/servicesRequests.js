@@ -165,3 +165,22 @@ export function sdrService(ram) {
     ]
   };
 }
+
+export function auralService(sendAudio, ram) {
+  return {
+    sensor_url: 'https://bluehorizon.network/documentation/introduction',
+    sensor_name: 'aural',
+    attributes: [
+      {
+        id: 'app - compat',
+        short_type: 'mapped',
+        label: 'app - compat',
+        publishable: true,
+        mappings: {
+          SEND_AUDIO: sendAudio,
+        },
+      },
+      {...computeAttrs('Aural Audio Classification', ram)},
+    ]
+  };
+}
