@@ -61,6 +61,8 @@ export function servicesFormSubmit(attributes, servicesForm) {
 				case 'sdr':
 					return doFetch(pays.sdrService(128));
 					break;
+        case 'aural':
+          return doFetch(pays.auralService(wl.sendAudio, 128));
 				default:
 					throw error({}, 'Unknown workload name', name);
 			}
