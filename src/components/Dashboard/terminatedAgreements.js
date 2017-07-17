@@ -16,6 +16,13 @@ require('./pagination.css');
 
 const ITEMS_PER_PAGE = 10;
 
+const prettyTime = (stamp) => {
+  const d = new Date(0);
+  d.setUTCSeconds(stamp);
+
+  return moment(d).format('MMMM DD, hh:mm A');
+}
+
 function arraysEqual(arr1, arr2) {
   if(arr1.length !== arr2.length) return false;
   for(var i = arr1.length; i--;) {
@@ -68,9 +75,14 @@ class TerminatedAgreements extends Component {
         _.includes(ag.consumer_id,newFilter) ||
         _.includes(ag.counterparty_address, newFilter) ||
         _.includes(ag.proposal, newFilter) ||
-        _.includes(ag.proposal_sig, newFilter) ||
+        _.includes(ag.agreement_protocol, newFilter) ||
         _.includes(ag.terminated_description, newFilter) ||
-        _.includes(ag.terminated_reason, newFilter))
+        _.includes(ag.terminated_reason, newFilter) ||
+        _.includes(prettyTime(ag.agreement_creation_time), newFilter) ||
+        _.includes(prettyTime(ag.agreement_accepted_time), newFilter) ||
+        _.includes(prettyTime(ag.agreement_finalized_time), newFilter) ||
+        _.includes(prettyTime(ag.agreement_terminated_time), newFilter) ||
+        _.includes(prettyTime(ag.workload_terminated_time), newFilter))
         return true;
     });
     let that = this;
@@ -94,12 +106,6 @@ class TerminatedAgreements extends Component {
   }
 
   render() {
-    let prettyTime = (stamp) => {
-      const d = new Date(0);
-      d.setUTCSeconds(stamp);
-
-      return moment(d).format('MMMM DD, hh:mm A');
-    }
 
     let archivedView;
     archivedView = _.map(this.state.data, (ag) => {
