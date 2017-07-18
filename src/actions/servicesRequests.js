@@ -168,7 +168,7 @@ export function sdrService(ram) {
 
 export function auralService(sendAudio, ram) {
   return {
-    sensor_url: 'https://bluehorizon.network/documentation/introduction',
+    sensor_url: 'https://bluehorizon.network/documentation/aural-device-api',
     sensor_name: 'aural',
     attributes: [
       {
