@@ -247,7 +247,7 @@ class ServicesForm extends Component {
         text: 'Fastest Server'
       }
     ];
-    
+
     return (
       <div>
         <Header size='large'>Services Selection</Header>
@@ -343,7 +343,7 @@ class ServicesForm extends Component {
           <Header size='medium'>Aural Audio Classification</Header>
           <Image src='/images/aural.svg' size='tiny' spaced floated='left' />
           <Checkbox style={{'marginBottom': '.75em'}} toggle label={servicesForm.fields.aural.enabled ? 'enabled' : 'disabled'} name='aural.enabled' defaultChecked={servicesForm.fields.purpleair.enabled} onChange={this.handleSegmentToggle} />
-          <p><strong>Hardware Required: </strong>USB sound card and analog microphone.</p>
+          <p><strong>Hardware Required: </strong>USB sound card and analog microphone</p>
           <Divider horizontal>Detail</Divider>
           <p>Your device will capture audio from the microphone and use neural networks to classify it. These binary classification are sent the cloud once per second, where they can be viewed. By default, the audio is destroyed after it is classified and never leaves your device. However, if you enable it, Aural will send a few samples of audio to our servers to help train the neural nets. While we appreciate this contribution of training data to improve our neural nets, the data may be accessible to the public. Please do not enable sending of audio unless you are confident that the device will never be within hearing range of private audio.</p>
           <ShowHide visibility={servicesForm.fields.aural.enabled}>
