@@ -364,7 +364,7 @@ class ServicesForm extends Component {
             <Form className='attached fluid segment' onSubmit={(event) => {event.preventDefault();}} id='aural'>
               <Form.Checkbox
                 toggle
-                label='Send audio to Horizon servers'
+                label='Send audio data to Horizon servers'
                 name='aural.sendAudio'
                 checked={this.state.fields.aural.sendAudio}
                 onChange={this.handleFieldChange}
