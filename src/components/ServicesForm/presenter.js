@@ -29,7 +29,7 @@ class ServicesForm extends Component {
 			fields: _.reduce({...servicesForm.fields}, (result, v, k) => { result[k] = _.omit(v, ['enabled']); return result;}, {})
     }
 
-    this.state = note.newManagers(init, ['submit', 'netspeed', 'sdr', 'citygram', 'pws', 'purpleair', 'cputemp']);
+    this.state = note.newManagers(init, ['submit', 'netspeed', 'sdr', 'citygram', 'pws', 'purpleair', 'cputemp', 'aural']);
   }
 
   handleCitygramAccount = (event) => {
@@ -87,13 +87,19 @@ class ServicesForm extends Component {
     servicesFormFieldChange(segment, fieldName, obj.value);
   }
 
-  handleFieldChange = (event) => {
-    const [segment, fieldName] = fieldSplit(event.target.name);
+  handleFieldChange = (event, data) => {
+    let segment, fieldName, targetVal;
+    // if coming from checkbox, `data` will be available
+    if (typeof data === 'undefined') {
+      [segment, fieldName] = fieldSplit(event.target.name);
+      targetVal = event.target.value;
+    }
+    else {
+      [segment, fieldName] = fieldSplit(data.name);
+      targetVal = data.checked;
+    }
 
-    // N.B. this function *must* be quick and early so that user doesn't get laggy input
-    // TODO: instead of waiting on validation here to set the input text state, return a validationResult immediately with the 'input' field set to the updated value and then have a promise resolution entail updating the validation result with other detail
-
-    doValidation(segment, fieldName, event.target.value)
+    doValidation(segment, fieldName, targetVal)
       .then((validationResult) => {
 
         if (!validationResult.isError()) {
@@ -105,6 +111,9 @@ class ServicesForm extends Component {
         // handleValidationResult always returns a properly-updated state object
         this.setState(note.handleValidationResult(this.state, validationResult));
       });
+
+    // N.B. this function *must* be quick and early so that user doesn't get laggy input
+    // TODO: instead of waiting on validation here to set the input text state, return a validationResult immediately with the 'input' field set to the updated value and then have a promise resolution entail updating the validation result with other detail
   }
 
   handleSegmentToggle = (event, obj) => {
@@ -238,7 +247,7 @@ class ServicesForm extends Component {
         text: 'Fastest Server'
       }
     ];
-
+    console.log('state', this.state);
     return (
       <div>
         <Header size='large'>Services Selection</Header>
@@ -326,6 +335,20 @@ class ServicesForm extends Component {
 						<NotificationList attached={true} mgr={note.segmentMgr(this.state.notificationMgrs, 'purpleair')} notificationHeader='PurpleAir Service Setup' errHeader='PurpleAir Service Setup Error' />
             <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();}} id="purpleair">
               <Form.Input fluid label="Name" name="purpleair.devicehostname" value={this.state.fields.purpleair.devicehostname} onChange={this.handleFieldChange} onBlur={this.handleInputBlur} error={fieldIsInError(this, 'purpleair.devicehostname')} placeholder="PurpleAir device hostname" />
+            </Form>
+          </ShowHide>
+        </Segment>
+
+        <Segment padded raised>
+          <Header size='medium'>Aural Audio Classification</Header>
+          <Image src='/images/aural.svg' size='tiny' spaced floated='left' />
+          <Checkbox style={{'marginBottom': '.75em'}} toggle label={servicesForm.fields.aural.enabled ? 'enabled' : 'disabled'} name='aural.enabled' defaultChecked={servicesForm.fields.purpleair.enabled} onChange={this.handleSegmentToggle} />
+          <p><strong>Hardware Required: </strong>USB sound card and analog microphone.</p>
+          <Divider horizontal>Detail</Divider>
+          <p>Your device will capture audio from the microphone and use neural networks to classify it. These binary classification are sent the cloud once per second, where they can be viewed. By default, the audio is destroyed after it is classified and never leaves your device. However, if you enable it, Aural will send a few samples of audio to our servers to help train the neural nets. While we appreciate this contribution of training data to improve our neural nets, the data may be accessible to the public. Please do not enable sending of audio unless you are confident that the device will never be within hearing range of private audio.</p>
+          <ShowHide visibility={servicesForm.fields.aural.enabled}>
+            <Form className='attached fluid segment' onSubmit={(event) => {event.preventDefault();}} id='aural'>
+              <Form.Checkbox toggle label='Send audio to Horizon servers' name='aural.sendAudio' checked={this.state.fields.aural.sendAudio} onChange={this.handleFieldChange} />
             </Form>
           </ShowHide>
         </Segment>
