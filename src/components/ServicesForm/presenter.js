@@ -247,7 +247,7 @@ class ServicesForm extends Component {
         text: 'Fastest Server'
       }
     ];
-    console.log('state', this.state);
+    
     return (
       <div>
         <Header size='large'>Services Selection</Header>
