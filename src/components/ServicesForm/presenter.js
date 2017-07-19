@@ -359,10 +359,17 @@ class ServicesForm extends Component {
           <Checkbox style={{'marginBottom': '.75em'}} toggle label={servicesForm.fields.aural.enabled ? 'enabled' : 'disabled'} name='aural.enabled' defaultChecked={servicesForm.fields.purpleair.enabled} onChange={this.handleSegmentToggle} />
           <p><strong>Hardware Required: </strong>USB sound card and analog microphone</p>
           <Divider horizontal>Detail</Divider>
-          <p>Your device will capture audio from the microphone and use neural networks to classify it. These binary classification are sent the cloud once per second, where they can be viewed. By default, the audio is destroyed after it is classified and never leaves your device. However, if you enable it, Aural will send a few samples of audio to our servers to help train the neural nets. While we appreciate this contribution of training data to improve our neural nets, the data may be accessible to the public. Please do not enable sending of audio unless you are confident that the device will never be within hearing range of private audio.</p>
+          <p>Horizon Aural classifies sounds on your device using a microphone. Audio clips are passed to onboard Neural Networks once per second, where they are recognized by binary classifiers as "speech", "music", "bird song", and other distinct classes. As Aural's Neural Network models are trained on additional crowdsourced data, your device will be regularly updated with new classes.</p>
           <ShowHide visibility={servicesForm.fields.aural.enabled}>
             <Form className='attached fluid segment' onSubmit={(event) => {event.preventDefault();}} id='aural'>
-              <Form.Checkbox toggle label='Send audio to Horizon servers' name='aural.sendAudio' checked={this.state.fields.aural.sendAudio} onChange={this.handleFieldChange} />
+              <Form.Checkbox
+                toggle
+                label='Send audio to Horizon servers'
+                name='aural.sendAudio'
+                checked={this.state.fields.aural.sendAudio}
+                onChange={this.handleFieldChange}
+              />
+              <p>If toggled ON, your device will send a few audio sample clips per day to Horizon servers for randomized public annotation (labeling) and automated Neural Network model improvement. While we appreciate your contributions, please do not enable sending of audio unless you are confident that the device will never be within range of sounds that should remain private.</p>
             </Form>
           </ShowHide>
         </Segment>
