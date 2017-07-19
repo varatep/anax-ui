@@ -1,5 +1,19 @@
 import React, { Component } from 'react';
-import { Button, Checkbox, Container, Dimmer, Header, Form, Input, Image, Divider, List, Loader, Segment, Dropdown } from 'semantic-ui-react';
+import {
+  Button,
+  Checkbox,
+  Container,
+  Dimmer,
+  Header,
+  Form,
+  Input,
+  Image,
+  Divider,
+  List,
+  Loader,
+  Segment,
+  Dropdown,
+} from 'semantic-ui-react';
 import {NotificationList} from '../Notifications';
 import {exception} from '../../util/dev';
 import {fieldSplit} from '../../util/names';
