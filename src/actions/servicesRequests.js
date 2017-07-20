@@ -13,6 +13,20 @@ function computeAttrs(label, ram, cpus = 1) {
   };
 }
 
+function meteringAttrs(metered = false, label = 'Metering Policy', tokens = 2, perTimeUnit = 'hour', publishable = true, notificationInterval = 900) {
+  return {
+    id: 'metering',
+    short_type: 'metering',
+    label,
+    publishable,
+    mappings: {
+      tokens,
+      perTimeUnit,
+      notificationInterval,
+    },
+  }
+}
+
 export function purpleairService(deviceHostname, ram) {
   return {
     sensor_url: 'https://bluehorizon.network/documentation/airpollution-device-api',
