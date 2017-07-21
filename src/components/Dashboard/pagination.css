@@ -1,0 +1,32 @@
+ul.pagination {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+ul.pagination li {
+  float: left;
+}
+
+ul.pagination li a {
+  display: block;
+  color: #000;
+  text-align: center;
+  padding: 16px;
+  text-decoration: none;
+}
+
+ul.pagination li a:hover {
+  background-color: #accfcc;
+}
+
+ul.pagination .active {
+  background-color: #accfcc;
+}
+
+ul.pagination .disabled {
+  pointer-events: none;
+  opacity: 0.3;
+}

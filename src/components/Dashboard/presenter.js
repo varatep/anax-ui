@@ -1,10 +1,27 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import { Button, Dimmer, Container, Header, Segment, Label, Loader, Progress, List } from 'semantic-ui-react';
-import {services} from '../../actions/services';
-import * as _ from 'lodash';
-import {mergeState, mgrUpdateGen} from '../../util/localStateOperations';
 import moment from 'moment';
+import {
+  Button,
+  Dimmer,
+  Container,
+  Header,
+  Segment,
+  Label,
+  Loader,
+  Progress,
+  List,
+  Menu,
+  Input,
+} from 'semantic-ui-react';
+import * as _ from 'lodash';
+import Highlight from 'react-highlight';
+import {services} from '../../actions/services';
+import {
+  mergeState,
+  mgrUpdateGen,
+} from '../../util/localStateOperations';
+import TerminatedAgreements from './terminatedAgreements'
 
 class Dashboard extends Component {
 
@@ -14,12 +31,17 @@ class Dashboard extends Component {
     const init = {
       ephemeral: {
         fetching: true,
-        interval: undefined
+        interval: undefined,
       },
+      activeItem: 'active',
       services: [], // enriched
+      terminatedAgreementsFilter: '',
     };
 
     this.state = init;
+
+    this.handleItemClick = this.handleItemClick.bind(this);
+    this.updateTerminatedAgreementsFilter = this.updateTerminatedAgreementsFilter.bind(this);
   }
 
   componentWillMount() {
@@ -77,6 +99,21 @@ class Dashboard extends Component {
     };
   }
 
+  sortedTerminatedAgreementsByTime() {
+    return _.orderBy(this.props.agreements.archived, (ag) => ag.agreement_terminated_time, ['desc'])
+  }
+
+  handleItemClick(e, {name}) {
+    let that = this;
+    this.setState({ activeItem: name }, () => {
+    });
+  }
+
+  updateTerminatedAgreementsFilter = _.debounce((e, data) => {
+    this.setState({terminatedAgreementsFilter: data.value}, () => {
+    });
+  }, 500)
+
   render() {
     const { attributes, device, router } = this.props;
 
@@ -88,6 +125,7 @@ class Dashboard extends Component {
     }
 
     let view;
+
     if (_.isEmpty(this.state.services)) {
       view = (
         <Segment padded>
@@ -99,11 +137,9 @@ class Dashboard extends Component {
       const reduceNum = (n) => {
         return n > 0 ? 1 : 0;
       }
-
       const sVal = (serv) => {
         if ('agreements' in serv && serv.agreements.active.length > 0) {
           const ag = serv.agreements.active[0];
-
           return reduceNum(ag.agreement_creation_time) +
                  reduceNum(ag.agreement_accepted_time) +
                  reduceNum(ag.agreement_finalized_time) +
@@ -241,7 +277,23 @@ class Dashboard extends Component {
     return (
       <div>
         <Header size="large">{'name' in device ? `${device.name} ` : '' }</Header>
-        {!this.state.ephemeral.fetching ? view : ''}
+        {!this.state.ephemeral.fetching ?
+          <div>
+            <Menu pointing secondary>
+              <Menu.Item name='active' active={this.state.activeItem === 'active'} onClick={this.handleItemClick} />
+              <Menu.Item name='terminated-agreements' active={this.state.activeItem === 'terminated-agreements'} onClick={this.handleItemClick} />
+              { this.state.activeItem === 'terminated-agreements' &&
+                <Menu.Menu position='right'>
+                  <Menu.Item>
+                    <Input icon='search' placeholder='Search...' onChange={this.updateTerminatedAgreementsFilter} />
+                  </Menu.Item>
+                </Menu.Menu>
+              }
+            </Menu>
+            { this.state.activeItem === 'active' && view }
+            { this.state.activeItem === 'terminated-agreements' && <TerminatedAgreements agreements={this.sortedTerminatedAgreementsByTime()} filter={this.state.terminatedAgreementsFilter} /> }
+          </div>
+          : ''}
       </div>
     );
   }
