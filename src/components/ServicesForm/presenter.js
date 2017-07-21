@@ -1,5 +1,19 @@
 import React, { Component } from 'react';
-import { Button, Checkbox, Container, Dimmer, Header, Form, Input, Image, Divider, List, Loader, Segment, Dropdown } from 'semantic-ui-react';
+import {
+  Button,
+  Checkbox,
+  Container,
+  Dimmer,
+  Header,
+  Form,
+  Input,
+  Image,
+  Divider,
+  List,
+  Loader,
+  Segment,
+  Dropdown,
+} from 'semantic-ui-react';
 import {NotificationList} from '../Notifications';
 import {exception} from '../../util/dev';
 import {fieldSplit} from '../../util/names';
@@ -29,7 +43,7 @@ class ServicesForm extends Component {
 			fields: _.reduce({...servicesForm.fields}, (result, v, k) => { result[k] = _.omit(v, ['enabled']); return result;}, {})
     }
 
-    this.state = note.newManagers(init, ['submit', 'netspeed', 'sdr', 'citygram', 'pws', 'purpleair', 'cputemp']);
+    this.state = note.newManagers(init, ['submit', 'netspeed', 'sdr', 'citygram', 'pws', 'purpleair', 'cputemp', 'aural']);
   }
 
   handleCitygramAccount = (event) => {
@@ -87,13 +101,19 @@ class ServicesForm extends Component {
     servicesFormFieldChange(segment, fieldName, obj.value);
   }
 
-  handleFieldChange = (event) => {
-    const [segment, fieldName] = fieldSplit(event.target.name);
+  handleFieldChange = (event, data) => {
+    let segment, fieldName, targetVal;
+    // if coming from checkbox, `data` will be available
+    if (typeof data === 'undefined') {
+      [segment, fieldName] = fieldSplit(event.target.name);
+      targetVal = event.target.value;
+    }
+    else {
+      [segment, fieldName] = fieldSplit(data.name);
+      targetVal = data.checked;
+    }
 
-    // N.B. this function *must* be quick and early so that user doesn't get laggy input
-    // TODO: instead of waiting on validation here to set the input text state, return a validationResult immediately with the 'input' field set to the updated value and then have a promise resolution entail updating the validation result with other detail
-
-    doValidation(segment, fieldName, event.target.value)
+    doValidation(segment, fieldName, targetVal)
       .then((validationResult) => {
 
         if (!validationResult.isError()) {
@@ -105,6 +125,9 @@ class ServicesForm extends Component {
         // handleValidationResult always returns a properly-updated state object
         this.setState(note.handleValidationResult(this.state, validationResult));
       });
+
+    // N.B. this function *must* be quick and early so that user doesn't get laggy input
+    // TODO: instead of waiting on validation here to set the input text state, return a validationResult immediately with the 'input' field set to the updated value and then have a promise resolution entail updating the validation result with other detail
   }
 
   handleSegmentToggle = (event, obj) => {
@@ -326,6 +349,27 @@ class ServicesForm extends Component {
 						<NotificationList attached={true} mgr={note.segmentMgr(this.state.notificationMgrs, 'purpleair')} notificationHeader='PurpleAir Service Setup' errHeader='PurpleAir Service Setup Error' />
             <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();}} id="purpleair">
               <Form.Input fluid label="Name" name="purpleair.devicehostname" value={this.state.fields.purpleair.devicehostname} onChange={this.handleFieldChange} onBlur={this.handleInputBlur} error={fieldIsInError(this, 'purpleair.devicehostname')} placeholder="PurpleAir device hostname" />
+            </Form>
+          </ShowHide>
+        </Segment>
+
+        <Segment padded raised>
+          <Header size='medium'>Aural Audio Classification</Header>
+          <Image src='/images/aural.svg' size='tiny' spaced floated='left' />
+          <Checkbox style={{'marginBottom': '.75em'}} toggle label={servicesForm.fields.aural.enabled ? 'enabled' : 'disabled'} name='aural.enabled' defaultChecked={servicesForm.fields.purpleair.enabled} onChange={this.handleSegmentToggle} />
+          <p><strong>Hardware Required: </strong>USB sound card and analog microphone</p>
+          <Divider horizontal>Detail</Divider>
+          <p>Horizon Aural classifies sounds on your device using a microphone. Audio clips are passed to onboard Neural Networks once per second, where they are recognized by binary classifiers as "speech", "music", "bird song", and other distinct classes. As Aural's Neural Network models are trained on additional crowdsourced data, your device will be regularly updated with new classes.</p>
+          <ShowHide visibility={servicesForm.fields.aural.enabled}>
+            <Form className='attached fluid segment' onSubmit={(event) => {event.preventDefault();}} id='aural'>
+              <Form.Checkbox
+                toggle
+                label='Send audio data to Horizon servers'
+                name='aural.sendAudio'
+                checked={this.state.fields.aural.sendAudio}
+                onChange={this.handleFieldChange}
+              />
+              <p>If toggled ON, your device will send a few audio sample clips per day to Horizon servers for randomized public annotation (labeling) and automated Neural Network model improvement. While we appreciate your contributions, please do not enable sending of audio unless you are confident that the device will never be within range of sounds that should remain private.</p>
             </Form>
           </ShowHide>
         </Segment>

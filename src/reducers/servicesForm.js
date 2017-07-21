@@ -29,6 +29,10 @@ const initialState = {
     },
     cputemp: {
       enabled: false
+    },
+    aural: {
+      enabled: false,
+      sendAudio: false,
     }
   }
 };
