@@ -43,26 +43,26 @@ export function servicesFormSubmit(attributes, servicesForm) {
 		if (wl.enabled) {
 			switch (name) {
 				case 'citygram':
-					return doFetch(pays.citygramService(wl.description, wl.email, wl.name, wl.password, 256));
+					return doFetch(pays.citygramService(wl.description, wl.email, wl.name, wl.password, wl.metered, 256));
 					break;
 				case 'cputemp':
-					return doFetch(pays.cputempService(128));
+					return doFetch(pays.cputempService(wl.metered, 128));
 					break;
 				case 'netspeed':
-					return doFetch(pays.netspeedService(wl.testalg, 128));
+					return doFetch(pays.netspeedService(wl.testalg, wl.metered, 128));
 					break;
 				case 'purpleair':
-					return doFetch(pays.purpleairService(wl.devicehostname, 128));
+					return doFetch(pays.purpleairService(wl.devicehostname, wl.metered, 128));
 					break;
         case 'pws':
           const modelType = wl.modelType.split(',');
-					return doFetch(pays.pwsService(wl.wugname, modelType[0], modelType[1], 128));
+					return doFetch(pays.pwsService(wl.wugname, modelType[0], modelType[1], wl.metered, 128));
 					break;
 				case 'sdr':
-					return doFetch(pays.sdrService(128));
+					return doFetch(pays.sdrService(wl.metered, 128));
 					break;
         case 'aural':
-          return doFetch(pays.auralService(wl.sendAudio, 128));
+          return doFetch(pays.auralService(wl.sendAudio, wl.metered, 128));
 				default:
 					throw error({}, 'Unknown workload name', name);
 			}
@@ -70,7 +70,7 @@ export function servicesFormSubmit(attributes, servicesForm) {
 	}), (pr) => { return !!pr; });
 
   // compat; only here so that it gets created at the same time as other services
-  promises.push(doFetch(pays.locationService(loc[0].mappings.use_gps, 128)));
+  promises.push(doFetch(pays.locationService(loc[0].mappings.use_gps, wl.metered, 128)));
 
   // TODO: this will only work first-time; needs to be smarter about conflicts and such to be re-executable
   return function(dispatch) {
