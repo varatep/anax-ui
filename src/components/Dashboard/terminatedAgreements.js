@@ -153,6 +153,19 @@ class TerminatedAgreements extends Component {
                   { ag.workload_terminated_time > 0 &&
                     <List.Description><strong>Workload Terminated Time</strong>: {prettyTime(ag.workload_terminated_time)}</List.Description> }
                 </div>
+
+                {ag.metering_notification.start_time > 0 &&
+                  <div>
+                    <br />
+                    <List.Description><strong>Metering Information</strong></List.Description>
+                    <div style={{paddingLeft: `2%`}}>
+                      <List.Description><strong>Token Amount</strong>: {ag.metering_notification.amount}</List.Description>
+                      <List.Description><strong>Start Time</strong>: {prettyTime(ag.metering_notification.start_time)}</List.Description>
+                      <List.Description><strong>Current Time</strong>: {prettyTime(ag.metering_notification.current_time)}</List.Description>
+                      <List.Description><strong>Missed Data Count</strong>: {ag.metering_notification.missed_time}</List.Description>
+                    </div>
+                  </div>
+                }
               </List.Content>
             </List.Item>
           </List>

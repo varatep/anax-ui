@@ -21,7 +21,7 @@ import {
   mergeState,
   mgrUpdateGen,
 } from '../../util/localStateOperations';
-import TerminatedAgreements from './terminatedAgreements'
+import TerminatedAgreements from './terminatedAgreements';
 
 class Dashboard extends Component {
 
@@ -248,6 +248,9 @@ class Dashboard extends Component {
                                 :
                                 <span></span>
                             }
+                            {it.agreements.active[0].agreement_protocol && 
+                              <List.Description><strong>Agreement Protocol</strong>: {it.agreements.active[0].agreement_protocol}</List.Description>
+                            }
                           </div>
                         </span>
                         :
@@ -261,6 +264,19 @@ class Dashboard extends Component {
                         </div>
                         :
                         <span></span>
+                    }
+
+                    {it.agreements.active[0].metering_notification.start_time > 0 &&
+                      <div>
+                        <br />
+                        <List.Description><strong>Metering Information</strong></List.Description>
+                        <div style={{paddingLeft: `2%`}}>
+                          <List.Description><strong>Token Amount</strong>: {it.agreements.active[0].metering_notification.amount}</List.Description>
+                          <List.Description><strong>Start Time</strong>: {prettyTime(it.agreements.active[0].metering_notification.start_time)}</List.Description>
+                          <List.Description><strong>Current Time</strong>: {prettyTime(it.agreements.active[0].metering_notification.current_time)}</List.Description>
+                          <List.Description><strong>Missed Data Count</strong>: {it.agreements.active[0].metering_notification.missed_time}</List.Description>
+                        </div>
+                      </div>
                     }
                   </List.Content>
                 </List.Item>
