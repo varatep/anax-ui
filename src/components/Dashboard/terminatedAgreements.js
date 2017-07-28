@@ -162,7 +162,7 @@ class TerminatedAgreements extends Component {
                       <List.Description><strong>Token Amount</strong>: {ag.metering_notification.amount}</List.Description>
                       <List.Description><strong>Start Time</strong>: {prettyTime(ag.metering_notification.start_time)}</List.Description>
                       <List.Description><strong>Current Time</strong>: {prettyTime(ag.metering_notification.current_time)}</List.Description>
-                      <List.Description><strong>Times Missed</strong>: {ag.metering_notification.missed_time}</List.Description>
+                      <List.Description><strong>Missed Data Count</strong>: {ag.metering_notification.missed_time}</List.Description>
                     </div>
                   </div>
                 }

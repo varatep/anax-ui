@@ -271,7 +271,7 @@ class Dashboard extends Component {
                           <List.Description><strong>Token Amount</strong>: {it.agreements.active[0].metering_notification.amount}</List.Description>
                           <List.Description><strong>Start Time</strong>: {prettyTime(it.agreements.active[0].metering_notification.start_time)}</List.Description>
                           <List.Description><strong>Current Time</strong>: {prettyTime(it.agreements.active[0].metering_notification.current_time)}</List.Description>
-                          <List.Description><strong>Times Missed</strong>: {it.agreements.active[0].metering_notification.missed_time}</List.Description>
+                          <List.Description><strong>Missed Data Count</strong>: {it.agreements.active[0].metering_notification.missed_time}</List.Description>
                         </div>
                       </div>
                     }
