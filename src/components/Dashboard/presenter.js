@@ -248,6 +248,9 @@ class Dashboard extends Component {
                                 :
                                 <span></span>
                             }
+                            {it.agreements.active[0].agreement_protocol && 
+                              <List.Description><strong>Agreement Protocol</strong>: {it.agreements.active[0].agreement_protocol}</List.Description>
+                            }
                           </div>
                         </span>
                         :
