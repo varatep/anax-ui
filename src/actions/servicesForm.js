@@ -69,8 +69,9 @@ export function servicesFormSubmit(attributes, servicesForm) {
 		}
 	}), (pr) => { return !!pr; });
 
-  // compat; only here so that it gets created at the same time as other services
-  promises.push(doFetch(pays.locationService(loc[0].mappings.use_gps, wl.metered, 128)));
+	// compat; only here so that it gets created at the same time as other services
+	// do not meter location since it is not in the /setup/services selection list
+  promises.push(doFetch(pays.locationService(loc[0].mappings.use_gps, false, 128)));
 
   // TODO: this will only work first-time; needs to be smarter about conflicts and such to be re-executable
   return function(dispatch) {
