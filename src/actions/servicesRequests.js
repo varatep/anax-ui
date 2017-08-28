@@ -73,7 +73,6 @@ export function locationService(usegps, metered = false, ram) {
         }
       },
       {...computeAttrs('Device location', ram)},
-      {...meteringAttrs(metered)},
     ]
   };
 
