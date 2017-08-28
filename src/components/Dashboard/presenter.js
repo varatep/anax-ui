@@ -266,7 +266,7 @@ class Dashboard extends Component {
                         <span></span>
                     }
 
-                    {it.agreements.active[0].metering_notification.start_time > 0 &&
+                    {it.agreements.active.length > 0 && it.agreements.active[0].metering_notification.start_time > 0 &&
                       <div>
                         <br />
                         <List.Description><strong>Metering Information</strong></List.Description>
