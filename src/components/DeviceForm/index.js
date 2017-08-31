@@ -9,7 +9,8 @@ import DeviceForm from './presenter';
 function mapStateToProps(state) {
 
   return {
-    deviceForm: state.deviceForm
+    deviceForm: state.deviceForm,
+    configuration: state.configuration,
   };
 }
 
