@@ -14,6 +14,8 @@ import {
   Segment,
   Dropdown,
 } from 'semantic-ui-react';
+import * as _ from 'lodash';
+
 import {NotificationList} from '../Notifications';
 import {exception} from '../../util/dev';
 import {fieldSplit} from '../../util/names';
@@ -25,7 +27,7 @@ import {pwsModels} from './pwsModels';
 import {latLonFetch, fieldIsInError} from '../../util/commonComponentHelpers';
 import * as cg from './citygram';
 import {error} from '../../util/msgs.js';
-import * as _ from 'lodash';
+import {getBaseUrl} from '../../util/envCheck';
 
 class ServicesForm extends Component {
 
@@ -244,7 +246,9 @@ class ServicesForm extends Component {
 	}
 
   render() {
-    const {servicesForm, display, router, netspeed} = this.props;
+    const {servicesForm, display, router, netspeed, configuration} = this.props;
+    
+    const envUrl = configuration.exchange_api && getBaseUrl(configuration.exchange_api);
 
 		// options for select
     const netspeedTestAlgs = [
@@ -311,7 +315,7 @@ class ServicesForm extends Component {
           <Header size="medium">SDR (Software-Defined Radio)</Header>
           <Image src='/images/sdr.svg' size='tiny' spaced floated='left' />
           <Checkbox style={{"marginBottom": ".75em"}} toggle label={servicesForm.fields.sdr.enabled ? 'enabled' : 'disabled'} name='sdr.enabled' defaultChecked={servicesForm.fields.sdr.enabled} onChange={this.handleSegmentToggle} />
-          <p><strong>Hardware required</strong>: <a href="https://bluehorizon.network/documentation/rpi2" target='_blank'>USB RTL-SDR Kit: Dongle and antenna</a></p>
+          <p><strong>Hardware required</strong>: <a href={`${envUrl}/documentation/rpi2`} target='_blank'>USB RTL-SDR Kit: Dongle and antenna</a></p>
           <Divider horizontal>Detail</Divider>
           <p>Using the SDR as a sensor, your device will host a radio frequency spectrum analyzer. Users will be able to run waterfall scans from 24Hz-1.8Ghz. The system will gather aircraft data over ADS-B for display on the Horizon website. IBM Watson speech-to-text and sentiment analysis will be run on local radio stations, to show what’s being discussed on airwaves in your area.</p>
           <ShowHide visibility={servicesForm.fields.sdr.enabled}>
@@ -324,7 +328,7 @@ class ServicesForm extends Component {
           <Checkbox style={{"marginBottom": ".75em"}} toggle label={servicesForm.fields.pws.enabled ? 'enabled' : 'disabled'} name='pws.enabled' defaultChecked={servicesForm.fields.pws.enabled} onChange={this.handleSegmentToggle} />
           <p><strong>Hardware required</strong>: A personal weather station. Supported models are listed in <a href="http://www.weewx.com/docs/usersguide.htm#hardware" target='_blank'>WeeWX documentation</a>.</p>
           <Divider horizontal>Detail</Divider>
-          <p>Weather data from your device will be published on the <a href="http://bluehorizon.network/map" target='_blank'>Blue Horizon map</a> and at <a href="http://www.wunderground.com" target='_blank'>weatherunderground.com</a>.</p>
+          <p>Weather data from your device will be published on the <a href={`${envUrl}/map`} target='_blank'>Blue Horizon map</a> and at <a href="http://www.wunderground.com" target='_blank'>weatherunderground.com</a>.</p>
           <ShowHide visibility={servicesForm.fields.pws.enabled}>
             <Form className='attached fluid segment' id='pws' onSubmit={(event) => {event.preventDefault();}}>
               <Form.Input fluid icon='circle thin' loading={this.state.ephemeral.geo_fetching} name='pws.wugname' defaultValue={servicesForm.fields.pws.wugname} placeholder='PWS Name' disabled={true} />
