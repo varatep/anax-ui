@@ -332,7 +332,7 @@ class ServicesForm extends Component {
           <Header size="medium">SDR (Software-Defined Radio)</Header>
           <Image src='/images/sdr.svg' size='tiny' spaced floated='left' />
           <Checkbox style={{"marginBottom": ".75em"}} toggle label={servicesForm.fields.sdr.enabled ? 'enabled' : 'disabled'} name='sdr.enabled' defaultChecked={servicesForm.fields.sdr.enabled} onChange={this.handleSegmentToggle} />
-          <p><strong>Hardware required</strong>: <a href={`${envUrl}/documentation/rpi2`} target='_blank'>USB RTL-SDR Kit: Dongle and antenna</a></p>
+          <p><strong>Hardware required</strong>: <a href={`${envUrl}/documentation/rpi-hardware`} target='_blank'>USB RTL-SDR Kit: Dongle and antenna</a></p>
           <Divider horizontal>Detail</Divider>
           <p>Using the SDR as a sensor, your device will host a radio frequency spectrum analyzer. Users will be able to run waterfall scans from 24Hz-1.8Ghz. The system will gather aircraft data over ADS-B for display on the Horizon website. IBM Watson speech-to-text and sentiment analysis will be run on local radio stations, to show what’s being discussed on airwaves in your area.</p>
           <ShowHide visibility={servicesForm.fields.sdr.enabled}>
