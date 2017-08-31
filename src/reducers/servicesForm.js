@@ -5,15 +5,18 @@ const initialState = {
   fields: {
     netspeed: {
       enabled: true,
-      testalg: 'closest'
+      testalg: 'closest',
+      metered: true,
     },
     sdr: {
-      enabled: false
+      enabled: false,
+      metered: true,
     },
     pws: {
       enabled: false,
       wugname: '',
-      modelType: 'WS2080A,FineOffsetUSB'
+      modelType: 'WS2080A,FineOffsetUSB',
+      metered: true,
     },
     citygram: {
       enabled: false,
@@ -21,18 +24,22 @@ const initialState = {
       password: '',
       description: '',
       name: '',
-      nyu_associated: false
+      nyu_associated: false,
+      metered: true,
     },
     purpleair: {
       enabled: false,
-      devicehostname: ''
+      devicehostname: '',
+      metered: true,
     },
     cputemp: {
-      enabled: false
+      enabled: false,
+      metered: true,
     },
     aural: {
       enabled: false,
       sendAudio: false,
+      metered: true,
     }
   }
 };

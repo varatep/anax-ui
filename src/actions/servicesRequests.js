@@ -13,7 +13,31 @@ function computeAttrs(label, ram, cpus = 1) {
   };
 }
 
-export function purpleairService(deviceHostname, ram) {
+function meteringAttrs(
+  metered = false,
+  label = 'Metering Policy',
+  tokens = 2,
+  perTimeUnit = 'hour',
+  publishable = true,
+  notificationInterval = 900
+) {
+  if (metered)
+    return {
+      id: 'metering',
+      short_type: 'metering',
+      label,
+      publishable,
+      mappings: {
+        tokens,
+        perTimeUnit,
+        notificationInterval,
+      },
+    }
+  // if not metered, return empty obj
+  return {}
+}
+
+export function purpleairService(deviceHostname, metered = false, ram) {
   return {
     sensor_url: 'https://bluehorizon.network/documentation/airpollution-device-api',
     sensor_name: 'airpollution',
@@ -28,13 +52,14 @@ export function purpleairService(deviceHostname, ram) {
           HZN_PURPLE_AIR_SENSOR_NAME: deviceHostname
         }
       },
-      {...computeAttrs('PurpleAir (air pollution sensing)', ram)}
+      {...computeAttrs('PurpleAir (air pollution sensing)', ram)},
+      {...meteringAttrs(metered)},
     ]
   };
 }
 
 // this is a compatibility thing
-export function locationService(usegps, ram) {
+export function locationService(usegps, metered = false, ram) {
   const obj = {
     sensor_url: 'https://bluehorizon.network/documentation/location-device-api',
     sensor_name: 'location',
@@ -47,14 +72,14 @@ export function locationService(usegps, ram) {
         mappings: {
         }
       },
-      {...computeAttrs('Device location', ram)}
+      {...computeAttrs('Device location', ram)},
     ]
   };
 
   return obj;
 }
 
-export function cputempService(ram) {
+export function cputempService(metered = false, ram) {
   return {
     sensor_url: 'https://bluehorizon.network/documentation/cputemp-device-api',
     sensor_name: 'cputemp',
@@ -69,12 +94,13 @@ export function cputempService(ram) {
           HZN_CPU_TEMP: 'true'
         }
       },
-      {...computeAttrs('CPU temperature', ram)}
+      {...computeAttrs('CPU temperature', ram)},
+      {...meteringAttrs(metered)},
     ]
   };
 }
 
-export function citygramService(description, email, name, password, ram) {
+export function citygramService(description, email, name, password, metered = false, ram) {
   return {
     sensor_url: 'https://bluehorizon.network/documentation/citygram-device-api',
     sensor_name: 'citygram',
@@ -99,12 +125,13 @@ export function citygramService(description, email, name, password, ram) {
           HZN_CG_RSDDESC: description
         }
       },
-      {...computeAttrs('NYU Citygram (noise pollution analysis)', ram)}
+      {...computeAttrs('NYU Citygram (noise pollution analysis)', ram)},
+      {...meteringAttrs(metered)},
     ]
   };
 }
 
-export function pwsService(wugname, model, type, ram) {
+export function pwsService(wugname, model, type, metered = false, ram) {
   return {
     sensor_url: 'https://bluehorizon.network/documentation/pws-device-api',
     sensor_name: 'pws',
@@ -123,12 +150,13 @@ export function pwsService(wugname, model, type, ram) {
           HZN_PWS_ST_TYPE: type
         }
       },
-      {...computeAttrs('Personal Weather Station', ram)}
+      {...computeAttrs('Personal Weather Station', ram)},
+      {...meteringAttrs(metered)},
     ]
   };
 }
 
-export function netspeedService(targetServer, ram) {
+export function netspeedService(targetServer, metered = false, ram) {
   return {
     sensor_url: 'https://bluehorizon.network/documentation/netspeed-device-api',
     sensor_name: 'netspeed',
@@ -143,12 +171,13 @@ export function netspeedService(targetServer, ram) {
           HZN_TARGET_SERVER: targetServer
         }
       },
-      {...computeAttrs('Netspeed (network quality testing)', ram)}
+      {...computeAttrs('Netspeed (network quality testing)', ram)},
+      {...meteringAttrs(metered)},
     ]
   };
 }
 
-export function sdrService(ram) {
+export function sdrService(metered = false, ram) {
   return {
     sensor_url: 'https://bluehorizon.network/documentation/sdr-device-api',
     sensor_name: 'sdr',
@@ -161,12 +190,13 @@ export function sdrService(ram) {
         mappings: {
         }
       },
-      {...computeAttrs('Software Defined Radio', ram)}
+      {...computeAttrs('Software Defined Radio', ram)},
+      {...meteringAttrs(metered)},
     ]
   };
 }
 
-export function auralService(sendAudio, ram) {
+export function auralService(sendAudio, metered = false, ram) {
   return {
     sensor_url: 'https://bluehorizon.network/documentation/aural-device-api',
     sensor_name: 'aural',
@@ -181,6 +211,7 @@ export function auralService(sendAudio, ram) {
         },
       },
       {...computeAttrs('Aural Audio Classification', ram)},
+      {...meteringAttrs(metered)},
     ]
   };
 }
