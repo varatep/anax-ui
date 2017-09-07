@@ -104,11 +104,10 @@ class ServicesForm extends Component {
   handleFieldChange = (event, data) => {
     let segment, fieldName, targetVal;
     // if coming from checkbox, `data` will be available
-    if (typeof data.name !== 'undefined' && !_.includes(data.name, 'metered')) {
+    if (typeof data.name !== 'undefined' && !_.includes(data.name, 'metered') && !_.includes(data.name, 'sendAudio')) {
       [segment, fieldName] = fieldSplit(event.target.name);
       targetVal = event.target.value;
-    }
-    else {
+    } else {
       [segment, fieldName] = fieldSplit(data.name);
       targetVal = data.checked;
     }
