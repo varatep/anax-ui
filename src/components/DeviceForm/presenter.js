@@ -217,6 +217,15 @@ class DeviceForm extends Component {
         </Segment>
 
         <Segment padded>
+          <Header size='medium'>Blockchain</Header>
+          <p>If enabled, agreements made with your device are recorded on Horizon's Ethereum Blockchain.</p>
+
+          <Form id='blockchain'>
+            <Checkbox style={{marginBottom: '.75em'}} toggle label='Enable Blockchain for your device' name='blockchain.usebc' defaultChecked={this.state.fields.blockchain.usebc} onChange={this.handleCheckboxChange} />
+          </Form>
+        </Segment>
+
+        <Segment padded>
           <Header size='medium'>Project Involvement</Header>
           <p>This project is under active development and we'd like to hear your feedback in our forum: <a href='https://discourse.bluehorizon.network/' target='_blank'>https://discourse.bluehorizon.network/</a>.</p>
         </Segment>
