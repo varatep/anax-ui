@@ -102,7 +102,7 @@ class DeviceForm extends Component {
   }
 
   handleSubmit = () => {
-    const {deviceForm, deviceFormSubmit, router} = this.props;
+    const {deviceForm, deviceFormSubmit, deviceFormSubmitBlockchain, router} = this.props;
 
     this.setState(mergeState(this.state, {ephemeral: { submitting: true }}));
 
@@ -114,7 +114,13 @@ class DeviceForm extends Component {
       this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
     } else {
       deviceFormSubmit(deviceForm).then((success) => {
-        router.push('/setup/services');
+        deviceFormSubmitBlockchain(deviceForm).then((bcSuccess) => {
+          router.push('/setup/services');
+        }).catch((bcErr) => {
+          const newBCMgr = submitMgr.fns.error('submit', `Blockchain configuration error. ${bcErr.msg}`);
+          this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+          this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
+        });
       }).catch((err) => {
         const newMgr = submitMgr.fns.error('submit', `Location submission error. ${err.msg}`);
         this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
