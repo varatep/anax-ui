@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import * as note from '../../util/notificationManagement';
 import {doValidation, referrerDomain} from './helpers';
 import {latLonFetch, fieldIsInError} from '../../util/commonComponentHelpers';
+import {getBaseUrl} from '../../util/envCheck';
 
 class DeviceForm extends Component {
 
@@ -175,6 +176,10 @@ class DeviceForm extends Component {
   }
 
   render() {
+    const {configuration} = this.props;
+
+    const envUrl = configuration.exchange_api && getBaseUrl(configuration.exchange_api);
+
     return (
       <div>
         <Header size='large'>Device Setup</Header>
@@ -193,7 +198,7 @@ class DeviceForm extends Component {
         </Container>
         <Segment padded>
           <Header size='medium'>Device Location</Header>
-          <p>Your device location will be made public by some applications like the <a href='https://bluehorizon.network/map/' target='_blank'>Horizon Map</a>. Many applications (including the Weather Underground Personal Weather Station publisher and NYU Citygram Sound analysis experiment) require accurate location data to produce useful results.</p>
+          <p>Your device location will be made public by some applications like the <a href={`${envUrl}/map/`} target='_blank'>Horizon Map</a>. Many applications (including the Weather Underground Personal Weather Station publisher and NYU Citygram Sound analysis experiment) require accurate location data to produce useful results.</p>
 
           <NotificationList attached={true} mgr={note.segmentMgr(this.state.notificationMgrs, 'location')} notificationHeader='Location Setup' errHeader='Location Data Error' />
           <Form className='attached fluid segment' id='location' onSubmit={(event) => {event.preventDefault();}}>

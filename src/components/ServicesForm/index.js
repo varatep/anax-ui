@@ -13,7 +13,8 @@ function mapStateToProps(state) {
   return {
     servicesForm: state.servicesForm,
     deviceForm: state.deviceForm,
-    attributes: state.attributes
+    attributes: state.attributes,
+    configuration: state.configuration,
   };
 }
 
