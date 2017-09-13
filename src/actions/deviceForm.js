@@ -34,6 +34,44 @@ export function deviceFormSubmit(deviceForm) {
   };
 }
 
+export function deviceFormSubmitBlockchain(deviceForm) {
+  return function(dispatch) {
+    let protocols = [{Basic:[]}];
+    if (deviceForm.fields.blockchain.usebc) {
+      protocols = [
+        {
+          "Citizen Scientist": [
+            {
+              "name": "bluehorizon",
+              "type": "ethereum"
+            }
+          ]
+        }
+      ];
+    }
+    return fetch(`${ANAX_URL_BASE}/service/attribute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: 'agreementprotocol',
+        short_type: 'agreementprotocol',
+        label: 'Agreement Protocols',
+        publishable: true,
+        mappings: {
+          protocols
+        }
+      })
+    })
+    .then((response) => {
+      if (!response.ok) {
+        throw error(response, 'Error saving Blockchain configuration in anax.');
+      } else {
+        return response.json();
+      }
+    });
+  }
+}
+
 export function deviceFormFieldChange(segment, fieldName, value) {
 
   return function(dispatch) {
