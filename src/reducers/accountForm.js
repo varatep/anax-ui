@@ -7,7 +7,8 @@ const initialState = {
 			password: '',
 			username: '',
 			email: '',
-			devicename: ''
+      devicename: '',
+      organization: 'public',
 		}
 	}
 };
