@@ -171,6 +171,7 @@ class AccountForm extends Component {
 
     !this.state.ephemeral.accountExists ? accountForm =
       <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();} } id='account'>
+        <Form.Input fluid focus label='Organization' name='account.organization' value={this.state.fields.account.organization} placeholder='Organization - Enter `public` for default' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.organization')} onBlur={this.handleInputBlur} />
         <Form.Input fluid focus label='Username' name='account.username' value={this.state.fields.account.username} placeholder='Username' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.username')} onBlur={this.handleInputBlur} />
         <Form.Input
           fluid
@@ -202,6 +203,7 @@ class AccountForm extends Component {
       </Form>
       : accountForm =
       <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();} } id='account'>
+        <Form.Input fluid focus label='Organization' name='account.organization' value={this.state.fields.account.organization} placeholder='Organization - Default is `public`' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.organization')} onBlur={this.handleInputBlur} />
         <Form.Input fluid focus label='Username' name='account.username' value={this.state.fields.account.username} placeholder='Username' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.username')} onBlur={this.handleInputBlur} />
         <Form.Input
           fluid
