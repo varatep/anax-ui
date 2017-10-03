@@ -1,5 +1,5 @@
 import { device } from './device';
-import { services } from './services';
+import { services, microservices, workloads } from './services';
 import { agreements } from './agreements';
 import { attributes } from './attributes';
 import { configuration } from './configuration';
@@ -12,6 +12,8 @@ export {
   agreements,
   device,
   services,
+  microservices,
+  workloads,
   attributes,
   configuration,
   accountFormFieldChange,
