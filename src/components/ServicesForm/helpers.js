@@ -7,6 +7,11 @@ import * as _ from 'lodash';
 
 import { CITYGRAM_URL_BASE } from '../../constants/configuration';
 
+export function labelContains(microserviceLabel, comparator) {
+  if (microserviceLabel.indexOf(comparator) >= 0) return true;
+  return false;
+}
+
 export function doValidation(segment, fieldName, text) {
   // could chain multiple validators, all that's required is we return a promise; could do more inbetween if desired
   switch (fieldName) {
