@@ -15,7 +15,11 @@ import {
   Loader,
   Segment,
   Dropdown,
+  Grid,
+  Label,
+  Icon,
 } from 'semantic-ui-react';
+import moment from 'moment';
 
 import {labelContains} from './helpers.js';
 
@@ -36,13 +40,16 @@ class ServicesForm extends Component {
     const { onMicroservicesGet, onWorkloadsGet, onConfigurationGet, configuration } = this.props;
     console.log('props in mswl', this.props);
 
-    onConfigurationGet()
-        .then((configData) => {
-          onMicroservicesGet(configData.exchange_api)
+    // onConfigurationGet()
+    //     .then((configData) => {
+          onMicroservicesGet('configData.exchange_api', 'IBM')
               .then((data) => {
                 console.log('got data', data);
               });
-        })
+        // })
+        // .catch((err) => {
+        //   console.error(err);
+        // })
   }
   _getMicroserviceIcon(microserviceLabel) {
     const underscoreLabel = _.toLower(microserviceLabel);
@@ -80,36 +87,94 @@ class ServicesForm extends Component {
     return '';
   }
 
-  _generateMicroserviceSegments(microservices) {
+  _generateHardwareList(matchHardware) {
+
+    return (
+      <List.Item>
+        <List.Content>
+          <List.Header>Hardware</List.Header>
+          <div style={{paddingLeft: '2%'}}>
+            {
+              _.map(Object.keys(matchHardware), (hwItem) => {
+                return <List.Description key={hwItem}><strong>{hwItem}</strong>: {matchHardware[hwItem]}</List.Description>
+              })
+            }
+          </div>
+        </List.Content>
+      </List.Item>
+    )
+  }
+
+  _generateMicroserviceSegments(microservices, msKey) {
+
+    const parseLastUpdated = (date) => {
+      return moment(date.split('[UTC]')[0]).toString();
+    };
+
+    let segmentRender = <div />;
+    const segments = _.map(Object.keys(microservices), (msSegmentKey) => {
+      if (msKey === msSegmentKey) {
+         segmentRender = _.map(microservices[msSegmentKey], (microservice) => {
+          return (
+            <Segment padded raised key={microservice.label}>
+              <Header size='medium'>{microservice.label} <small>v{microservice.version}</small></Header>
+              <Checkbox
+                style={{marginBottom: '.75em'}}
+                toggle
+                label='enabled'
+              />
+              <Label attached='top right'>
+                <Icon name='user outline' />
+                {microservice.owner}
+              </Label>
+              <List>
+                <List.Item><strong>Description</strong>: {microservice.description}</List.Item>
+                <List.Item><strong>Architecture</strong>: {microservice.arch}</List.Item>
+                <List.Item><strong>Last Updated</strong>: {parseLastUpdated(microservice.lastUpdated)}</List.Item>
+                <List.Item><strong>Sharable</strong>: {microservice.sharable}</List.Item>
+                <List.Item><strong>Public</strong>: {microservice.public.toString()}</List.Item>
+                <List.Item><strong>Download URL</strong>: {microservice.downloadUrl}</List.Item>
+                <List.Item><strong>Spec Ref</strong>: <a href={microservice.specRef}>{microservice.specRef}</a></List.Item>
+                {this._generateHardwareList(microservice.matchHardware)}
+              </List>
+            </Segment>
+          );
+        });
+      }
+    });
+    console.log('segments', segments)
+    return segmentRender;
+  }
+
+  _generateMicroserviceSections(microservices) {
     const { servicesForm } = this.props;
-    const segments = _.map(microservices, (microservice) => {
-      console.log('microservice.label:', microservice);
-      return (
-        <Segment padded raised key={microservice.label}>
-          <Header size='medium'>{microservice.label}</Header>
-          <Image src={this._getMicroserviceIcon(microservice.label)} size='tiny' spaced floated='left' />
-          <Checkbox
-            style={{marginBottom: '.75em'}}
-            toggle
-            label={servicesForm.fields[this._getMicroserviceShortname(microservice.label)].enabled
-              ? 'enabled' : 'disabled'}
-          />
+    const orgSections = _.map(Object.keys(microservices), (msKey) => {
+    return (
+        <Segment vertical key={msKey}>
+          <Header size='small'>{msKey}</Header>
+          {this._generateMicroserviceSegments(microservices, msKey)}
         </Segment>
       );
     });
-    return segments;
+    return orgSections;
   }
 
   render() {
     const { services } = this.props;
-
     return (
       <div>
         <Header size='large'>Services Selection</Header>
-        {typeof services !== 'undefined' 
-          && typeof services.microservices !== 'undefined' 
-          && this._generateMicroserviceSegments(Object.values(services.microservices))
-        }
+        <Grid columns={2} relaxed>
+          <Grid.Column>
+            {typeof services !== 'undefined' 
+              && typeof services.microservices !== 'undefined' 
+              && this._generateMicroserviceSections(services.microservices)
+            }
+          </Grid.Column>
+          <Grid.Column>
+            hi
+          </Grid.Column>
+        </Grid>
       </div>
     )
   }
