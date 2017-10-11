@@ -53,7 +53,7 @@ class Dashboard extends Component {
     onAttributesGet()
       .then((data) => {
         if (!!data && 'attributes' in data) {
-          this.setState(mergeState(this.state, {services: _.filter(data.attributes, {id: 'compute'}), ephemeral: { fetching: false}}));
+          this.setState(mergeState(this.state, {services: _.filter(data.attributes, {type: 'ComputeAttributes'}), ephemeral: { fetching: false}}));
 
           const enrichFn = this.enrich([onServicesGet, onAgreementsGet], router);
           // get it started
@@ -74,11 +74,10 @@ class Dashboard extends Component {
 
     let hydrate = (computeAttrs, serviceData, agreementData) => {
       return _.map(computeAttrs, (compute) => {
-
         // TODO: expand to accommodate more sensor urls and more applicable enrichments
         const policy = _.filter(serviceData, (d) => { return compute.sensor_urls[0] === d.policy.apiSpec[0].specRef;});
-        const active = _.filter(agreementData.agreements.active, (a) => { return compute.sensor_urls[0] === a.sensor_url;});
-        const archived = _.filter(agreementData.agreements.archived, (a) => { return compute.sensor_urls[0] === a.sensor_url;});
+        const active = _.filter(agreementData.agreements.active, (a) => { return compute.sensor_urls[0] === a.sensor_url[0];});
+        const archived = _.filter(agreementData.agreements.archived, (a) => { return compute.sensor_urls[0] === a.sensor_url[0];});
 
         return {...compute, ...policy[0], agreements: {active, archived}};
       });
@@ -91,7 +90,6 @@ class Dashboard extends Component {
       }
 
       Promise.all(_.map(fns, (fn) => {return fn();})).then((responses) => {
-
         this.setState(mergeState(this.state, {
           services: hydrate(this.state.services, responses[0], responses[1])
         }));
