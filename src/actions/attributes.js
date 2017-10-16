@@ -4,7 +4,7 @@ import { ANAX_URL_BASE } from '../constants/configuration';
 // dispatches and returns promise so it can be used elsewhere
 export function attributes() {
   return function(dispatch) {
-    return fetch(`${ANAX_URL_BASE}/service/attribute`)
+    return fetch(`${ANAX_URL_BASE}/attribute`)
       .then((response) => response.json())
       .then((data) => {
         dispatch({
