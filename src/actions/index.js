@@ -4,7 +4,7 @@ import { agreements } from './agreements';
 import { attributes } from './attributes';
 import { configuration } from './configuration';
 import { accountFormFieldChange, accountFormMultiFieldChange, accountFormDataSubmit, accountFormPasswordReset } from './accountForm';
-import { deviceFormFieldChange, deviceFormMultiFieldChange, deviceFormSubmit} from './deviceForm';
+import { deviceFormFieldChange, deviceFormMultiFieldChange, deviceFormSubmit, deviceFormSubmitBlockchain } from './deviceForm';
 import { servicesFormFieldChange, servicesFormMultiFieldChange, servicesFormSubmit } from './servicesForm';
 
 // public interface to actions
@@ -21,6 +21,7 @@ export {
   deviceFormFieldChange,
   deviceFormMultiFieldChange,
   deviceFormSubmit,
+  deviceFormSubmitBlockchain,
   servicesFormFieldChange,
   servicesFormMultiFieldChange,
   servicesFormSubmit

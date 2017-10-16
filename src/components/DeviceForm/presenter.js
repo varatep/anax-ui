@@ -103,7 +103,7 @@ class DeviceForm extends Component {
   }
 
   handleSubmit = () => {
-    const {deviceForm, deviceFormSubmit, router} = this.props;
+    const {deviceForm, deviceFormSubmit, deviceFormSubmitBlockchain, router} = this.props;
 
     this.setState(mergeState(this.state, {ephemeral: { submitting: true }}));
 
@@ -115,7 +115,13 @@ class DeviceForm extends Component {
       this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
     } else {
       deviceFormSubmit(deviceForm).then((success) => {
-        router.push('/setup/services');
+        deviceFormSubmitBlockchain(deviceForm).then((bcSuccess) => {
+          router.push('/setup/services');
+        }).catch((bcErr) => {
+          const newBCMgr = submitMgr.fns.error('submit', `Blockchain configuration error. ${bcErr.msg}`);
+          this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+          this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
+        });
       }).catch((err) => {
         const newMgr = submitMgr.fns.error('submit', `Location submission error. ${err.msg}`);
         this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
@@ -219,6 +225,15 @@ class DeviceForm extends Component {
           </Form>
 
           <p><strong>Note</strong>: You needn't have a GPS device at this time to opt-in; if you attach a device at a later time the system will make use of it.</p>
+        </Segment>
+
+        <Segment padded>
+          <Header size='medium'>Blockchain</Header>
+          <p>If enabled, agreements made with your device are recorded on Horizon's Ethereum Blockchain.</p>
+
+          <Form id='blockchain'>
+            <Checkbox style={{marginBottom: '.75em'}} toggle label='Enable Blockchain for your device' name='blockchain.usebc' defaultChecked={this.state.fields.blockchain.usebc} onChange={this.handleCheckboxChange} />
+          </Form>
         </Segment>
 
         <Segment padded>

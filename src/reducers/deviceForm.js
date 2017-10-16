@@ -11,7 +11,10 @@ export const initialState = {
 		},
 		motion: {
 			usegps: false
-		}
+		},
+		blockchain: {
+			usebc: false
+		},
 	}
 };
 

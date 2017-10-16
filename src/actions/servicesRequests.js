@@ -37,6 +37,43 @@ function meteringAttrs(
   return {}
 }
 
+function agreementProtocolAttrs(isBlockchain = false, blockchainName="bluehorizon", blockchainType = "ethereum") {
+  if (isBlockchain) {
+    return {
+      "id": "agreementprotocol",
+      "short_type": "agreementprotocol",
+      "label": "Agreement Protocols",
+      "publishable": true,
+      "mappings": {
+        "protocols": [
+          {
+            "Citizen Scientist": [
+              {
+                "name": "bluehorizon",
+                "type": "ethereum"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  } else {
+    return {
+      "id": "agreementprotocol",
+      "short_type": "agreementprotocol",
+      "label": "Agreement Protocols",
+      "publishable": true,
+      "mappings": {
+        "protocols": [
+          {
+            "Basic": []
+          }
+        ]
+      }
+    }
+  }
+}
+
 export function purpleairService(deviceHostname, metered = false, ram) {
   return {
     sensor_url: 'https://bluehorizon.network/documentation/airpollution-device-api',

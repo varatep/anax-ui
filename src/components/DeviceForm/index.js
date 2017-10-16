@@ -18,7 +18,8 @@ function mapDispatchToProps(dispatch) {
   return {
     deviceFormFieldChange: bindActionCreators(actions.deviceFormFieldChange, dispatch),
     deviceFormMultiFieldChange: bindActionCreators(actions.deviceFormMultiFieldChange, dispatch),
-    deviceFormSubmit: bindActionCreators(actions.deviceFormSubmit, dispatch)
+    deviceFormSubmit: bindActionCreators(actions.deviceFormSubmit, dispatch),
+    deviceFormSubmitBlockchain: bindActionCreators(actions.deviceFormSubmitBlockchain, dispatch),
   };
 }
 
