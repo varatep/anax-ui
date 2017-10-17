@@ -325,6 +325,29 @@ class ServicesForm extends Component {
     return orgSections;
   }
 
+  /**
+   * Find microservices for a given workload api spec
+   * @param {object} spec 
+   */
+  _microserviceLookup(spec) {
+    const {microservices} = this.props.services;
+    const msKeys = Object.keys(microservices);
+    for (let i = 0; i < msKeys.length; i++) {
+      if (msKeys[i] === spec.org) {
+        const microservicesInOrg = microservices[msKeys[i]];
+        let requiredMicroservices = [];
+        for (let j = 0; j < microservicesInOrg.length; j++) {
+          if (microservicesInOrg[j].specRef === spec.specRef
+              && microservicesInOrg[j].version === spec.version
+              && microservicesInOrg[j].arch === spec.arch) 
+                requiredMicroservices.push(microservicesInOrg[j]);
+        }
+        return requiredMicroservices;
+      }
+    }
+
+    return [];
+  }
   render() {
     const { services } = this.props;
     return (
