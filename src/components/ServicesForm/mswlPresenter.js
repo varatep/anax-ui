@@ -273,11 +273,6 @@ class ServicesForm extends Component {
    * @param {string} msKey 
    */
   _generateMicroserviceSegments(microservices, msKey) {
-
-    const parseLastUpdated = (date) => {
-      return moment(date.split('[UTC]')[0]).toString();
-    };
-
     let segmentRender = <div />;
     const segments = _.map(Object.keys(microservices), (msSegmentKey) => {
       if (msKey === msSegmentKey) {
