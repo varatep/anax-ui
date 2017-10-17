@@ -245,6 +245,10 @@ class ServicesForm extends Component {
     return '';
   }
 
+  /**
+   * Generate a list of hardwares required for a given workload
+   * @param {object} matchHardware 
+   */
   _generateHardwareList(matchHardware) {
 
     return (
