@@ -412,6 +412,42 @@ class ServicesForm extends Component {
       </List.Item>
     );
   }
+
+  _generateWorkloadSegments(workloads, wlKey) {
+    let segmentRender = <div />;
+    const segments = _.map(Object.keys(workloads), (wlSegmentKey) => {
+      if (wlKey === wlSegmentKey) {
+         segmentRender = _.map(workloads[wlSegmentKey], (workload, idx) => {
+          return (
+            <Segment padded raised key={workload.label}>
+              <Header size='medium'>{workload.label} <small>v{workload.version}</small></Header>
+              <Checkbox
+                style={{marginBottom: '.75em'}}
+                toggle
+                label={this.state.fields.workloads[idx].enabled ? 'enabled' : 'disabled'}
+                name={`${workload.originalKey}#enablement`}
+                onChange={this.handleWorkloadEnablement}
+              />
+              <Label attached='top right'>
+                <Icon name='user' />
+                {workload.owner}
+              </Label>
+              <List>
+                <List.Item><strong>Description</strong>: {workload.description}</List.Item>
+                <List.Item><strong>Architecture</strong>: {workload.arch}</List.Item>
+                <List.Item><strong>Last Updated</strong>: {parseLastUpdated(workload.lastUpdated)}</List.Item>
+                <List.Item><strong>Public</strong>: {workload.public.toString()}</List.Item>
+                <List.Item><strong>Workload URL</strong>: <a href={workload.specRef}>{workload.workloadUrl}</a></List.Item>
+                {this._generateUserInputs(workload)}
+                {this._generateRequiredMicroservices(workload)}
+              </List>
+            </Segment>
+          );
+        });
+      }
+    });
+    return segmentRender;
+  }
   render() {
     const { services } = this.props;
     return (
