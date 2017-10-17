@@ -193,6 +193,11 @@ class ServicesForm extends Component {
     const { onMicroservicesGet, onWorkloadsGet, onConfigurationGet, configuration } = this.props;
     console.log('props in mswl', this.props);
 
+    Promise.all([onMicroservicesGet('configData.exchange_api', 'IBM'), onWorkloadsGet('configData.exchange_api', 'IBM')])
+        .then(values => {
+          this.initiateFieldState();
+        })
+
     // onConfigurationGet()
     //     .then((configData) => {
           onMicroservicesGet('configData.exchange_api', 'IBM')
