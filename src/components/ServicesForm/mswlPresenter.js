@@ -39,7 +39,9 @@ class ServicesForm extends Component {
         submitting: false,
       },
       location: 'servicesForm',
+      fields: undefined,
     };
+
     this.handleUserInputChange = this.handleUserInputChange.bind(this);
     this.handleWorkloadEnablement = this.handleWorkloadEnablement.bind(this);
     this.handleMicroserviceEnablement = this.handleMicroserviceEnablement.bind(this);
