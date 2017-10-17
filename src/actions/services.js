@@ -19,10 +19,10 @@ export function services() {
   };
 };
 
-export function microservices(exchange_api) {
+export function microservices(exchange_api, orgid, username, password) {
   exchange_api = 'https://exchange.staging.bluehorizon.network/api/v1';
   return function(dispatch) {
-    return fetch(`${exchange_api}/microservices?${qs}`)
+    return fetch(`${exchange_api}/orgs/${orgid}/microservices?${qs}`)
         .then((response) => response.json())
         .then((data) => {
           dispatch(setMicroservices(data.microservices));
@@ -34,10 +34,10 @@ export function microservices(exchange_api) {
   };
 };
 
-export function workloads(exchange_api) {
+export function workloads(exchange_api, orgid, username, password) {
   exchange_api = 'https://exchange.staging.bluehorizon.network/api/v1';
   return function(dispatch) {
-    return fetch(`${exchange_api}/workloads?${qs}`)
+    return fetch(`${exchange_api}/orgs/${orgid}/workloads?${qs}`)
         .then((response) => response.json())
         .then((data) => {
           dispatch(setWorkloads(data.workloads));
