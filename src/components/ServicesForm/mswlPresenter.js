@@ -469,6 +469,29 @@ class ServicesForm extends Component {
     return (
       <div>
         <Header size='large'>Services Selection</Header>
+
+        <Accordion styled>
+          <Accordion.Title>
+            <Icon name='dropdown' />
+            Filter
+          </Accordion.Title>
+          <Accordion.Content>
+            <Form widths='equal'>
+              <Form.Group grouped>
+                <Popup
+                  wide
+                  trigger={<label>Approach</label>}
+                  content='Select whether you want to register your device using a microservice perspective (choose which microservices you want and automatically enable possible workloads), workload perspective (choose which workloads you want and automatically enable required microservices), or view everything at once.'
+                />
+                <Form.Field label='Microservice' control='input' type='radio' name='regApproach' />
+                <Form.Field label='Workload' control='input' type='radio' name='regApproach' />
+                <Form.Field label='View All' control='input' type='radio' name='regApproach' />
+              </Form.Group>
+            </Form>
+          </Accordion.Content>
+        </Accordion>
+        <br />
+
         <Grid columns={2} relaxed>
           <Grid.Column>
             {typeof services !== 'undefined' 
