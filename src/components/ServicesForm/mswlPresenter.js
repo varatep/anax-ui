@@ -42,6 +42,9 @@ class ServicesForm extends Component {
     };
     this.handleUserInputChange = this.handleUserInputChange.bind(this);
     this.handleWorkloadEnablement = this.handleWorkloadEnablement.bind(this);
+    this.handleMicroserviceEnablement = this.handleMicroserviceEnablement.bind(this);
+  }
+
   /**
    * Sets the input in field state.
    * @param {SyntheticEvent} event 
@@ -90,6 +93,23 @@ class ServicesForm extends Component {
       }
     }
     this.setState({fields: {...this.state.fields, workloads}});
+  }
+
+  /**
+   * Handles checkbox toggle for microservice enablement
+   * @param {SyntheticEvent} event 
+   * @param {object} data 
+   */
+  handleMicroserviceEnablement(event, data) {
+    const fieldNameSplit = data.name.split('#');
+    const mses = this.state.fields.microservices;
+    for (let i = 0; i < mses.length; i++) {
+      if (mses[i].originalKey === fieldNameSplit[0]) {
+        mses[i].enabled = data.checked;
+        break;
+      }
+    }
+    this.setState({fields: {...this.state.fields, microservices: mses}});
   }
   }
 
