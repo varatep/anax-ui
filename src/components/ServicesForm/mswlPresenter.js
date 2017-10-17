@@ -41,6 +41,7 @@ class ServicesForm extends Component {
       location: 'servicesForm',
     };
     this.handleUserInputChange = this.handleUserInputChange.bind(this);
+    this.handleWorkloadEnablement = this.handleWorkloadEnablement.bind(this);
   /**
    * Sets the input in field state.
    * @param {SyntheticEvent} event 
@@ -66,6 +67,26 @@ class ServicesForm extends Component {
             }
           }
         }
+      }
+    }
+    this.setState({fields: {...this.state.fields, workloads}});
+  }
+
+  /**
+   * Handles checkbox toggle for workload enablement
+   * @param {SyntheticEvent} event 
+   * @param {object} data 
+   */
+  handleWorkloadEnablement(event, data) {
+    console.log('workload enablement', event, data);
+    
+    const fieldNameSplit = data.name.split('#');
+    const workloads = this.state.fields.workloads;
+    // TODO: hacky... mutates
+    for (let i = 0; i < workloads.length; i++) {
+      if (workloads[i].originalKey === fieldNameSplit[0]) {
+        workloads[i].enabled = data.checked;
+        break;
       }
     }
     this.setState({fields: {...this.state.fields, workloads}});
