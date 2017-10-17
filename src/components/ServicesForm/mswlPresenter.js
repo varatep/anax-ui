@@ -297,7 +297,6 @@ class ServicesForm extends Component {
                 <List.Item><strong>Last Updated</strong>: {parseLastUpdated(microservice.lastUpdated)}</List.Item>
                 <List.Item><strong>Sharable</strong>: {microservice.sharable}</List.Item>
                 <List.Item><strong>Public</strong>: {microservice.public.toString()}</List.Item>
-                <List.Item><strong>Download URL</strong>: {microservice.downloadUrl}</List.Item>
                 <List.Item><strong>Spec Ref</strong>: <a href={microservice.specRef}>{microservice.specRef}</a></List.Item>
                 {this._generateHardwareList(microservice.matchHardware)}
               </List>
