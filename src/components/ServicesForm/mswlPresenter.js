@@ -448,6 +448,22 @@ class ServicesForm extends Component {
     });
     return segmentRender;
   }
+
+  _generateWorkloadSections(workloads) {
+    const { servicesForm } = this.props;
+    const orgSections = _.map(Object.keys(workloads), (wlKey) => {
+      console.log('wlkey', wlKey)
+      return (
+        <Segment vertical key={wlKey}>
+          <Header size='small'>{wlKey}</Header>
+          {this._generateWorkloadSegments(workloads, wlKey)}
+        </Segment>
+      )
+    });
+
+    return orgSections;
+  }
+
   render() {
     const { services } = this.props;
     return (
