@@ -494,13 +494,18 @@ class ServicesForm extends Component {
 
         <Grid columns={2} relaxed>
           <Grid.Column>
-            {typeof services !== 'undefined' 
-              && typeof services.microservices !== 'undefined' 
+            <Header size='medium'>Microservices</Header>
+            {typeof services !== 'undefined'
+              && typeof services.microservices !== 'undefined'
               && this._generateMicroserviceSections(services.microservices)
             }
           </Grid.Column>
           <Grid.Column>
-            hi
+          <Header size='medium'>Workloads</Header>
+            {typeof services !== 'undefined'
+              && typeof services.workloads !== 'undefined'
+              && this._generateWorkloadSections(services.workloads)
+            }
           </Grid.Column>
         </Grid>
       </div>
