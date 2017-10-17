@@ -387,6 +387,31 @@ class ServicesForm extends Component {
       {_.map(userInputs, genInput)}
     </Form></Segment>);
   }
+
+  /**
+   * Generates a renderable list of required microservices for a given workload based off of the workload pattern
+   * @param {object} workload
+   * @returns {object}
+   */
+  _generateRequiredMicroservices(workload) {
+    const { microservices } = this.props.services;
+    const workloadApiSpec = workload.apiSpec;
+    const msesForSpec = _.map(workloadApiSpec, (spec) => {
+      return this._microserviceLookup(spec);
+    });
+    let renderArr = [];
+    const msRender = _.map(msesForSpec, (mses) => {
+      for (let i = 0; i < mses.length; i++) {
+        renderArr.push(<Label key={mses[i].label}>{mses[i].label}</Label>)
+      }
+    });
+
+    return (
+      <List.Item>
+        <strong>Required microservices</strong>: {renderArr}
+      </List.Item>
+    );
+  }
   render() {
     const { services } = this.props;
     return (
