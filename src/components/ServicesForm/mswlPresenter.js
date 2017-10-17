@@ -267,6 +267,11 @@ class ServicesForm extends Component {
     )
   }
 
+  /**
+   * Generate single renderable microservice item
+   * @param {array} microservices 
+   * @param {string} msKey 
+   */
   _generateMicroserviceSegments(microservices, msKey) {
 
     const parseLastUpdated = (date) => {
