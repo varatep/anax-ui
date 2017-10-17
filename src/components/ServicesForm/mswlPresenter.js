@@ -136,6 +136,18 @@ class ServicesForm extends Component {
     return null;
   }
 
+  /**
+   * Finds an individual user input object from field state
+   * @param {string} originalKey original key from api
+   * @param {string} name name of user input
+   * @param {string} from from microservice or workload
+   */
+  findUserInputByName(originalKey, name, from) {
+    // workloads is an array of workloads
+    const {workloads} = this.state.fields;
+    const found = this.findServiceByOriginalKey(originalKey, from);
+    return _.filter(found.userInput, {name})[0];
+  }
   }
 
   componentWillMount() {
