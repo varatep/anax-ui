@@ -40,6 +40,36 @@ class ServicesForm extends Component {
       },
       location: 'servicesForm',
     };
+    this.handleUserInputChange = this.handleUserInputChange.bind(this);
+  /**
+   * Sets the input in field state.
+   * @param {SyntheticEvent} event 
+   * @param {object} data 
+   */
+  handleUserInputChange(event, data) {
+
+    // check for missing props
+    if (typeof data === 'undefined') return;
+
+    const fieldNameSplit = data.name.split('#');
+    const workloads = this.state.fields.workloads;
+    // TODO: this is hacky and mutates... fix ASAP
+    for (let i = 0; i < workloads.length; i++) {
+      if (workloads[i].originalKey === fieldNameSplit[0]) {
+        for (let j = 0; j < workloads[i].userInput.length; j++) {
+          if (workloads[i].userInput[j].name === fieldNameSplit[1]) {
+            let tmpUserInput = workloads[i].userInput[j];
+            if (data.type === 'checkbox') {
+              tmpUserInput.defaultValue = data.checked;
+            } else if (data.type === 'text') {
+              tmpUserInput.defaultValue = data.value;
+            }
+          }
+        }
+      }
+    }
+    this.setState({fields: {...this.state.fields, workloads}});
+  }
   }
 
   componentWillMount() {
