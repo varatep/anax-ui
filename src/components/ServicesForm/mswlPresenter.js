@@ -310,6 +310,10 @@ class ServicesForm extends Component {
     return segmentRender;
   }
 
+  /**
+   * Generate renderable segment that lists microservices
+   * @param {array} microservices 
+   */
   _generateMicroserviceSections(microservices) {
     const { servicesForm } = this.props;
     const orgSections = _.map(Object.keys(microservices), (msKey) => {
