@@ -148,6 +148,45 @@ class ServicesForm extends Component {
     const found = this.findServiceByOriginalKey(originalKey, from);
     return _.filter(found.userInput, {name})[0];
   }
+
+  /**
+   * Prepare the state that handle microservices, workloads, and user input values.
+   */
+  initiateFieldState() {
+    // workloads and microservices are arrays of objects with key `org` and value `array`
+    const { microservices, workloads } = this.props.services;
+
+    // All we need from each workload is the enabled property and user input
+    let workloadFields = [];
+    const workloadKeys = Object.keys(workloads);
+    for (let i = 0; i < workloadKeys.length; i++) {
+      let currentWorkload;
+      for (let j = 0; j < workloads[workloadKeys[i]].length; j++) {
+        currentWorkload = workloads[workloadKeys[i]][j];
+        workloadFields.push(Object.assign({}, currentWorkload, {
+          enabled: false,
+        }));
+      }
+    }
+
+    // All we need from each microservice is the enabled property
+    let microserviceFields = [];
+    const microserviceKeys = Object.keys(microservices);
+    for (let i = 0; i < microserviceKeys.length; i++) {
+      let currentMicroservice;
+      for (let j = 0; j < microservices[microserviceKeys[i]].length; j++) {
+        currentMicroservice = microservices[microserviceKeys[i]][j];
+        microserviceFields.push(Object.assign({}, currentMicroservice, {
+          enabled: false,
+        }));
+      }
+    }
+
+    this.setState({fields: {
+      microservices: microserviceFields,
+      workloads: workloadFields,
+    }});
+    console.log('set state for field', this.state.fields)
   }
 
   componentWillMount() {
