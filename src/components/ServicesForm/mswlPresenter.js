@@ -25,6 +25,10 @@ import moment from 'moment';
 
 import {labelContains} from './helpers.js';
 
+const parseLastUpdated = (date) => {
+  return moment(date.split('[UTC]')[0]).toString();
+};
+
 class ServicesForm extends Component {
   constructor(props) {
     super(props);
