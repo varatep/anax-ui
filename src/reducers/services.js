@@ -30,21 +30,25 @@ const hashToArray = (hash) => {
 
 /**
  * Create a hashmap of organizations with microsrvices that belong to that organization
- * @param {array} microservices 
+ * @param {array} mswl 
  * @returns {hashmap}
  */
-const parseMicroservices = (microservices) => {
+const parseMSWLSplit = (mswl) => {
   let msHash = {};
-  const microservicesArray = hashToArray(microservices);
-  
+  const mswlArray = hashToArray(mswl);
+
   // add microservice to hash based on orgs
-  for (let i = 0; i < microservicesArray.length; i++) {
-    const currentOrg = extractOrg(microservicesArray[i].label);
+  for (let i = 0; i < mswlArray.length; i++) {
+    const currentOrg = extractOrg(mswlArray[i].label);
+
+    let item = Object.assign({}, mswlArray[i].item, {
+      originalKey: mswlArray[i].label,
+    });
 
     if (typeof msHash[currentOrg] !== 'undefined') {
-      msHash[currentOrg].push(microservicesArray[i].item);
+      msHash[currentOrg].push(item);
     } else {
-      msHash[currentOrg] = [microservicesArray[i].item];
+      msHash[currentOrg] = [item];
     }
   }
 
@@ -58,11 +62,11 @@ export default function(state = initialState, action) {
       return Object.assign({}, state, action.services);
     case actionTypes.MICROSERVICES_SET:
       return Object.assign({}, state, {
-        microservices: parseMicroservices(action.microservices),
+        microservices: parseMSWLSplit(action.microservices),
       });
     case actionTypes.WORKLOADS_SET:
       return Object.assign({}, state, {
-        workloads: action.workloads,
+        workloads: parseMSWLSplit(action.workloads),
       });
     default:
       return state;
