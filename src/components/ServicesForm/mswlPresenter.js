@@ -348,6 +348,45 @@ class ServicesForm extends Component {
 
     return [];
   }
+
+  /**
+   * Generates a renderable user input form
+   * @param {object} workload 
+   */
+  _generateUserInputs(workload) {
+    const userInputs = workload.userInput;
+
+    // check to see if we don't even need to start assigning vars
+    if (userInputs.length === 0) {
+      return <div />;
+    }
+    
+    const genInput = (userInput) => {
+      if (userInput.type === 'string') {
+        return (<Form.Field key={userInput.name}>
+          <label>{userInput.label}</label>
+          <Input 
+            placeholder={userInput.defaultValue || userInput.label} 
+            name={`${workload.originalKey}#${userInput.name}`}
+            onChange={this.handleUserInputChange}
+          />
+        </Form.Field>);
+      } else if (userInput.type === 'boolean') {
+        return (<Form.Field key={userInput.name}>
+          <Checkbox 
+            toggle 
+            label={userInput.label} 
+            name={`${workload.originalKey}#${userInput.name}`}
+            onChange={this.handleUserInputChange}
+          />
+        </Form.Field>);
+      }
+    };
+
+    return (<Segment><Form>
+      {_.map(userInputs, genInput)}
+    </Form></Segment>);
+  }
   render() {
     const { services } = this.props;
     return (
