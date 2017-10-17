@@ -276,17 +276,19 @@ class ServicesForm extends Component {
     let segmentRender = <div />;
     const segments = _.map(Object.keys(microservices), (msSegmentKey) => {
       if (msKey === msSegmentKey) {
-         segmentRender = _.map(microservices[msSegmentKey], (microservice) => {
+         segmentRender = _.map(microservices[msSegmentKey], (microservice, idx) => {
           return (
             <Segment padded raised key={microservice.label}>
               <Header size='medium'>{microservice.label} <small>v{microservice.version}</small></Header>
               <Checkbox
                 style={{marginBottom: '.75em'}}
                 toggle
-                label='enabled'
+                label={this.state.fields.microservices[idx].enabled ? 'enabled' : 'disabled'}
+                name={`${microservice.originalKey}#enablement`}
+                onChange={this.handleMicroserviceEnablement}
               />
               <Label attached='top right'>
-                <Icon name='user outline' />
+                <Icon name='user' />
                 {microservice.owner}
               </Label>
               <List>
