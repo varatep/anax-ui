@@ -466,7 +466,7 @@ class ServicesForm extends Component {
 
   render() {
     const { services } = this.props;
-    return (
+    const readyRender = () => (
       <div>
         <Header size='large'>Services Selection</Header>
 
@@ -509,7 +509,13 @@ class ServicesForm extends Component {
           </Grid.Column>
         </Grid>
       </div>
-    )
+    );
+
+    return (
+      <div>
+        {typeof this.state.fields !== 'undefined' ? readyRender() : <Header>Loading</Header>}
+      </div>
+    );
   }
 }
 
