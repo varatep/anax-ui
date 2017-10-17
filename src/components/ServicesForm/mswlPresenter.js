@@ -113,6 +113,29 @@ class ServicesForm extends Component {
     }
     this.setState({fields: {...this.state.fields, microservices: mses}});
   }
+
+  /**
+   * Finds either a microservice or workload (given by `from`) using the originalKey.
+   * @param {string} originalKey original key from api
+   * @param {string} from from microservice or workload
+   */
+  findServiceByOriginalKey(originalKey, from) {
+    if (from === 'workload' || from === 'workloads') {
+      // workloads is an array of workloads
+      const {workloads} = this.state.fields;
+      return _.filter(workloads, {originalKey})[0];
+    } else if (from === 'microservice' || from === 'microservices') {
+      // microservices is an array of microservices
+      const {microservices} = this.state.fields;
+      return _.filter(microservices, (ms) => {
+        return ms.originalKey === originalKey;
+      })[0];
+    }
+
+    // means the method did not receive correct `from` parameter
+    return null;
+  }
+
   }
 
   componentWillMount() {
