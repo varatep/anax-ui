@@ -25,6 +25,8 @@ import moment from 'moment';
 
 import {labelContains} from './helpers.js';
 
+import FilterSegment from './FilterSegment';
+
 const parseLastUpdated = (date) => {
   return moment(date.split('[UTC]')[0]).toString();
 };
@@ -200,14 +202,18 @@ class ServicesForm extends Component {
 
     // onConfigurationGet()
     //     .then((configData) => {
-          onMicroservicesGet('configData.exchange_api', 'IBM')
-              .then((data) => {
-                console.log('got data', data);
-              });
-        // })
-        // .catch((err) => {
-        //   console.error(err);
-        // })
+    //       onMicroservicesGet('configData.exchange_api', 'IBM')
+    //           .then((data) => {
+    //             console.log('got data', data);
+    //           });
+    //     // })
+    //     // .catch((err) => {
+    //     //   console.error(err);
+    //     // })
+    // onWorkloadsGet('configData.exchange_api', 'IBM')
+    //           .then((data) => {
+    //             console.log('got data', data);
+    //           });
   }
   _getMicroserviceIcon(microserviceLabel) {
     const underscoreLabel = _.toLower(microserviceLabel);
@@ -470,26 +476,7 @@ class ServicesForm extends Component {
       <div>
         <Header size='large'>Services Selection</Header>
 
-        <Accordion styled>
-          <Accordion.Title>
-            <Icon name='dropdown' />
-            Filter
-          </Accordion.Title>
-          <Accordion.Content>
-            <Form widths='equal'>
-              <Form.Group grouped>
-                <Popup
-                  wide
-                  trigger={<label>Approach</label>}
-                  content='Select whether you want to register your device using a microservice perspective (choose which microservices you want and automatically enable possible workloads), workload perspective (choose which workloads you want and automatically enable required microservices), or view everything at once.'
-                />
-                <Form.Field label='Microservice' control='input' type='radio' name='regApproach' />
-                <Form.Field label='Workload' control='input' type='radio' name='regApproach' />
-                <Form.Field label='View All' control='input' type='radio' name='regApproach' />
-              </Form.Group>
-            </Form>
-          </Accordion.Content>
-        </Accordion>
+        <FilterSegment />
         <br />
 
         <Grid columns={2} relaxed>
