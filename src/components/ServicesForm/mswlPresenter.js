@@ -291,63 +291,6 @@ class ServicesForm extends Component {
     //             console.log('got data', data);
     //           });
   }
-  _getMicroserviceIcon(microserviceLabel) {
-    const underscoreLabel = _.toLower(microserviceLabel);
-
-    if (labelContains(underscoreLabel, 'netspeed')) return '/images/netspeed.svg';
-    if (labelContains(underscoreLabel, 'network')) return '/images/netspeed.svg';
-    if (labelContains(underscoreLabel, 'citygram')) return '/images/citygram.svg';
-    if (labelContains(underscoreLabel, 'sdr')) return '/images/sdr.svg';
-    if (labelContains(underscoreLabel, 'pws')) return '/images/pws.svg';
-    // TODO: add location icon
-    if (labelContains(underscoreLabel, 'location')) return '/images/gps.svg';
-    if (labelContains(underscoreLabel, 'cpu')) return '/images/cputemp.svg';
-    if (labelContains(underscoreLabel, 'air pollution')) return '/images/purpleair.svg';
-    if (labelContains(underscoreLabel, 'aural')) return '/images/aural.svg';
-    if (labelContains(underscoreLabel, 'gps')) return '/images/gps.svg';
-
-    // TODO: add ? icon
-    // else
-    return '/images/gps.svg';
-  }
-
-  _getMicroserviceShortname(microserviceLabel) {
-    const underscoreLabel = _.toLower(microserviceLabel);
-
-    if (labelContains(underscoreLabel, 'netspeed')) return 'netspeed';
-    if (labelContains(underscoreLabel, 'network')) return 'netspeed';
-    if (labelContains(underscoreLabel, 'citygram')) return 'citygram';
-    if (labelContains(underscoreLabel, 'sdr')) return 'sdr';
-    if (labelContains(underscoreLabel, 'pws')) return 'pws';
-    if (labelContains(underscoreLabel, 'location')) return 'location';
-    if (labelContains(underscoreLabel, 'cpu')) return 'cputemp';
-    if (labelContains(underscoreLabel, 'air pollution')) return 'purpleair';
-    if (labelContains(underscoreLabel, 'aural')) return 'aural';
-    if (labelContains(underscoreLabel, 'gps')) return 'gps';
-    return '';
-  }
-
-  /**
-   * Generate a list of hardwares required for a given workload
-   * @param {object} matchHardware 
-   */
-  _generateHardwareList(matchHardware) {
-
-    return (
-      <List.Item>
-        <List.Content>
-          <List.Header>Hardware</List.Header>
-          <div style={{paddingLeft: '2%'}}>
-            {
-              _.map(Object.keys(matchHardware), (hwItem) => {
-                return <List.Description key={hwItem}><strong>{hwItem}</strong>: {matchHardware[hwItem]}</List.Description>
-              })
-            }
-          </div>
-        </List.Content>
-      </List.Item>
-    )
-  }
 
   /**
    * Generate single renderable microservice item
