@@ -65,6 +65,54 @@ class ServicesForm extends Component {
       return ms.enabled;
     });
   }
+
+  getPossibleWorkloads() {
+    if (this.state.filters.currentApproach !== MICROSERVICE_APPROACH) return [];
+    const {workloads} = this.state.fields;
+    const enabledMses = this.getEnabledMicroservices();
+    const possibleWorkloads = _.filter(workloads, (wl) => {
+      const requiredMses = _.map(wl.apiSpec, (spec) => {
+        return this._microserviceLookup(spec)[0];
+      });
+      let isWLPossible = true;
+
+      for (let i = 0; i < requiredMses.length; i++) {
+        let isMSFulfilled = false;
+        for (let j = 0; j < enabledMses.length; j++) {
+          if (requiredMses[i].originalKey === enabledMses[j].originalKey)
+            {
+              isMSFulfilled = true;
+              break;
+            }
+        }
+        if (!isMSFulfilled) {
+          isWLPossible = false;
+          break;
+        }
+      }
+      return isWLPossible;
+    });
+
+    // transform to something readable by render fn
+    let orgHash = {};
+    const extractOrg = (wl) => {
+      return (wl.originalKey.split('/')[0]);
+    };
+    for (let i = 0; i < possibleWorkloads.length; i++) {
+      if (typeof orgHash[extractOrg(possibleWorkloads[i])] === 'undefined') { // DNE
+        let tmpObj = {};
+        tmpObj[possibleWorkloads[i].originalKey] = possibleWorkloads[i];
+        orgHash[extractOrg(possibleWorkloads[i])] = tmpObj;
+      } else { // EXISTS
+        let tmpObj = orgHash[extractOrg(possibleWorkloads[i])];
+        tmpObj[possibleWorkloads[i].originalKey] = possibleWorkloads[i];
+        orgHash[extractOrg(possibleWorkloads[i])] = tmpObj;
+      }
+    }
+    console.log('org hash', orgHash);
+
+    return orgHash;
+  }
   /**
    * Sets the input in field state.
    * @param {SyntheticEvent} event 
