@@ -7,9 +7,11 @@ import {
   Radio,
 } from 'semantic-ui-react';
 
-const ALL_APPROACH = 'ALL_APPROACH';
-const MICROSERVICE_APPROACH = 'MICROSERVICE_APPROACH';
-const WORKLOAD_APPROACH = 'WORKLOAD_APPROACH';
+import {
+  ALL_APPROACH,
+  WORKLOAD_APPROACH,
+  MICROSERVICE_APPROACH,
+} from './helpers';
 
 class FilterSegment extends Component {
   constructor(props) {
@@ -24,6 +26,7 @@ class FilterSegment extends Component {
 
   handleApproachChange(event, {value}) {
     this.setState({currentApproach: value});
+    this.props.updateCurrentApproach(value);
   }
 
   render() {

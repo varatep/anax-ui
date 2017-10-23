@@ -23,7 +23,12 @@ import {
 } from 'semantic-ui-react';
 import moment from 'moment';
 
-import {labelContains} from './helpers.js';
+import {
+  labelContains,
+  MICROSERVICE_APPROACH,
+  WORKLOAD_APPROACH,
+  ALL_APPROACH,
+} from './helpers.js';
 
 import FilterSegment from './FilterSegment';
 
