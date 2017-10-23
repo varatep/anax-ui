@@ -59,6 +59,12 @@ class ServicesForm extends Component {
     this.handleMicroserviceEnablement = this.handleMicroserviceEnablement.bind(this);
   }
 
+  getEnabledMicroservices() {
+    const {microservices} = this.state.fields;
+    return _.filter(microservices, (ms) => {
+      return ms.enabled;
+    });
+  }
   /**
    * Sets the input in field state.
    * @param {SyntheticEvent} event 
