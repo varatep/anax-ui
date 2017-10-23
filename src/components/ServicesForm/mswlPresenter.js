@@ -113,6 +113,10 @@ class ServicesForm extends Component {
 
     return orgHash;
   }
+  
+  resetAllEnablements() {
+    this.setState({fields: undefined}, () => {this.initiateFieldState()});
+  }
   /**
    * Sets the input in field state.
    * @param {SyntheticEvent} event 
