@@ -449,7 +449,7 @@ class ServicesForm extends Component {
               <Checkbox
                 style={{marginBottom: '.75em'}}
                 toggle
-                label={this.state.fields.workloads[idx].enabled ? 'enabled' : 'disabled'}
+                label={workload.enabled ? 'enabled' : 'disabled'}
                 name={`${workload.originalKey}#enablement`}
                 onChange={this.handleWorkloadEnablement}
               />
