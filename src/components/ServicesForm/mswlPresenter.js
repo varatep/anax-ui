@@ -476,6 +476,11 @@ class ServicesForm extends Component {
 
   _generateWorkloadSections(workloads) {
     const { servicesForm } = this.props;
+
+    if (this.state.filters.currentApproach === MICROSERVICE_APPROACH) {
+      workloads = this.getPossibleWorkloads();
+    }
+    console.log('filteredWorkloads', workloads);
     const orgSections = _.map(Object.keys(workloads), (wlKey) => {
       console.log('wlkey', wlKey)
       return (
