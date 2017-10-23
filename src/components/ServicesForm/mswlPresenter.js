@@ -117,6 +117,14 @@ class ServicesForm extends Component {
   resetAllEnablements() {
     this.setState({fields: undefined}, () => {this.initiateFieldState()});
   }
+
+  updateCurrentApproach(currentApproach) {
+    if (currentApproach === ALL_APPROACH)
+      this.setState({filters:{currentApproach, workloads: undefined, microservices: undefined}}, () => {this.resetAllEnablements()});
+    else
+      this.setState({filters:{currentApproach}}, () => {this.resetAllEnablements()});
+  }
+
   /**
    * Sets the input in field state.
    * @param {SyntheticEvent} event 
