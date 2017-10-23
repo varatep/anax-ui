@@ -47,6 +47,11 @@ class ServicesForm extends Component {
       },
       location: 'servicesForm',
       fields: undefined,
+      filters: {
+        currentApproach: ALL_APPROACH,
+        microservices: undefined,
+        workloads: undefined,
+      }
     };
 
     this.handleUserInputChange = this.handleUserInputChange.bind(this);
