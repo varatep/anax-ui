@@ -500,31 +500,35 @@ class ServicesForm extends Component {
       <div>
         <Header size='large'>Services Selection</Header>
 
-        <FilterSegment />
+        <FilterSegment updateCurrentApproach={this.updateCurrentApproach.bind(this)} />
         <br />
-
-        <Grid columns={2} relaxed>
-          <Grid.Column>
-            <Header size='medium'>Microservices</Header>
-            {typeof services !== 'undefined'
-              && typeof services.microservices !== 'undefined'
-              && this._generateMicroserviceSections(services.microservices)
-            }
-          </Grid.Column>
-          <Grid.Column>
-          <Header size='medium'>Workloads</Header>
-            {typeof services !== 'undefined'
-              && typeof services.workloads !== 'undefined'
-              && this._generateWorkloadSections(services.workloads)
-            }
-          </Grid.Column>
-        </Grid>
+          {typeof this.state.fields !== 'undefined' ? 
+            <div>
+              <Grid columns={2} relaxed>
+                <Grid.Column>
+                  <Header size='medium'>Microservices</Header>
+                  {typeof services !== 'undefined'
+                    && typeof services.microservices !== 'undefined'
+                    && this._generateMicroserviceSections(services.microservices)
+                  }
+                </Grid.Column>
+                <Grid.Column>
+                <Header size='medium'>Workloads</Header>
+                  {typeof services !== 'undefined'
+                    && typeof services.workloads !== 'undefined'
+                    && this._generateWorkloadSections(services.workloads)
+                  }
+                </Grid.Column>
+              </Grid>
+              <Button primary>Submit</Button>
+            </div> : <Header>Loading...</Header>
+          }
       </div>
     );
 
     return (
       <div>
-        {typeof this.state.fields !== 'undefined' ? readyRender() : <Header>Loading</Header>}
+        {readyRender()}
       </div>
     );
   }
