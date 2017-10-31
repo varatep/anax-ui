@@ -6,6 +6,7 @@ import { configuration } from './configuration';
 import { accountFormFieldChange, accountFormMultiFieldChange, accountFormDataSubmit, accountFormPasswordReset } from './accountForm';
 import { deviceFormFieldChange, deviceFormMultiFieldChange, deviceFormSubmit, deviceFormSubmitBlockchain } from './deviceForm';
 import { servicesFormFieldChange, servicesFormMultiFieldChange, servicesFormSubmit } from './servicesForm';
+import { patterns } from './patterns';
 
 // public interface to actions
 export {
@@ -26,5 +27,6 @@ export {
   deviceFormSubmitBlockchain,
   servicesFormFieldChange,
   servicesFormMultiFieldChange,
-  servicesFormSubmit
+  servicesFormSubmit,
+  patterns,
 };
