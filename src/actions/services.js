@@ -1,3 +1,5 @@
+import queryString from 'query-string';
+
 import * as actionTypes from '../constants/actionTypes';
 import { ANAX_URL_BASE } from '../constants/configuration';
 import {error} from '../util/msgs';
@@ -19,8 +21,18 @@ export function services() {
   };
 };
 
-export function microservices(exchange_api, orgid, username, password) {
-  exchange_api = 'https://exchange.staging.bluehorizon.network/api/v1';
+export function microservices(env, orgid, username, password) {
+  let exchange_api = 'https://exchange.bluehorizon.network/api/v1';
+  if (env === 'staging')
+    exchange_api = 'https://exchange.staging.bluehorizon.network/api/v1';
+
+    const params = {
+      id: `${orgid}/${username}`,
+      token: password,
+      arch: 'arm',
+    };
+    const qs = queryString.stringify(params);
+
   return function(dispatch) {
     return fetch(`${exchange_api}/orgs/${orgid}/microservices?${qs}`)
         .then((response) => response.json())
@@ -34,8 +46,18 @@ export function microservices(exchange_api, orgid, username, password) {
   };
 };
 
-export function workloads(exchange_api, orgid, username, password) {
-  exchange_api = 'https://exchange.staging.bluehorizon.network/api/v1';
+export function workloads(env, orgid, username, password) {
+  let exchange_api = 'https://exchange.bluehorizon.network/api/v1';
+  if (env === 'staging')
+    exchange_api = 'https://exchange.staging.bluehorizon.network/api/v1';
+
+  const params = {
+    id: `${orgid}/${username}`,
+    token: password,
+    arch: 'arm',
+  };
+  const qs = queryString.stringify(params);
+
   return function(dispatch) {
     return fetch(`${exchange_api}/orgs/${orgid}/workloads?${qs}`)
         .then((response) => response.json())
@@ -44,7 +66,7 @@ export function workloads(exchange_api, orgid, username, password) {
           return data.workloads;
         })
         .catch((err) => {
-          throw error(err, 'Error fetching workloads')
+          throw error(err, 'Error fetching workloads');
         });
   };
 };
