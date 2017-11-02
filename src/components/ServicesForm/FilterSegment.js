@@ -32,7 +32,7 @@ class FilterSegment extends Component {
   render() {
     return (
       <div>
-        <Accordion styled>
+        <Accordion fluid styled>
           <Accordion.Title>
             <Icon name='dropdown' />
             Filter
@@ -53,14 +53,14 @@ class FilterSegment extends Component {
                   name='regApproach' 
                   onChange={this.handleApproachChange}
                 />
-                <Form.Field 
+                {/* <Form.Field 
                   label='Workload' 
                   value={WORKLOAD_APPROACH} 
                   checked={this.state.currentApproach === WORKLOAD_APPROACH} 
                   control={Radio}
                   name='regApproach'
                   onChange={this.handleApproachChange}
-                />
+                /> */}
                 <Form.Field 
                   label='View All' 
                   value={ALL_APPROACH} 
