@@ -20,6 +20,7 @@ import {
   Icon,
   Accordion,
   Popup,
+  Modal,
 } from 'semantic-ui-react';
 import moment from 'moment';
 
@@ -45,6 +46,12 @@ class ServicesForm extends Component {
         fetching: true,
         submitting: false,
       },
+      isWaitingCreds: true,
+      credentials: {
+        organization: undefined,
+        username: undefined,
+        password: undefined,
+      },
       location: 'servicesForm',
       fields: undefined,
       filters: {
@@ -57,6 +64,8 @@ class ServicesForm extends Component {
     this.handleUserInputChange = this.handleUserInputChange.bind(this);
     this.handleWorkloadEnablement = this.handleWorkloadEnablement.bind(this);
     this.handleMicroserviceEnablement = this.handleMicroserviceEnablement.bind(this);
+    this.handleModalFieldChange = this.handleModalFieldChange.bind(this);    
+    this.initData = this.initData.bind(this);
   }
 
   getEnabledMicroservices() {
@@ -116,6 +125,15 @@ class ServicesForm extends Component {
   
   resetAllEnablements() {
     this.setState({fields: undefined}, () => {this.initiateFieldState()});
+  }
+
+  handleModalFieldChange() {
+
+
+  }
+
+  handleModalClose() {
+
   }
 
   updateCurrentApproach(currentApproach) {
@@ -266,15 +284,33 @@ class ServicesForm extends Component {
     }});
     console.log('set state for field', this.state.fields)
   }
-
-  componentWillMount() {
+  
+  initData() {
     const { onMicroservicesGet, onWorkloadsGet, onConfigurationGet, configuration } = this.props;
-    console.log('props in mswl', this.props);
+    const { organization, username, password } = this.state.credentials;
 
-    Promise.all([onMicroservicesGet('configData.exchange_api', 'IBM'), onWorkloadsGet('configData.exchange_api', 'IBM')])
+    Promise.all([onMicroservicesGet('staging', organization, username, password), onWorkloadsGet('staging', organization, username, password)])
         .then(values => {
           this.initiateFieldState();
+          this.setState({ephemeral: {fetching: false}, isWaitingCreds: false});
         })
+  }
+
+  handleModalFieldChange(e, {name, value}) {
+    console.log({[name]: value})
+    this.setState({credentials: Object.assign({}, this.state.credentials, {
+      [name]: value,
+    })}, () => {console.log('set state', this.state)});
+  }
+
+  componentWillMount() {
+    // const { onMicroservicesGet, onWorkloadsGet, onConfigurationGet, configuration } = this.props;
+    // console.log('props in mswl', this.props);
+
+    // Promise.all([onMicroservicesGet('staging', 'IBM'), onWorkloadsGet('configData.exchange_api', 'IBM')])
+    //     .then(values => {
+    //       this.initiateFieldState();
+    //     })
 
     // onConfigurationGet()
     //     .then((configData) => {
@@ -529,6 +565,51 @@ class ServicesForm extends Component {
     return (
       <div>
         {readyRender()}
+        {
+          this.state.isWaitingCreds &&
+            <Modal
+              open={this.state.isWaitingCreds}
+              onClose={this.handleModalClose}
+              size='small'
+            >
+              <Header content='Authorization' />
+              <Modal.Content>
+                <Form>
+                  <Form.Field
+                    width={6}
+                    id='form-input-control-org'
+                    control={Input}
+                    name='organization'
+                    label='Organization'
+                    placeholder='Organization'
+                    onChange={this.handleModalFieldChange}
+                  />
+                  <Form.Field 
+                    width={6} 
+                    id='form-input-control-username' 
+                    control={Input} 
+                    name='username'
+                    label='Username' 
+                    placeholder='Username without organization id' 
+                    onChange={this.handleModalFieldChange}
+                  />
+                  <Form.Field 
+                    width={6} 
+                    id='form-input-control-password' 
+                    control={Input} 
+                    type='password' 
+                    name='password'
+                    label='Password' 
+                    placeholder='Password' 
+                    onChange={this.handleModalFieldChange} 
+                  />
+                </Form>
+              </Modal.Content>
+              <Modal.Actions>
+                <Button primary type='submit' onClick={this.initData}>Submit</Button>
+              </Modal.Actions>
+            </Modal>
+        }
       </div>
     );
   }
