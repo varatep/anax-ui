@@ -9,6 +9,7 @@ import configuration from './configuration';
 import accountForm from './accountForm';
 import deviceForm from './deviceForm';
 import servicesForm from './servicesForm';
+import patterns from './patterns';
 
 export default combineReducers({
   device,
@@ -19,5 +20,6 @@ export default combineReducers({
   accountForm,
   deviceForm,
   servicesForm,
+  patterns,
   routing: routerReducer
 });
