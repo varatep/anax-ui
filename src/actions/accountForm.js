@@ -4,6 +4,15 @@ import { ANAX_URL_BASE } from '../constants/configuration';
 
 import {device as deviceFetch} from './device';
 
+export function setExpectExistingAccount(expectExistingAccount) {
+  return function(dispatch) {
+    return dispatch({
+      type: actionTypes.ACCOUNT_FORM_SET_EXPECT,
+      expectExistingAccount,
+    });
+  }
+}
+
 export function accountFormPasswordReset(exchange_url_base, username, orgid) {
   return function(dispatch) {
     return fetch(`${exchange_url_base}/orgs/${encodeURIComponent(orgid)}/users/${encodeURIComponent(username)}/reset`,
