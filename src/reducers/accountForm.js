@@ -9,8 +9,9 @@ const initialState = {
 			email: '',
       devicename: '',
       organization: 'public',
-		}
-	}
+    },
+  },
+  expectExistingAccount: false,
 };
 
 // responsible for merging the existing state (state) w/ the state that comes from the action (in action)
@@ -22,7 +23,9 @@ export default function(state, action) {
       const merged = _.merge({}, state, {fields: {[segment]: {[fieldName]: value}}});
       return merged;
     case actionTypes.ACCOUNT_FORM_MULTI_UPDATE:
-			return _.merge({}, state, action.updateObj);
+      return _.merge({}, state, action.updateObj);
+    case actionTypes.ACCOUNT_FORM_SET_EXPECT:
+      return _.merge({}, state, {expectExistingAccount: action.expectExistingAccount});
     default:
       return _.merge({}, initialState, state);
   };
