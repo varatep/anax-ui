@@ -98,7 +98,7 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
     const regUrl = `${exchange_url_base}/orgs/${encodeURIComponent(accountForm.fields.account.organization)}/nodes/${encodeURIComponent(nodeId)}`;
 
     const authHeaders = {
-      'Authorization': authHeaderValue(accountForm.fields.account.username, accountForm.fields.account.password),
+      'Authorization': authHeaderValue(`${accountForm.fields.account.organization}/${accountForm.fields.account.username}`, accountForm.fields.account.password),
       'Content-Type': 'application/json'
     };
 
