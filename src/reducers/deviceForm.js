@@ -15,6 +15,9 @@ export const initialState = {
 		blockchain: {
 			usebc: false
 		},
+		pattern: {
+			usepattern: false
+		},
 	}
 };
 
