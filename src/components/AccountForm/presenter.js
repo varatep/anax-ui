@@ -79,7 +79,14 @@ class AccountForm extends Component {
   }
 
   handleSubmit = (expectExistingAccount) => {
-    const {configuration, accountFormDataSubmit, device, accountForm, accountFormFieldChange, router} = this.props;
+    const {configuration, accountFormDataSubmit, device, accountForm, accountFormFieldChange, router, setExpectExistingAccount} = this.props;
+
+        // .then(() => {
+        //   router.push('/setup');
+        // })
+        // .catch((err) => {
+        //   const newMgr = submitMgr.fns.error('account', `Error in setting account existance expectations. ${err.msg}`);
+        // })
 
 		this.setState(mergeState(this.state, {ephemeral: { submitting: true }}));
 
@@ -90,14 +97,17 @@ class AccountForm extends Component {
       const newMgr = submitMgr.fns.error('submit', 'Please resolve field errors and submit again.');
       this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
     } else {
-      accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, expectExistingAccount).then((success) => {
-				accountFormFieldChange('account', 'password', '');
-        router.push('/setup');
-      }).catch((err) => {
-        const newMgr = submitMgr.fns.error('account', `Account data submission error. ${err.msg}`);
-        this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
-        this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
-      });
+      setExpectExistingAccount(expectExistingAccount);
+      this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+      router.push('/setup');
+      // accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, expectExistingAccount).then((success) => {
+			// 	accountFormFieldChange('account', 'password', '');
+      //   router.push('/setup');
+      // }).catch((err) => {
+      //   const newMgr = submitMgr.fns.error('account', `Account data submission error. ${err.msg}`);
+      //   this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+      //   this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
+      // });
     }
 	}
 
@@ -199,7 +209,7 @@ class AccountForm extends Component {
           error={fieldIsInError(this, 'account.devicename')}
           onBlur={this.handleInputBlur}
         />
-        <Button primary color="blue" onClick={() => {this.handleSubmit(false);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Register Device with New Account</Button>
+        <Button primary color="blue" onClick={() => {this.handleSubmit(false);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Continue</Button>
       </Form>
       : accountForm =
       <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();} } id='account'>
@@ -231,7 +241,7 @@ class AccountForm extends Component {
           error={fieldIsInError(this, 'account.devicename')}
           onBlur={this.handleInputBlur}
         />
-        <Button primary color="blue" onClick={() => {this.handleSubmit(true);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Register Device with Existing Account</Button>
+        <Button primary color="blue" onClick={() => {this.handleSubmit(true);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Continue</Button>
         <Button basic onClick={this.handlePasswordReset}>Reset Password</Button>
       </Form>;
     return (
