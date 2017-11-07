@@ -17,7 +17,8 @@ function mapDispatchToProps(dispatch) {
     accountFormFieldChange: bindActionCreators(actions.accountFormFieldChange, dispatch),
     accountFormMultiFieldChange: bindActionCreators(actions.accountFormMultiFieldChange, dispatch),
     accountFormPasswordReset: bindActionCreators(actions.accountFormPasswordReset, dispatch),
-    accountFormDataSubmit: bindActionCreators(actions.accountFormDataSubmit, dispatch)
+    accountFormDataSubmit: bindActionCreators(actions.accountFormDataSubmit, dispatch),
+    setExpectExistingAccount: bindActionCreators(actions.setExpectExistingAccount, dispatch),
   };
 }
 
