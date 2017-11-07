@@ -114,19 +114,24 @@ class DeviceForm extends Component {
       const newMgr = submitMgr.fns.error('submit', 'Please resolve field errors and submit again.');
       this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
     } else {
-      deviceFormSubmit(deviceForm).then((success) => {
-        deviceFormSubmitBlockchain(deviceForm).then((bcSuccess) => {
-          router.push('/setup/services');
-        }).catch((bcErr) => {
-          const newBCMgr = submitMgr.fns.error('submit', `Blockchain configuration error. ${bcErr.msg}`);
-          this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
-          this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
-        });
-      }).catch((err) => {
-        const newMgr = submitMgr.fns.error('submit', `Location submission error. ${err.msg}`);
-        this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
-        this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
-      });
+      if (deviceForm.fields.pattern.usepattern) {
+        router.push('/setup/pattern');
+      } else {
+        router.push('/setup/services');
+      }
+      // deviceFormSubmit(deviceForm).then((success) => {
+      //   deviceFormSubmitBlockchain(deviceForm).then((bcSuccess) => {
+      //     router.push('/setup/services');
+      //   }).catch((bcErr) => {
+      //     const newBCMgr = submitMgr.fns.error('submit', `Blockchain configuration error. ${bcErr.msg}`);
+      //     this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+      //     this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
+      //   });
+      // }).catch((err) => {
+      //   const newMgr = submitMgr.fns.error('submit', `Location submission error. ${err.msg}`);
+      //   this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+      //   this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
+      // });
     }
   }
 
@@ -233,6 +238,15 @@ class DeviceForm extends Component {
 
           <Form id='blockchain'>
             <Checkbox style={{marginBottom: '.75em'}} toggle label='Enable Blockchain for your device' name='blockchain.usebc' defaultChecked={this.state.fields.blockchain.usebc} onChange={this.handleCheckboxChange} />
+          </Form>
+        </Segment>
+
+        <Segment padded>
+          <Header size='medium'>Pattern</Header>
+          <p>If enabled, device registration will use a pattern approach instead of a microservice/workload approach.</p>
+
+          <Form id='pattern'>
+            <Checkbox style={{marginBottom: '.75em'}} toggle label='Use pattern registration' name='pattern.usepattern' defaultChecked={this.state.fields.pattern.usepattern} onChange={this.handleCheckboxChange} />
           </Form>
         </Segment>
 

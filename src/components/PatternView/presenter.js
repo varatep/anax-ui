@@ -57,6 +57,94 @@ class PatternView extends Component {
     this.handleDropdownChange = this.handleDropdownChange.bind(this);
     this.handleModalFieldChange = this.handleModalFieldChange.bind(this);
     this.initData = this.initData.bind(this);
+    this.savePattern = this.savePattern.bind(this);
+  }
+
+  componentDidMount() {
+    document.title += ' - Pattern Setup';
+
+    if (typeof this.props.accountForm.fields.account.organization !== 'undefined'
+        && this.props.accountForm.fields.account.username !== ''
+        && this.props.accountForm.fields.account.password !== ''
+        && this.props.accountForm.fields.account.organization !== '')
+      this.setState({isWaitingCreds: false, credentials: {
+        organization: this.props.accountForm.fields.account.organization,
+        username: this.props.accountForm.fields.account.username,
+        password: this.props.accountForm.fields.account.password,
+      }}, () => {
+        this.initData();
+      });
+  }
+
+  componentWillMount() {
+    const {onConfigurationGet} = this.props;
+    onConfigurationGet()
+        .then(configData => {
+          console.log('Fetched config data successfully: ', configData);
+        })
+        .catch(err => {
+          console.error('Error fetching config data', err);
+          throw err;
+        });
+  }
+
+  savePattern() {
+    const {
+      onSavePattern, 
+      accountFormDataSubmit, 
+      accountFormFieldChange, 
+      deviceFormSubmit, 
+      deviceFormSubmitBlockchain, 
+      router, 
+      deviceForm, 
+      accountForm,
+      device,
+      configuration,
+    } = this.props;
+    console.log('saving pattern')
+
+    Promise.all([
+      accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, accountForm.expectExistingAccount, ''),
+      deviceFormSubmit(deviceForm),
+    ])
+        .then(values => {
+          console.log('Promise.all vals', values);
+          deviceFormSubmitBlockchain(deviceForm).then((bcSuccess) => {
+            console.log('bc success');
+            router.push('/dashboard');
+          })
+          .catch((bcErr) => {
+            const newBCMgr = submitMgr.fns.error('submit', `Blockchain configuration error. ${bcErr.msg}`);
+            this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+            this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
+          })
+        })
+        .catch(reason => {
+          console.log('Promise.all reason', reason);
+        })
+
+    // accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, expectExistingAccount).then((success) => {
+			// 	accountFormFieldChange('account', 'password', '');
+      //   router.push('/setup');
+      // }).catch((err) => {
+      //   const newMgr = submitMgr.fns.error('account', `Account data submission error. ${err.msg}`);
+      //   this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+      //   this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
+      // });
+
+    // deviceFormSubmit(deviceForm).then((success) => {
+      //   deviceFormSubmitBlockchain(deviceForm).then((bcSuccess) => {
+      //     router.push('/setup/services');
+      //   }).catch((bcErr) => {
+      //     const newBCMgr = submitMgr.fns.error('submit', `Blockchain configuration error. ${bcErr.msg}`);
+      //     this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+      //     this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
+      //   });
+      // }).catch((err) => {
+      //   const newMgr = submitMgr.fns.error('submit', `Location submission error. ${err.msg}`);
+      //   this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+      //   this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
+      // });
   }
 
   /**
@@ -134,10 +222,6 @@ class PatternView extends Component {
   handleDropdownChange(e, data) {
     // data.value is the originalKey prop
     this.setState({selectedPattern: data.value});
-  }
-
-  filterMicroservicesForWorkload() {
-
   }
 
   // gets workload version based on priority
@@ -525,7 +609,7 @@ class PatternView extends Component {
           }
         <br />
         {typeof this.state.selectedPattern !== 'undefined' && this.generatePatternDetailedSection()}
-        {typeof this.state.selectedPattern !== 'undefined' && <Button primary>Confirm</Button>}
+        {typeof this.state.selectedPattern !== 'undefined' && <Button onClick={this.savePattern} primary>Confirm</Button>}
       </div>
     );
   }
