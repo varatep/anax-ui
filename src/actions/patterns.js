@@ -29,9 +29,34 @@ export function patterns(env, orgid, username, password) {
   }
 }
 
+export function patchPattern(pattern) {
+  return fetch(`${ANAX_URL_BASE}/horizondevice`, {
+    method: 'PATCH',
+    headers: {'Content-Type': 'application/json'},
+    body: {
+      pattern,
+    }
+  })
+      .then((response) => response.json())
+      .then((data) => {
+        dispatchEvent(patchedPattern(data));
+        return data;
+      })
+      .catch((err) => {
+        throw err(err, 'Error saving pattern');
+      });
+};
+
 export function setPatterns(patterns) {
   return {
     type: actionTypes.PATTERNS_SET,
     patterns,
+  };
+};
+
+export function patchedPattern(result) {
+  return {
+    type: actionTypes.PATTERN_PATCHED,
+    result,
   };
 };
