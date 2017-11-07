@@ -303,6 +303,10 @@ class ServicesForm extends Component {
     })}, () => {console.log('set state', this.state)});
   }
 
+  componentDidMount() {
+    document.title += ' - Microservice and Workload Setup';
+  }
+
   componentWillMount() {
     // const { onMicroservicesGet, onWorkloadsGet, onConfigurationGet, configuration } = this.props;
     // console.log('props in mswl', this.props);
