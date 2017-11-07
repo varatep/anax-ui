@@ -60,7 +60,7 @@ export function accountFormMultiFieldChange(segment, updateObj) {
 
 // TODO: factor out duplicate handling of response.ok in fetch handlers below
 
-export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, expectExistingAccount) {
+export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, expectExistingAccount, pattern) {
 
   let registerExchangeAccount = () => {
     // TODO: expected that we're creating a new account here; use GET first to check (since existing is 400, not 409) and create a visible error
@@ -109,9 +109,11 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
           body: JSON.stringify({
             'token': token,
             'name': accountForm.fields.account.devicename,
+            'pattern': '',
             'registeredMicroservices': [],
             'msgEndPoint': '',
-            'softwareVersions': {}
+            'publicKey': '',
+            'softwareVersions': {},
           })
         }
       )
