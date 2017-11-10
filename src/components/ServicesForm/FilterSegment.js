@@ -22,6 +22,7 @@ class FilterSegment extends Component {
 
   state = {
     currentApproach: ALL_APPROACH,
+    isAccordionOpen: false,
   }
 
   handleApproachChange(event, {value}) {
@@ -29,15 +30,19 @@ class FilterSegment extends Component {
     this.props.updateCurrentApproach(value);
   }
 
+  toggleAccordion(e, titleProps) {
+    this.setState({isAccordionOpen: !this.state.isAccordionOpen});
+  }
+
   render() {
     return (
       <div>
         <Accordion fluid styled>
-          <Accordion.Title>
+          <Accordion.Title active={this.state.isAccordionOpen} onClick={this.toggleAccordion.bind(this)}>
             <Icon name='dropdown' />
             Filter
           </Accordion.Title>
-          <Accordion.Content>
+          <Accordion.Content active={this.state.isAccordionOpen}>
             <Form widths='equal'>
               <Form.Group grouped>
                 <Popup
