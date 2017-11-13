@@ -241,12 +241,16 @@ class DeviceForm extends Component {
           </Form>
         </Segment>
 
-        <Segment padded>
+        <Segment padded disabled>
           <Header size='medium'>Pattern</Header>
           <p>If enabled, device registration will use a pattern approach instead of a microservice/workload approach.</p>
 
+          <Message>
+            <p>Pattern usage is currently required for registration.</p>
+          </Message>
+
           <Form id='pattern'>
-            <Checkbox style={{marginBottom: '.75em'}} toggle label='Use pattern registration' name='pattern.usepattern' defaultChecked={this.state.fields.pattern.usepattern} onChange={this.handleCheckboxChange} />
+            <Checkbox disabled style={{marginBottom: '.75em'}} toggle label='Use pattern registration' name='pattern.usepattern' defaultChecked={this.state.fields.pattern.usepattern} onChange={this.handleCheckboxChange} />
           </Form>
         </Segment>
 
