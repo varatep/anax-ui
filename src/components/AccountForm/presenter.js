@@ -209,7 +209,7 @@ class AccountForm extends Component {
           error={fieldIsInError(this, 'account.devicename')}
           onBlur={this.handleInputBlur}
         />
-        <Button primary color="blue" onClick={() => {this.handleSubmit(false);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Continue</Button>
+        <Button type="button" primary color="blue" onClick={() => {this.handleSubmit(false);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Continue</Button>
       </Form>
       : accountForm =
       <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();} } id='account'>
@@ -241,7 +241,7 @@ class AccountForm extends Component {
           error={fieldIsInError(this, 'account.devicename')}
           onBlur={this.handleInputBlur}
         />
-        <Button primary color="blue" onClick={() => {this.handleSubmit(true);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Continue</Button>
+        <Button type="button" primary color="blue" onClick={() => {this.handleSubmit(true);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Continue</Button>
         <Button basic onClick={this.handlePasswordReset}>Reset Password</Button>
       </Form>;
     return (
