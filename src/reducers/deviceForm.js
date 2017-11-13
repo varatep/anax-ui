@@ -7,7 +7,7 @@ export const initialState = {
     location: {
 			latitude: '',
 			longitude: '',
-			user_provided_coords: true
+			location_accuracy_km: 0.5,
 		},
 		motion: {
 			usegps: false
