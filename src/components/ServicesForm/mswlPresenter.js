@@ -66,6 +66,52 @@ class ServicesForm extends Component {
     this.handleMicroserviceEnablement = this.handleMicroserviceEnablement.bind(this);
     this.handleModalFieldChange = this.handleModalFieldChange.bind(this);    
     this.initData = this.initData.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit() {
+    const {
+      accountFormDataSubmit,
+      accountFormFieldChange,
+      deviceFormSubmit,
+      deviceFormSubmitBlockchain,
+      router,
+      deviceForm,
+      accountForm,
+      device,
+      configuration,
+      onSetDeviceConfigured,
+    } = this.props;
+    const {microservices, workloads} = this.state.fields;
+    const {microservices:filteredMs, workloads:filteredWls} = this.state.filters;
+
+    console.log('State on submit', this.state);
+
+  }
+
+  /**
+   * Return a hashmap of enabled workloads in their organization
+   * @param {Array} workloads array of objects containing an originalKey
+   * 
+   * Sample object: {
+                "workload_url": "https://bluehorizon.network/workloads/netspeed",
+                "organization": "IBM",
+                "workload_version": "[0.0.0,INFINITY)",
+                "variables": {
+                  "HZN_TARGET_SERVER": "random"
+                }
+              }
+   */
+  prepareWorkloadsForApi(workloads) {
+    
+  }
+
+  /**
+   * Return a hashmap of enabled microservices in their organization
+   * @param {Array} microservices array of objects containing an originalKey
+   */
+  prepareMicroservicesForApi(microservices) {
+
   }
 
   getEnabledMicroservices() {
@@ -125,15 +171,6 @@ class ServicesForm extends Component {
   
   resetAllEnablements() {
     this.setState({fields: undefined}, () => {this.initiateFieldState()});
-  }
-
-  handleModalFieldChange() {
-
-
-  }
-
-  handleModalClose() {
-
   }
 
   updateCurrentApproach(currentApproach) {
@@ -560,7 +597,7 @@ class ServicesForm extends Component {
                   }
                 </Grid.Column>
               </Grid>
-              <Button primary>Submit</Button>
+              <Button primary onClick={this.handleSubmit}>Submit</Button>
             </div> : <Header>Loading...</Header>
           }
       </div>
@@ -597,15 +634,15 @@ class ServicesForm extends Component {
                     placeholder='Username without organization id' 
                     onChange={this.handleModalFieldChange}
                   />
-                  <Form.Field 
-                    width={6} 
-                    id='form-input-control-password' 
-                    control={Input} 
-                    type='password' 
+                  <Form.Field
+                    width={6}
+                    id='form-input-control-password'
+                    control={Input}
+                    type='password'
                     name='password'
-                    label='Password' 
-                    placeholder='Password' 
-                    onChange={this.handleModalFieldChange} 
+                    label='Password'
+                    placeholder='Password'
+                    onChange={this.handleModalFieldChange}
                   />
                 </Form>
               </Modal.Content>
