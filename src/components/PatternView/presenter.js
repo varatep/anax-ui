@@ -146,6 +146,10 @@ class PatternView extends Component {
                 })
           }, 3000);
         })
+        .catch(err => {
+          console.error(err);
+          this.showErr(err);
+        })
   }
 
   /**
@@ -548,7 +552,7 @@ class PatternView extends Component {
     const readyRender = () => {
       console.log('error state', this.state.errors);
       return <div>
-        {this.state.errors &&
+        {typeof this.state.errors !== 'undefined' &&
           <Message error>
             <Message.Header>An error has occurred</Message.Header>
             <p>{JSON.stringify(this.state.errors)}</p>
