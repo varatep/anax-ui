@@ -23,7 +23,6 @@ import {
   Message,
 } from 'semantic-ui-react';
 import moment from 'moment';
-import sequential from 'promise-sequential';
 
 const parseLastUpdated = (date) => {
   return moment(date.split('[UTC]')[0]).toString();
