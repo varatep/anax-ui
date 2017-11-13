@@ -20,8 +20,10 @@ import {
   Accordion,
   Popup,
   Modal,
+  Message,
 } from 'semantic-ui-react';
 import moment from 'moment';
+import sequential from 'promise-sequential';
 
 const parseLastUpdated = (date) => {
   return moment(date.split('[UTC]')[0]).toString();
@@ -51,6 +53,7 @@ class PatternView extends Component {
         microservices: undefined,
         workloads: undefined,
       },
+      errors: undefined,
     };
 
     this.handleAccordionClick = this.handleAccordionClick.bind(this);
@@ -84,11 +87,23 @@ class PatternView extends Component {
         })
         .catch(err => {
           console.error('Error fetching config data', err);
+          this.showErr(err);
           throw err;
         });
   }
 
+  showErr(err) {
+    this.setState({errors: err});
+  }
+
+  removeErrs() {
+    this.setState({errors: undefined});
+  }
+
   savePattern() {
+
+    this.removeErrs();
+
     const {
       onSavePattern, 
       accountFormDataSubmit, 
@@ -100,51 +115,38 @@ class PatternView extends Component {
       accountForm,
       device,
       configuration,
+      onSetDeviceConfigured,
     } = this.props;
-    console.log('saving pattern')
 
-    Promise.all([
-      accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, accountForm.expectExistingAccount, ''),
-      deviceFormSubmit(deviceForm),
-    ])
-        .then(values => {
-          console.log('Promise.all vals', values);
-          deviceFormSubmitBlockchain(deviceForm).then((bcSuccess) => {
-            console.log('bc success');
-            router.push('/dashboard');
-          })
-          .catch((bcErr) => {
-            const newBCMgr = submitMgr.fns.error('submit', `Blockchain configuration error. ${bcErr.msg}`);
-            this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
-            this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
-          })
+    // CB hell... would prefer promise-sequential
+    accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, accountForm.expectExistingAccount, this.state.selectedPattern.split('/')[1])
+        .then((res) => {
+          // Need to wait for account form fetch to finish
+          setTimeout(() => {
+            deviceFormSubmit(deviceForm)
+                .then((res) => {
+                  deviceFormSubmitBlockchain(deviceForm)
+                      .then((res) => {
+                        onSetDeviceConfigured()
+                            .then((res) => {
+                              router.push('/dashboard');
+                            })
+                            .catch((err) => {
+                              console.error(err);
+                              this.showErr(err);
+                            })
+                      })
+                      .catch((err) => {
+                        console.error(err);
+                        this.showErr(err);
+                      })
+                })
+                .catch((err) => {
+                  console.error(err);
+                  this.showErr(err);
+                })
+          }, 3000);
         })
-        .catch(reason => {
-          console.log('Promise.all reason', reason);
-        })
-
-    // accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, expectExistingAccount).then((success) => {
-			// 	accountFormFieldChange('account', 'password', '');
-      //   router.push('/setup');
-      // }).catch((err) => {
-      //   const newMgr = submitMgr.fns.error('account', `Account data submission error. ${err.msg}`);
-      //   this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
-      //   this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
-      // });
-
-    // deviceFormSubmit(deviceForm).then((success) => {
-      //   deviceFormSubmitBlockchain(deviceForm).then((bcSuccess) => {
-      //     router.push('/setup/services');
-      //   }).catch((bcErr) => {
-      //     const newBCMgr = submitMgr.fns.error('submit', `Blockchain configuration error. ${bcErr.msg}`);
-      //     this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
-      //     this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
-      //   });
-      // }).catch((err) => {
-      //   const newMgr = submitMgr.fns.error('submit', `Location submission error. ${err.msg}`);
-      //   this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
-      //   this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
-      // });
   }
 
   /**
@@ -184,7 +186,6 @@ class PatternView extends Component {
       microservices: microserviceFields,
       workloads: workloadFields,
     }});
-    console.log('set state for field', this.state.fields)
   }
 
   initData() {
@@ -198,7 +199,6 @@ class PatternView extends Component {
   }
 
   handleModalFieldChange(e, {name, value}) {
-    console.log({[name]: value})
     this.setState({credentials: Object.assign({}, this.state.credentials, {
       [name]: value,
     })}, () => {console.log('set state', this.state)});
@@ -221,7 +221,7 @@ class PatternView extends Component {
 
   handleDropdownChange(e, data) {
     // data.value is the originalKey prop
-    this.setState({selectedPattern: data.value});
+    this.setState({selectedPattern: data.value, errors: undefined});
   }
 
   // gets workload version based on priority
@@ -287,11 +287,8 @@ class PatternView extends Component {
     let microservices = {};
     let workloads = {};
 
-    console.log('wls', wls);
-
     const currentPattern = this.getPatternInfo(this.state.selectedPattern);
 
-    console.log('current pattern', currentPattern);
     // loop thru workloads in selected pattern and append to workloads var based on org
     for (let i = 0; i < currentPattern.workloads.length; i++) {
       const compWorkload = {
@@ -301,26 +298,22 @@ class PatternView extends Component {
         workloadVersion: this.getLatestWorkloadVersion(currentPattern.workloads[i].workloadVersions),
       };
 
+      if (typeof wls == 'undefined') return {microservices, workloads};
       const wlsKeys = Object.keys(wls);
-      console.log('compworkload', compWorkload);
-      console.log('wlskeys', wlsKeys);
       // loop thru unfiltered renderable workloads
       for (let j = 0; j < wlsKeys.length; j++) {
         // check for org match
-        console.log('checking for org match', wlsKeys[j], compWorkload.workloadOrgId);
         if (wlsKeys[j] === compWorkload.workloadOrgId) {
           const workloadOrg = wlsKeys[j];
           let wlToAdd = undefined;
 
           // find the single instance of a workload
           const workloadsInOrg = wls[workloadOrg];
-          console.log('looping thru workloads in org', workloadsInOrg);
           for (let k = 0; k < workloadsInOrg.length; k++) {
             if (workloadsInOrg[k].arch === compWorkload.workloadArch &&
                 workloadsInOrg[k].workloadUrl === compWorkload.workloadUrl &&
                 workloadsInOrg[k].version === compWorkload.workloadVersion) {
                   wlToAdd = workloadsInOrg[k];
-                  console.log('setting wl to add', wlToAdd);
                 }
           }
 
@@ -336,7 +329,6 @@ class PatternView extends Component {
     }
 
     // we have the filtered workloads, now get the microservices for each filtered workload
-    console.log('filtered workloads', workloads);
     const filteredWLKeys = Object.keys(workloads);
     let filteredMSArr = [];
     for (let i = 0; i < filteredWLKeys.length; i++) {
@@ -345,8 +337,6 @@ class PatternView extends Component {
       for (let j = 0; j < filteredOrgWLs.length; j++) {
         const microservicesForWL = this.getRequiredMicroservices(filteredOrgWLs[j]);
         filteredMSArr = filteredMSArr.concat(microservicesForWL);
-        console.log('microservicesforwl', microservicesForWL);
-        console.log('filteredmsarr', filteredMSArr);
       }
     }
     
@@ -359,7 +349,6 @@ class PatternView extends Component {
     }
 
     const dedupedFilteredMS = Object.values(tracker);
-    console.log('deduped', dedupedFilteredMS);
     
     // transfer deduped mses into renderable hash
     for (let i = 0; i < dedupedFilteredMS.length; i++) {
@@ -409,7 +398,6 @@ class PatternView extends Component {
   generateWorkloadSections(workloads) {
     workloads = this.filterMSWLForPattern(workloads).workloads;
     const orgSections = _.map(Object.keys(workloads), (wlKey) => {
-      console.log('wlkey', wlKey)
       return (
         <Segment vertical key={wlKey}>
           <Header size='small'>{wlKey}</Header>
@@ -478,6 +466,9 @@ class PatternView extends Component {
       Promise.all([onMicroservicesGet('staging', organization, username, password), onWorkloadsGet('staging', organization, username, password)])
           .then(values => {
             this.initiateFieldState();
+          })
+          .catch(err => {
+            this.showErr(err);
           })
     }
 
@@ -556,7 +547,16 @@ class PatternView extends Component {
   render() {
 
     const readyRender = () => {
-      return <div>{this.generatePatternSelectionSection()}</div>
+      console.log('error state', this.state.errors);
+      return <div>
+        {this.state.errors &&
+          <Message error>
+            <Message.Header>An error has occurred</Message.Header>
+            <p>{JSON.stringify(this.state.errors)}</p>
+          </Message>
+        }
+        {this.generatePatternSelectionSection()}
+      </div>
     };
 
     return (
