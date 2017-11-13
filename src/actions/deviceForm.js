@@ -17,10 +17,10 @@ export function deviceFormSubmit(deviceForm) {
         publishable: false,
         host_only: false,
         mappings: {
-          lat: String(deviceForm.fields.location.latitude),
-          lon: String(deviceForm.fields.location.longitude),
-          user_provided_coords: deviceForm.fields.location.user_provided_coords,
+          lat: parseFloat(deviceForm.fields.location.latitude),
+          lon: parseFloat(deviceForm.fields.location.longitude),
           use_gps: deviceForm.fields.motion.usegps,
+          location_accuracy_km: parseFloat(deviceForm.fields.location.location_accuracy_km),
         },
       })
     })
