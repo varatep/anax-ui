@@ -108,7 +108,7 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
           headers: authHeaders,
           body: JSON.stringify({
             'token': token,
-            'name': accountForm.fields.account.devicename,
+            'name': accountForm.fields.account.devicename || nodeId,
             'pattern': '',
             'registeredMicroservices': [],
             'msgEndPoint': '',
@@ -180,13 +180,12 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          'account': {
-            'id': accountForm.fields.account.username,
-            'email': accountForm.fields.account.email,
-          },
           'id': nodeId,
-          'name': accountForm.fields.account.devicename,
-          'token': token
+          'name': accountForm.fields.account.devicename || nodeId,
+          'token': token,
+          'organization': accountForm.fields.account.organization,
+          'ha_device': false,
+          'pattern': pattern,
         })
       }
     )
