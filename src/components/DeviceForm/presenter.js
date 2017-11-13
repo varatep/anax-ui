@@ -209,6 +209,17 @@ class DeviceForm extends Component {
           <Form className='attached fluid segment' id='location' onSubmit={(event) => {event.preventDefault();}}>
             <Form.Input fluid focus icon='circle thin' loading={this.state.ephemeral.latlon_fetching} label='Latitude' name='location.latitude' value={this.state.fields.location.latitude} onChange={this.handleFieldChange} onFocus={this.handleLatLonFocus} onBlur={this.handleInputBlur} error={fieldIsInError(this, 'location.latitude')} placeholder='Latitude' />
             <Form.Input fluid icon='circle thin' loading={this.state.ephemeral.latlon_fetching} label='Longitude' name='location.longitude' value={this.state.fields.location.longitude} onChange={this.handleFieldChange} onFocus={this.handleLatLonFocus} onBlur={this.handleInputBlur} error={fieldIsInError(this, 'location.longitude')} placeholder='Longitude' />
+            <Form.Input 
+              fluid 
+              icon='circle thin'
+              label='Location Accuracy (km) - Used to show a location estimation within a certain km instead of the device&#39;s actual location.' 
+              name='location.location_accuracy_km' 
+              value={this.state.fields.location.location_accuracy_km} 
+              onChange={this.handleFieldChange} 
+              onBlur={this.handleInputBlur} 
+              error={fieldIsInError(this, 'location.location_accuracy_km')} 
+              placeholder='Location Accuracy (km)' 
+            />
           </Form>
 
           <Divider horizontal>Info</Divider>
