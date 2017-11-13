@@ -16,7 +16,7 @@ export const initialState = {
 			usebc: false
 		},
 		pattern: {
-			usepattern: false
+			usepattern: true
 		},
 	}
 };
