@@ -71,6 +71,30 @@ export function workloads(env, orgid, username, password) {
   };
 };
 
+export function workloadConfig(workloads) {
+  return fetch(`${ANAX_URL_BASE}/workloadconfig`, {
+    method: 'POST',
+  })
+      .then((response) => response.json())
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw error(err, 'Error setting workload config');
+      });
+};
+
+export function microserviceConfig(microservices) {
+  return fetch(`${ANAX_URL_BASE}/service`)
+      .then((response) => response.json())
+      .then((data) => {
+        return data;
+      })
+      .catch((err) => {
+        throw error(err, 'Error setting microservice config');
+      });
+};
+
 export function setServices(services) {
   return {
     type: actionTypes.SERVICES_SET,
