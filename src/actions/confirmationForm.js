@@ -4,14 +4,14 @@ import { ANAX_URL_BASE } from '../constants/configuration';
 
 export function confirmationFormDataSubmit(deviceForm, servicesForm, confirmationForm) {
   return function(dispatch) {
-    return fetch(`${ANAX_URL_BASE}/service/attribute`, {
+    return fetch(`${ANAX_URL_BASE}/attribute`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        "id": "location",
-				"short_type": "location",
+				"type": "LocationAttribute",
 				"label": "Registered Location Facts",
 				"publishable": false,
+				"host_only": false,
 				"mappings": {
 					"lat": deviceForm.latitude,
 					"lon": deviceForm.longitude,
