@@ -19,9 +19,37 @@ export function device() {
   };
 };
 
+export function deviceConfigured() {
+  return function(dispatch) {
+    return fetch(`${ANAX_URL_BASE}/horizondevice/configstate`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        state: 'configured',
+      }),
+    })
+        .then((response) => {
+          if (!response.ok) {
+            throw error(response, 'Error setting configstate to "configured"');
+          } else {
+            return response.json();
+          }
+        })
+        .then((data) => {
+          dispatch(deviceConfiguredSuccess(data));
+        })
+  }
+}
+
 export function setDevice(device) {
   return {
     type: actionTypes.DEVICE_SET,
-    device
-  };
-};
+    device,
+  }
+}
+
+export function deviceConfiguredSuccess(data) {
+  return {
+    type: actionTypes.DEVICE_CONFIGURED_SUCCESS,
+    data,
+  }
+}
