@@ -1,5 +1,5 @@
-import { device } from './device';
-import { services, microservices, workloads } from './services';
+import { device, deviceConfigured } from './device';
+import { services, microservices, workloads, workloadConfig, microserviceConfig } from './services';
 import { agreements } from './agreements';
 import { attributes } from './attributes';
 import { configuration } from './configuration';
@@ -12,6 +12,7 @@ import { patterns } from './patterns';
 export {
   agreements,
   device,
+  deviceConfigured,
   services,
   microservices,
   workloads,
@@ -29,5 +30,7 @@ export {
   servicesFormFieldChange,
   servicesFormMultiFieldChange,
   servicesFormSubmit,
+  workloadConfig,
+  microserviceConfig,
   patterns,
 };
