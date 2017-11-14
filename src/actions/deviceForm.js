@@ -8,20 +8,20 @@ export function deviceFormSubmit(deviceForm) {
     // N.B. we leave the registration of the 'location' service to the next page for now; should probably be here in the future
     // TODO: fix the API to accept floats and not strings
 
-    return fetch(`${ANAX_URL_BASE}/service/attribute`, {
+    return fetch(`${ANAX_URL_BASE}/attribute`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        id: 'location',
-        short_type: 'location',
+        type: 'LocationAttributes',
         label: 'Registered Location Facts',
         publishable: false,
+        host_only: false,
         mappings: {
-          lat: String(deviceForm.fields.location.latitude),
-          lon: String(deviceForm.fields.location.longitude),
-          user_provided_coords: deviceForm.fields.location.user_provided_coords,
-          use_gps: deviceForm.fields.motion.usegps
-        }
+          lat: parseFloat(deviceForm.fields.location.latitude),
+          lon: parseFloat(deviceForm.fields.location.longitude),
+          use_gps: deviceForm.fields.motion.usegps,
+          location_accuracy_km: parseFloat(deviceForm.fields.location.location_accuracy_km),
+        },
       })
     })
     .then((response) => {
@@ -43,23 +43,23 @@ export function deviceFormSubmitBlockchain(deviceForm) {
           "Citizen Scientist": [
             {
               "name": "bluehorizon",
-              "type": "ethereum"
-            }
+              "type": "ethereum",
+            },
           ]
         }
       ];
     }
-    return fetch(`${ANAX_URL_BASE}/service/attribute`, {
+    return fetch(`${ANAX_URL_BASE}/attribute`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        id: 'agreementprotocol',
-        short_type: 'agreementprotocol',
+        type: 'AgreementProtocolAttributes',
         label: 'Agreement Protocols',
         publishable: true,
+        host_only: false,
         mappings: {
-          protocols
-        }
+          protocols,
+        },
       })
     })
     .then((response) => {

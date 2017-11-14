@@ -13,6 +13,7 @@ import AccountForm from './components/AccountForm';
 import Setup from './components/Setup';
 import DeviceForm from './components/DeviceForm';
 import ServicesForm from './components/ServicesForm';
+import PatternView from './components/PatternView';
 
 const store = mainStore();
 
@@ -29,6 +30,7 @@ ReactDOM.render(
           <IndexRedirect to="device" />
           <Route path="device" component={DeviceForm} />
           <Route path="services" component={ServicesForm} />
+          <Route path="pattern" component={PatternView} />
         </Route>
       </Route>
     </Router>

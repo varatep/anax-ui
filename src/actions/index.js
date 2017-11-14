@@ -1,28 +1,36 @@
-import { device } from './device';
-import { services } from './services';
+import { device, deviceConfigured } from './device';
+import { services, microservices, workloads, workloadConfig, microserviceConfig } from './services';
 import { agreements } from './agreements';
 import { attributes } from './attributes';
 import { configuration } from './configuration';
-import { accountFormFieldChange, accountFormMultiFieldChange, accountFormDataSubmit, accountFormPasswordReset } from './accountForm';
+import { accountFormFieldChange, accountFormMultiFieldChange, accountFormDataSubmit, accountFormPasswordReset, setExpectExistingAccount } from './accountForm';
 import { deviceFormFieldChange, deviceFormMultiFieldChange, deviceFormSubmit, deviceFormSubmitBlockchain } from './deviceForm';
 import { servicesFormFieldChange, servicesFormMultiFieldChange, servicesFormSubmit } from './servicesForm';
+import { patterns } from './patterns';
 
 // public interface to actions
 export {
   agreements,
   device,
+  deviceConfigured,
   services,
+  microservices,
+  workloads,
   attributes,
   configuration,
   accountFormFieldChange,
   accountFormMultiFieldChange,
   accountFormDataSubmit,
   accountFormPasswordReset,
+  setExpectExistingAccount,
   deviceFormFieldChange,
   deviceFormMultiFieldChange,
   deviceFormSubmit,
   deviceFormSubmitBlockchain,
   servicesFormFieldChange,
   servicesFormMultiFieldChange,
-  servicesFormSubmit
+  servicesFormSubmit,
+  workloadConfig,
+  microserviceConfig,
+  patterns,
 };

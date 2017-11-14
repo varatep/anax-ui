@@ -11,6 +11,8 @@ export function doValidation(segment, fieldName, text) {
       return validator.validText(segment, fieldName, text);
     case 'devicename':
       return validator.validText(segment, fieldName, text);
+    case 'organization':
+      return validator.validText(segment, fieldName, text);
     default:
       console.log('noop validation / type coercion for fieldName', fieldName);
       return validator.noop(segment, fieldName, text);

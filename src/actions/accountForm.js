@@ -4,9 +4,18 @@ import { ANAX_URL_BASE } from '../constants/configuration';
 
 import {device as deviceFetch} from './device';
 
-export function accountFormPasswordReset(exchange_url_base, username) {
+export function setExpectExistingAccount(expectExistingAccount) {
   return function(dispatch) {
-    return fetch(`${exchange_url_base}/users/${encodeURIComponent(username)}/reset`,
+    return dispatch({
+      type: actionTypes.ACCOUNT_FORM_SET_EXPECT,
+      expectExistingAccount,
+    });
+  }
+}
+
+export function accountFormPasswordReset(exchange_url_base, username, orgid) {
+  return function(dispatch) {
+    return fetch(`${exchange_url_base}/orgs/${encodeURIComponent(orgid)}/users/${encodeURIComponent(username)}/reset`,
       {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -51,13 +60,13 @@ export function accountFormMultiFieldChange(segment, updateObj) {
 
 // TODO: factor out duplicate handling of response.ok in fetch handlers below
 
-export function accountFormDataSubmit(exchange_url_base, deviceId, accountForm, expectExistingAccount) {
+export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, expectExistingAccount, pattern) {
 
   let registerExchangeAccount = () => {
     // TODO: expected that we're creating a new account here; use GET first to check (since existing is 400, not 409) and create a visible error
 
     // return promise
-    return fetch(`${exchange_url_base}/users/${encodeURIComponent(accountForm.fields.account.username)}`,
+    return fetch(`${exchange_url_base}/orgs/${encodeURIComponent(accountForm.fields.account.organization)}/users/${encodeURIComponent(accountForm.fields.account.username)}`,
       {
         method: 'POST',
         headers: {
@@ -85,11 +94,11 @@ export function accountFormDataSubmit(exchange_url_base, deviceId, accountForm, 
 
   let registerExchangeDevice = (token) => {
 
-    const getUrl = `${exchange_url_base}/devices`;
-    const regUrl = `${exchange_url_base}/devices/${encodeURIComponent(deviceId)}`;
+    const getUrl = `${exchange_url_base}/orgs/${encodeURIComponent(accountForm.fields.account.organization)}/nodes`;
+    const regUrl = `${exchange_url_base}/orgs/${encodeURIComponent(accountForm.fields.account.organization)}/nodes/${encodeURIComponent(nodeId)}`;
 
     const authHeaders = {
-      'Authorization': authHeaderValue(accountForm.fields.account.username, accountForm.fields.account.password),
+      'Authorization': authHeaderValue(`${accountForm.fields.account.organization}/${accountForm.fields.account.username}`, accountForm.fields.account.password),
       'Content-Type': 'application/json'
     };
 
@@ -99,10 +108,12 @@ export function accountFormDataSubmit(exchange_url_base, deviceId, accountForm, 
           headers: authHeaders,
           body: JSON.stringify({
             'token': token,
-            'name': accountForm.fields.account.devicename,
+            'name': accountForm.fields.account.devicename || nodeId,
+            'pattern': '',
             'registeredMicroservices': [],
             'msgEndPoint': '',
-            'softwareVersions': {}
+            'publicKey': '',
+            'softwareVersions': {},
           })
         }
       )
@@ -126,7 +137,7 @@ export function accountFormDataSubmit(exchange_url_base, deviceId, accountForm, 
         return response.json();
       }
     }).then(json => {
-      if (_.includes(_.keys(json.devices), deviceId)) {
+      if (_.includes(_.keys(json.nodes), nodeId)) {
 
         // do delete first then regNew()
         return Promise.all([
@@ -169,13 +180,12 @@ export function accountFormDataSubmit(exchange_url_base, deviceId, accountForm, 
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          'account': {
-            'id': accountForm.fields.account.username,
-            'email': accountForm.fields.account.email,
-          },
-          'id': deviceId,
-          'name': accountForm.fields.account.devicename,
-          'token': token
+          'id': nodeId,
+          'name': accountForm.fields.account.devicename || nodeId,
+          'token': token,
+          'organization': accountForm.fields.account.organization,
+          'ha_device': false,
+          'pattern': pattern,
         })
       }
     )
@@ -215,7 +225,7 @@ export function accountFormDataSubmit(exchange_url_base, deviceId, accountForm, 
                 return dispatch({
                   type: actionTypes.ACCOUNT_SET,
                   accountForm,
-                  deviceId
+                  nodeId
                 });
             });
       })
