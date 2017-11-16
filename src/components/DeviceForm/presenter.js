@@ -188,7 +188,7 @@ class DeviceForm extends Component {
     return (
       <div>
         <Header size='large'>Device Setup</Header>
-        <Container fluid>
+        {/* <Container fluid>
           <Header size='medium'>Security Considerations</Header>
           <p>Your device is accessible via a default account name and password. It is recommended that you change this password to avoid unwanted access.</p>
           <p>To change your Pi's default password, log in to your Pi via the console (if using an external monitor) or ssh from another computer. For example:</p>
@@ -200,7 +200,7 @@ class DeviceForm extends Component {
             <p>(set new password as prompted)</p>
             <p>Additional security advice: Take care to not expose the device management page outside of your LAN. Use proper LAN security measures (strong router passwords, firewall).</p>
 
-        </Container>
+        </Container> */}
         <Segment padded>
           <Header size='medium'>Device Location</Header>
           <p>Your device location will be made public by some applications like the <a href={`${envUrl}/map/`} target='_blank'>Horizon Map</a>. Many applications (including the Weather Underground Personal Weather Station publisher and NYU Citygram Sound analysis experiment) require accurate location data to produce useful results.</p>
