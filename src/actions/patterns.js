@@ -12,7 +12,6 @@ export function patterns(env, orgid, username, password) {
   const params = {
     id: `${orgid}/${username}`,
     token: password,
-    idfilter: '%arm',
   };
   const qs = queryString.stringify(params);
 
