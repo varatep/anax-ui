@@ -9,10 +9,11 @@ class Main extends Component {
     const { device, router } = this.props;
 
     // preconditions: don't want to evaluate further if we're in registration or still fetching device
-    if (!(router.isActive({pathname: '/account'}) || device.isFetching) &&
-      (!(device.token_valid || 'account' in device))) {
+    if (!(router.isActive({pathname: '/account'}) || typeof device.isFetching === 'undefined' || device.isFetching)) {
       router.push('/account');
     }
+
+    if (router.isActive({pathname: '/dashboard'}) && device.organization === null) router.push('/account');
 
     // TODO: handle ensuring that user doesn't browse to /account if anax device has registration facts
   }
