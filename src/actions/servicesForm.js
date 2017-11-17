@@ -31,7 +31,7 @@ export function servicesFormSubmit(attributes, servicesForm) {
 	}
 
 	let doFetch = (body) => {
-    return fetch(`${ANAX_URL_BASE}/service`,
+    return fetch(`${ANAX_URL_BASE}/microservice/config`,
 			{
         method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
