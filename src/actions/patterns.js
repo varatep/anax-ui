@@ -29,7 +29,7 @@ export function patterns(env, orgid, username, password) {
 }
 
 export function patchPattern(pattern) {
-  return fetch(`${ANAX_URL_BASE}/horizondevice`, {
+  return fetch(`${ANAX_URL_BASE}/node`, {
     method: 'PATCH',
     headers: {'Content-Type': 'application/json'},
     body: {

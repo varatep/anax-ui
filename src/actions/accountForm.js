@@ -173,7 +173,7 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
 
   // anax operation; TODO: perhaps handle the 409 more gently
   let persistExchangeAccount = (token) => {
-    return fetch(`${ANAX_URL_BASE}/horizondevice`,
+    return fetch(`${ANAX_URL_BASE}/node`,
       {
         method: 'POST',
         headers: {
