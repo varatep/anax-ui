@@ -252,12 +252,12 @@ class DeviceForm extends Component {
           </Form>
         </Segment>
 
-        <Segment padded disabled>
+        <Segment padded>
           <Header size='medium'>Pattern</Header>
           <p>If enabled, device registration will use a pattern approach instead of a microservice/workload approach.</p>
 
           <Message>
-            <p>Pattern usage is currently required for registration.</p>
+            <p>Pattern usage is currently required for registration and enabled by default. Proceed to the next page for pattern configuration.</p>
           </Message>
 
           <Form id='pattern'>
@@ -272,7 +272,7 @@ class DeviceForm extends Component {
 
         <NotificationList attached={false} mgr={note.segmentMgr(this.state.notificationMgrs, 'submit')} notificationHeader='Submission' errHeader='Submission Error' />
         <Button.Group>
-          <Button color='blue' onClick={this.handleSubmit} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Register Device Settings</Button>
+          <Button color='blue' onClick={this.handleSubmit} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Continue</Button>
         </Button.Group>
       </div>
     );
