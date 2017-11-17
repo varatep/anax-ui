@@ -116,7 +116,7 @@ class PatternView extends Component {
       configuration,
       onSetDeviceConfigured,
     } = this.props;
-
+    this.setState({ephemeral: {submitting: true}});
     // CB hell... would prefer promise-sequential
     accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, accountForm.expectExistingAccount, this.state.selectedPattern.split('/')[1])
         .then((res) => {
@@ -564,8 +564,11 @@ class PatternView extends Component {
 
     return (
       <div>
+        <Dimmer inverted active={this.state.ephemeral.submitting}>
+          <Loader />
+        </Dimmer>
         {
-          !this.state.ephemeral.fetching ? readyRender() : <Header>Loading...</Header>
+          !this.state.ephemeral.fetching && !this.state.ephemeral.submitting ? readyRender() : <Header>Loading...</Header>
         }
         {this.state.isWaitingCreds &&
           <Modal
