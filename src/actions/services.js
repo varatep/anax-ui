@@ -29,7 +29,6 @@ export function microservices(env, orgid, username, password) {
     const params = {
       id: `${orgid}/${username}`,
       token: password,
-      arch: 'arm',
     };
     const qs = queryString.stringify(params);
 
@@ -54,7 +53,6 @@ export function workloads(env, orgid, username, password) {
   const params = {
     id: `${orgid}/${username}`,
     token: password,
-    arch: 'arm',
   };
   const qs = queryString.stringify(params);
 
