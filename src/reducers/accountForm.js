@@ -8,6 +8,7 @@ const initialState = {
 			username: '',
 			email: '',
       devicename: '',
+      deviceid: '',
       organization: 'public',
     },
   },

@@ -180,7 +180,7 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          'id': nodeId,
+          'id': accountForm.fields.account.deviceid || nodeId,
           'name': accountForm.fields.account.devicename || nodeId,
           'token': token,
           'organization': accountForm.fields.account.organization,

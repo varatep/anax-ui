@@ -209,6 +209,15 @@ class AccountForm extends Component {
           error={fieldIsInError(this, 'account.devicename')}
           onBlur={this.handleInputBlur}
         />
+        <Form.Input fluid focus
+          label={<label>Device ID - <small>Enter an ID for the device. This is optional and will default to {this.props.device.id}.</small></label>}
+          name='account.deviceid'
+          value={this.state.fields.account.deviceid}
+          placeholder='Device ID'
+          onChange={this.handleFieldChange}
+          error={fieldIsInError(this, 'account.deviceid')}
+          onBlur={this.handleInputBlur}
+        />
         <Button type="button" primary color="blue" onClick={() => {this.handleSubmit(false);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Continue</Button>
       </Form>
       : accountForm =
@@ -239,6 +248,15 @@ class AccountForm extends Component {
           placeholder='Device Name'
           onChange={this.handleFieldChange}
           error={fieldIsInError(this, 'account.devicename')}
+          onBlur={this.handleInputBlur}
+        />
+        <Form.Input fluid focus
+          label={<label>Device ID - <small>Enter an ID for the device. This is optional and will default to {this.props.device.id}.</small></label>}
+          name='account.deviceid'
+          value={this.state.fields.account.deviceid}
+          placeholder='Device ID'
+          onChange={this.handleFieldChange}
+          error={fieldIsInError(this, 'account.deviceid')}
           onBlur={this.handleInputBlur}
         />
         <Button type="button" primary color="blue" onClick={() => {this.handleSubmit(true);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Continue</Button>
