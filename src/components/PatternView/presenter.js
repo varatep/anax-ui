@@ -195,7 +195,7 @@ class PatternView extends Component {
     const {onPatternsGet, configuration} = this.props;
     const {organization, username, password} = this.state.credentials;
 
-    onPatternsGet('staging', organization, username, password)
+    onPatternsGet(configuration.exchange_api, configuration.architecture, organization, username, password)
         .then(values => {
           this.setState({ephemeral: {fetching: false}, isWaitingCreds: false});
         });
