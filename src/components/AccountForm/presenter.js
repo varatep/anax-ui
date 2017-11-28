@@ -174,6 +174,10 @@ class AccountForm extends Component {
     }
   }
 
+  componentDidMount() {
+    this.setState(Object.assign({}, this.state, {fields: {account: {deviceid: this.props.device.id}}}));
+  }
+
   render() {
     // TODO: make sure returning to this page after reg (like if user hits the back button), causes redirection to dashboard
 
@@ -210,7 +214,7 @@ class AccountForm extends Component {
           onBlur={this.handleInputBlur}
         />
         <Form.Input fluid focus
-          label={<label>Device ID - <small>Enter an ID for the device. This is optional and will default to {this.props.device.id}.</small></label>}
+          label={<label>Device ID</label>}
           name='account.deviceid'
           value={this.state.fields.account.deviceid}
           placeholder='Device ID'
@@ -251,7 +255,7 @@ class AccountForm extends Component {
           onBlur={this.handleInputBlur}
         />
         <Form.Input fluid focus
-          label={<label>Device ID - <small>Enter an ID for the device. This is optional and will default to {this.props.device.id}.</small></label>}
+          label={<label>Device ID</label>}
           name='account.deviceid'
           value={this.state.fields.account.deviceid}
           placeholder='Device ID'
