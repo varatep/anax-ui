@@ -1,12 +1,13 @@
 SHELL := /bin/bash
 
-NODE_CMD := $(shell which nodejs || echo "node")
-NPM_CMD := $(shell (PATH=/usr/local/bin:$$PATH; which npm-cache) || echo "npm")
+NODE_CMD = $(shell which nodejs 2> /dev/null || echo "node")
+NPM_CMD = $(shell (PATH=/usr/local/bin:$$PATH; which npm-cache) 2> /dev/null || echo "npm")
 
-all: build
+all: deps all-nodeps
+all-nodeps: build
 
 # will always run b/c of deps target
-build: deps ./src/*
+build: ./src/*
 	$(NODE_CMD) ./scripts/build.js
 
 clean:
@@ -16,7 +17,7 @@ clean:
 install:
 	mkdir -p $(DESTDIR)/web; cp -Rvfap build/. $(DESTDIR)/web/
 
-node_modules: npmcmd
+node_modules:
 	$(NPM_CMD) install
 
 nodecmd:
@@ -28,4 +29,4 @@ npmcmd:
 deps: node_modules
 pull: deps
 
-.PHONY: clean deps install pull
+.PHONY: build clean deps install pull
