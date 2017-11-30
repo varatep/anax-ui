@@ -177,19 +177,19 @@ class AccountForm extends Component {
           />}
         />
         <Form.Input fluid focus
-          label={<label>Device Name - <small>Enter a name for device {this.props.device.id} that you will easily recognize.</small></label>}
+          label={<label>Edge Node Name - <small>Enter a name for node {this.props.device.id} that you will easily recognize.</small></label>}
           name='account.devicename'
           value={this.state.fields.account.devicename}
-          placeholder='Device Name'
+          placeholder='Edge Node Name'
           onChange={this.handleFieldChange}
           error={fieldIsInError(this, 'account.devicename')}
           onBlur={this.handleInputBlur}
         />
         <Form.Input fluid focus
-          label={<label>Device ID</label>}
+          label={<label>Edge Node ID</label>}
           name='account.deviceid'
           value={this.state.fields.account.deviceid}
-          placeholder='Device ID'
+          placeholder='Edge Node ID'
           onChange={this.handleFieldChange}
           error={fieldIsInError(this, 'account.deviceid')}
           onBlur={this.handleInputBlur}
@@ -201,7 +201,7 @@ class AccountForm extends Component {
       <div>
         <Header size="large">Account Setup</Header>
         <Segment padded raised>
-          <p>Register this device with an existing Blue Horizon Exchange user account.</p>
+          <p>Register this edge node with an existing Blue Horizon Exchange user account.</p>
 					<NotificationList attached={true} mgr={note.segmentMgr(this.state.notificationMgrs, 'account')} notificationHeader='Account Setup' errHeader='Account Data Error' />
           {accountForm}
         </Segment>

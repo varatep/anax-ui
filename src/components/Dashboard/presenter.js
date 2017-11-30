@@ -127,7 +127,7 @@ class Dashboard extends Component {
     if (_.isEmpty(this.state.services)) {
       view = (
         <Segment padded>
-          <p>Your device is not configured to execute any services.</p>
+          <p>Your edge node is not configured to execute any services.</p>
           <Button fluid primary color="blue" onClick={() => {router.push('/setup');}}>Begin Setup</Button>
         </Segment>
       );
