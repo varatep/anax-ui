@@ -516,6 +516,18 @@ class PatternView extends Component {
 
     let patternOptions = [];
     const patternKeys = Object.keys(patterns);
+
+    if (patternKeys.length === 0) {
+      return (
+        <Message warning>
+          <Message.Header>
+            No Patterns
+          </Message.Header>
+          <p>There are currently no patterns. Please check back later.</p>
+        </Message>
+      )
+    }
+
     let _this = this;
     for (let i = 0; i < patternKeys.length; i++) {
       const patternsInOrg = _.map(patterns[patternKeys[i]], (pattern) => { // map thru pattern in org
