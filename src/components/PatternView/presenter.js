@@ -91,6 +91,14 @@ class PatternView extends Component {
         });
   }
 
+  stateSubmitting(val) {
+    this.setState({ephemeral: Object.assign({}, this.state.ephemeral, {submitting: val}) });
+  }
+
+  stateFetching(val) {
+    this.setState({ ephemeral: Object.assign({}, this.state.ephemeral, {fetching: val}) });
+  }
+
   showErr(err) {
     this.setState({errors: err});
   }
@@ -197,6 +205,10 @@ class PatternView extends Component {
 
     onPatternsGet(configuration.exchange_api, configuration.architecture, organization, username, password)
         .then(values => {
+          this.setState({ephemeral: {fetching: false}, isWaitingCreds: false});
+        })
+        .catch(err => {
+          this.showErr(err);
           this.setState({ephemeral: {fetching: false}, isWaitingCreds: false});
         });
   }
@@ -570,7 +582,7 @@ class PatternView extends Component {
             <p>{JSON.stringify(this.state.errors)}</p>
           </Message>
         }
-        {this.generatePatternSelectionSection()}
+        {typeof this.state.errors === 'undefined' && this.generatePatternSelectionSection()}
       </div>
     };
 

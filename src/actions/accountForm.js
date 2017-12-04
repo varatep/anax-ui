@@ -1,7 +1,7 @@
 import {error} from '../util/msgs.js';
 import * as actionTypes from '../constants/actionTypes';
 import { ANAX_URL_BASE } from '../constants/configuration';
-
+import queryString from 'query-string';
 import {device as deviceFetch} from './device';
 
 export function setExpectExistingAccount(expectExistingAccount) {
@@ -54,6 +54,32 @@ export function accountFormMultiFieldChange(segment, updateObj) {
       type: actionTypes.ACCOUNT_FORM_MULTI_UPDATE,
       updateObj: updateObj
     });
+  }
+}
+
+export function checkAccountCredentials(exchange_url_base, organization, username, password) {
+  return function(dispatch) {
+
+    const params = {
+      username: `${organization}/${username}`,
+      password,
+    };
+    const qs = queryString.stringify(params);
+
+    return fetch(`${exchange_url_base}/orgs/${organization}/users/${username}?${qs}`, {
+      method: 'GET',
+      headers: {'Content-Type': 'application/json'},
+    })
+        .then((response) => {
+          if (!response.ok) {
+            if (response.status === 401) {
+              throw error(response, 'Invalid credentials');
+            }
+            throw error(response, 'Unable to confirm credentials');
+          } else {
+            return response.json();
+          }
+        });
   }
 }
 

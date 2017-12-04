@@ -19,6 +19,7 @@ function mapDispatchToProps(dispatch) {
     accountFormPasswordReset: bindActionCreators(actions.accountFormPasswordReset, dispatch),
     accountFormDataSubmit: bindActionCreators(actions.accountFormDataSubmit, dispatch),
     setExpectExistingAccount: bindActionCreators(actions.setExpectExistingAccount, dispatch),
+    onCheckAccountCredentials: bindActionCreators(actions.checkAccountCredentials, dispatch),
   };
 }
 
