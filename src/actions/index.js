@@ -3,7 +3,7 @@ import { services, microservices, workloads, workloadConfig, microserviceConfig 
 import { agreements } from './agreements';
 import { attributes } from './attributes';
 import { configuration } from './configuration';
-import { accountFormFieldChange, accountFormMultiFieldChange, accountFormDataSubmit, accountFormPasswordReset, setExpectExistingAccount } from './accountForm';
+import { accountFormFieldChange, accountFormMultiFieldChange, accountFormDataSubmit, accountFormPasswordReset, setExpectExistingAccount, checkAccountCredentials } from './accountForm';
 import { deviceFormFieldChange, deviceFormMultiFieldChange, deviceFormSubmit, deviceFormSubmitBlockchain } from './deviceForm';
 import { servicesFormFieldChange, servicesFormMultiFieldChange, servicesFormSubmit } from './servicesForm';
 import { patterns } from './patterns';
@@ -22,6 +22,7 @@ export {
   accountFormMultiFieldChange,
   accountFormDataSubmit,
   accountFormPasswordReset,
+  checkAccountCredentials,
   setExpectExistingAccount,
   deviceFormFieldChange,
   deviceFormMultiFieldChange,

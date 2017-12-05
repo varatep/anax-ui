@@ -91,6 +91,14 @@ class PatternView extends Component {
         });
   }
 
+  stateSubmitting(val) {
+    this.setState({ephemeral: Object.assign({}, this.state.ephemeral, {submitting: val}) });
+  }
+
+  stateFetching(val) {
+    this.setState({ ephemeral: Object.assign({}, this.state.ephemeral, {fetching: val}) });
+  }
+
   showErr(err) {
     this.setState({errors: err});
   }
@@ -197,6 +205,10 @@ class PatternView extends Component {
 
     onPatternsGet(configuration.exchange_api, configuration.architecture, organization, username, password)
         .then(values => {
+          this.setState({ephemeral: {fetching: false}, isWaitingCreds: false});
+        })
+        .catch(err => {
+          this.showErr(err);
           this.setState({ephemeral: {fetching: false}, isWaitingCreds: false});
         });
   }
@@ -516,6 +528,18 @@ class PatternView extends Component {
 
     let patternOptions = [];
     const patternKeys = Object.keys(patterns);
+
+    if (patternKeys.length === 0) {
+      return (
+        <Message warning>
+          <Message.Header>
+            No Patterns
+          </Message.Header>
+          <p>There are currently no patterns. Please check back later.</p>
+        </Message>
+      )
+    }
+
     let _this = this;
     for (let i = 0; i < patternKeys.length; i++) {
       const patternsInOrg = _.map(patterns[patternKeys[i]], (pattern) => { // map thru pattern in org
@@ -558,7 +582,7 @@ class PatternView extends Component {
             <p>{JSON.stringify(this.state.errors)}</p>
           </Message>
         }
-        {this.generatePatternSelectionSection()}
+        {typeof this.state.errors === 'undefined' && this.generatePatternSelectionSection()}
       </div>
     };
 

@@ -26,6 +26,7 @@ class AccountForm extends Component {
         accountExists: false,
         passwordType: 'password',
       },
+      error: undefined,
       fields: {...accountForm.fields},
     };
     this.state = note.newManagers(init, ['account']);
@@ -79,7 +80,7 @@ class AccountForm extends Component {
   }
 
   handleSubmit = (expectExistingAccount) => {
-    const {configuration, accountFormDataSubmit, device, accountForm, accountFormFieldChange, router, setExpectExistingAccount} = this.props;
+    const {configuration, accountFormDataSubmit, device, accountForm, accountFormFieldChange, router, setExpectExistingAccount, onCheckAccountCredentials} = this.props;
 
 		this.setState(mergeState(this.state, {ephemeral: { submitting: true }}));
 
@@ -91,8 +92,18 @@ class AccountForm extends Component {
       this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
     } else {
       setExpectExistingAccount(expectExistingAccount);
-      this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
-      router.push('/setup');
+
+      onCheckAccountCredentials(configuration.exchange_api, accountForm.fields.account.organization, accountForm.fields.account.username, accountForm.fields.account.password)
+          .then(vals => {
+            this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+            router.push('/setup');
+          })
+          .catch(err => {
+            console.log('caught err');
+            this.setState(mergeState(this.state, {ephemeral: {submitting: false}, error: err}));
+            console.error(err);
+          })
+      
     }
 	}
 
@@ -203,6 +214,12 @@ class AccountForm extends Component {
         <Segment padded raised>
           <p>Register this edge node with an existing Blue Horizon Exchange user account.</p>
 					<NotificationList attached={true} mgr={note.segmentMgr(this.state.notificationMgrs, 'account')} notificationHeader='Account Setup' errHeader='Account Data Error' />
+          {typeof this.state.error !== 'undefined' &&
+            <Message error>
+              <Message.Header>Authentication Error</Message.Header>
+              <p>{this.state.error.msg}</p>
+            </Message>
+          }
           {accountForm}
         </Segment>
       </div>
