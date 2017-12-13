@@ -13,6 +13,56 @@ export function setExpectExistingAccount(expectExistingAccount) {
   }
 }
 
+export function setExpectExistingToken(expectExistingToken, deviceid, devicetoken) {
+  return function(dispatch) {
+    return dispatch({
+      type: actionTypes.ACCOUNT_FORM_SET_EXPECT_TOKEN,
+      expectExistingToken,
+      deviceid,
+      devicetoken,
+    });
+  }
+}
+
+export function generateNodeToken() {
+  return function(dispatch) {
+    return fetch(`${ANAX_URL_BASE}/token/random`)
+        .then((response) => {
+          if (!response.ok) {
+            throw error(response, 'Error retrieving token from anax.');
+          } else {
+            return response.json();
+          }
+        })
+        .then((data) => data.token);
+  }
+}
+
+export function createExchangeUserAccount(exchange_url_base, organization, username, password, email) {
+  return function(dispatch) {
+    return fetch(`${exchange_url_base}/orgs/${encodeURIComponent(organization)}/users/${encodeURIComponent(username)}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        password,
+        email,
+        admin: false,
+      })
+    })
+        .then((response) => {
+          if (!response.ok) {
+            if (response === 400) {
+              throw error(response, `Account "${username}" already exists.`);
+            } else {
+              throw error(response, `Error creating a new Exchange User account "${username}".`);
+            }
+          } else {
+            return response.json();
+          }
+        });
+  }
+}
+
 export function accountFormPasswordReset(exchange_url_base, username, orgid) {
   return function(dispatch) {
     return fetch(`${exchange_url_base}/orgs/${encodeURIComponent(orgid)}/users/${encodeURIComponent(username)}/reset`,
@@ -86,7 +136,7 @@ export function checkAccountCredentials(exchange_url_base, organization, usernam
 
 // TODO: factor out duplicate handling of response.ok in fetch handlers below
 
-export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, expectExistingAccount, pattern) {
+export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, expectExistingAccount, pattern, inputToken) {
 
   let registerExchangeAccount = () => {
     // TODO: expected that we're creating a new account here; use GET first to check (since existing is 400, not 409) and create a visible error
@@ -233,7 +283,7 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
 
     return Promise.all(promises)
       .then((results) => {
-        const token = results[0];
+        const token = inputToken || results[0];
 
         // first two necessary AJAX calls done, now register device, send one to local anax to record the doings and fetch the update
         return registerExchangeDevice(token)

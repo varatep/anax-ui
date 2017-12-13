@@ -69,6 +69,7 @@ class PatternView extends Component {
         && this.props.accountForm.fields.account.username !== ''
         && this.props.accountForm.fields.account.password !== ''
         && this.props.accountForm.fields.account.organization !== '')
+
       this.setState({isWaitingCreds: false, credentials: {
         organization: this.props.accountForm.fields.account.organization,
         username: this.props.accountForm.fields.account.username,
