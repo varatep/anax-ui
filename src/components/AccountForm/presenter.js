@@ -24,15 +24,43 @@ class AccountForm extends Component {
       ephemeral: {
         submitting: false,
         accountExists: false,
+        tokenExists: false,
         passwordType: 'password',
       },
+      generatedToken: undefined,
       error: undefined,
       fields: {...accountForm.fields},
     };
     this.state = note.newManagers(init, ['account']);
     this.handlePasswordVisibility = this.handlePasswordVisibility.bind(this);
-		console.log('state', this.state);
-		console.log('accountForm', accountForm);
+    this.handleAccountToggle = this.handleAccountToggle.bind(this);
+    this.handleTokenToggle = this.handleTokenToggle.bind(this);
+    this.handleGenerateToken = this.handleGenerateToken.bind(this);
+  }
+
+  handleGenerateToken(evt, data) {
+    const { onGenerateNodeToken } = this.props;
+
+    onGenerateNodeToken()
+        .then((res) => {
+          this.setState({generatedToken: res});
+          const input = document.querySelector('#tokenInput');
+          input.value = res;
+          return res;
+        })
+        .catch((error) => {
+          this.setState({error});
+        });
+  }
+
+  handleAccountToggle(evt, data) {
+    this.setState(mergeState(this.state, {errors: undefined, ephemeral: {accountExists: data.checked, tokenExists: false}}), () => {
+      this.tokenCheckRef.checked = false;
+    });
+  }
+
+  handleTokenToggle(evt, data) {
+    this.setState(mergeState(this.state, {ephemeral: {tokenExists: data.checked}, errors: undefined}));
   }
 
   handleFieldChange = (event) => {
@@ -80,7 +108,7 @@ class AccountForm extends Component {
   }
 
   handleSubmit = (expectExistingAccount) => {
-    const {configuration, accountFormDataSubmit, device, accountForm, accountFormFieldChange, router, setExpectExistingAccount, onCheckAccountCredentials} = this.props;
+    const {configuration, accountFormDataSubmit, device, accountForm, accountFormFieldChange, router, setExpectExistingAccount, onSetExpectExistingToken, onCheckAccountCredentials, onCreateExchangeUserAccount} = this.props;
 
 		this.setState(mergeState(this.state, {ephemeral: { submitting: true }}));
 
@@ -91,19 +119,39 @@ class AccountForm extends Component {
       const newMgr = submitMgr.fns.error('submit', 'Please resolve field errors and submit again.');
       this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
     } else {
-      setExpectExistingAccount(expectExistingAccount);
+      if (!this.state.ephemeral.accountExists) {
+        onCreateExchangeUserAccount(configuration.exchange_api, accountForm.fields.account.organization, accountForm.fields.account.username, accountForm.fields.account.password, accountForm.fields.account.email)
+            .then(vals => {
+              this.setState(mergeState(this.state, {ephemeral: {submitting: false}}));
+              router.push('/setup');
+            })
+            .catch(err => {
+              console.error('Caught error: ', err);
+              this.setState(mergeState(this.state, {ephemeral: {submitting: false}, error: err}));
+            })
+      } else {
+        setExpectExistingAccount(expectExistingAccount);
 
-      onCheckAccountCredentials(configuration.exchange_api, accountForm.fields.account.organization, accountForm.fields.account.username, accountForm.fields.account.password)
-          .then(vals => {
-            this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
-            router.push('/setup');
-          })
-          .catch(err => {
-            console.log('caught err');
-            this.setState(mergeState(this.state, {ephemeral: {submitting: false}, error: err}));
-            console.error(err);
-          })
-      
+        let username = accountForm.fields.account.username;
+        let password = accountForm.fields.account.password;
+        if (this.state.ephemeral.tokenExists) {
+          username = accountForm.fields.account.deviceid;
+          password = accountForm.fields.account.devicetoken;
+          onSetExpectExistingToken(true, username, password);
+        }
+
+        onCheckAccountCredentials(configuration.exchange_api, accountForm.fields.account.organization, username, password)
+            .then(vals => {
+              this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
+              router.push('/setup');
+            })
+            .catch(err => {
+              console.log('caught err');
+              this.setState(mergeState(this.state, {ephemeral: {submitting: false}, error: err}));
+              console.error(err);
+            })
+        
+      }      
     }
 	}
 
@@ -127,7 +175,7 @@ class AccountForm extends Component {
 					const newMgr = mgr.fns.error('account', `Reset error. ${err.msg}.`);
 					this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
 				});
-			}
+    }
   }
 
   handlePasswordVisibility(evt) {
@@ -168,8 +216,32 @@ class AccountForm extends Component {
 
     let accountForm =
       <Form className="attached fluid segment" onSubmit={(event) => {event.preventDefault();} } id='account'>
-        <Form.Input fluid focus label='Organization' name='account.organization' value={this.state.fields.account.organization} placeholder='Organization - Default is `public`' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.organization')} onBlur={this.handleInputBlur} />
-        <Form.Input fluid focus label='Username' name='account.username' value={this.state.fields.account.username} placeholder='Username' onChange={this.handleFieldChange} error={fieldIsInError(this, 'account.username')} onBlur={this.handleInputBlur} />
+        <Checkbox toggle checked={this.state.ephemeral.tokenExists} ref={(c) => {this.tokenCheckRef = c}} label='I have a node ID and token' value={this.state.ephemeral.tokenExists} onChange={this.handleTokenToggle} disabled={!this.state.ephemeral.accountExists} />
+        <br /><br />
+        <Form.Input
+          fluid
+          focus
+          label='Organization'
+          name='account.organization'
+          value={this.state.fields.account.organization}
+          placeholder='Organization - Default is `public`'
+          onChange={this.handleFieldChange}
+          error={fieldIsInError(this, 'account.organization')}
+          onBlur={this.handleInputBlur}
+          disabled={!this.state.ephemeral.accountExists}
+        />
+        <Form.Input 
+          fluid 
+          focus 
+          label='Username' 
+          name='account.username' 
+          value={this.state.fields.account.username} 
+          placeholder='Username' 
+          onChange={this.handleFieldChange} 
+          error={fieldIsInError(this, 'account.username')} 
+          onBlur={this.handleInputBlur} 
+          disabled={this.state.ephemeral.tokenExists}
+        />
         <Form.Input
           fluid
           label='Password'
@@ -181,11 +253,24 @@ class AccountForm extends Component {
           error={fieldIsInError(this, 'account.password')}
           placeholder="Password"
           onBlur={this.handleInputBlur}
+          disabled={this.state.ephemeral.tokenExists}
           icon={<Icon
             name="eye"
             link
             onClick={this.handlePasswordVisibility}
           />}
+        />
+        <Form.Input
+          fluid
+          focus
+          label='Email'
+          name='account.email'
+          value={this.state.fields.account.email}
+          placeholder='Email'
+          onChange={this.handleFieldChange}
+          error={fieldIsInError(this, 'account.password')}
+          onBlur={this.handleInputBlur}
+          disabled={this.state.ephemeral.accountExists}
         />
         <Form.Input fluid focus
           label={<label>Edge Node Name - <small>Enter a name for node {this.props.device.id} that you will easily recognize.</small></label>}
@@ -205,22 +290,54 @@ class AccountForm extends Component {
           error={fieldIsInError(this, 'account.deviceid')}
           onBlur={this.handleInputBlur}
         />
+        {this.state.ephemeral.tokenExists ?
+          <Form.Input fluid focus
+            label='Edge Node Token'
+            name='account.devicetoken'
+            value={this.state.fields.account.devicetoken}
+            placeholder='Edge Node Token'
+            onChange={this.handleFieldChange}
+            error={fieldIsInError(this, 'account.devicetoken')}
+            onBlur={this.handleInputBlur}
+          />
+        :
+          <Form.Input fluid focus
+            id="tokenInput"
+            action={{color: 'teal', labelPosition: 'right', icon: 'write', content: 'Generate token', onClick: this.handleGenerateToken}}
+            label='Edge Node Token'
+            name='account.devicetoken'
+            value={this.state.fields.account.devicetoken}
+            placeholder='Edge Node Token'
+            onChange={this.handleFieldChange}
+            error={fieldIsInError(this, 'account.devicetoken')}
+            onBlur={this.handleInputBlur}
+          />
+        }
         <Button type="button" primary color="blue" onClick={() => {this.handleSubmit(true);}} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Continue</Button>
         <Button basic onClick={this.handlePasswordReset}>Reset Password</Button>
-      </Form>;
+      </Form>
+
     return (
       <div>
         <Header size="large">Account Setup</Header>
         <Segment padded raised>
-          <p>Register this edge node with an existing Blue Horizon Exchange user account.</p>
-					<NotificationList attached={true} mgr={note.segmentMgr(this.state.notificationMgrs, 'account')} notificationHeader='Account Setup' errHeader='Account Data Error' />
-          {typeof this.state.error !== 'undefined' &&
-            <Message error>
-              <Message.Header>Authentication Error</Message.Header>
-              <p>{this.state.error.msg}</p>
-            </Message>
-          }
-          {accountForm}
+          <Checkbox toggle label='I have a user account' onChange={this.handleAccountToggle} />
+
+          <Segment padded raised>
+            {this.state.ephemeral.accountExists ? 
+            <p>Register this edge node with an existing Blue Horizon Exchange user account.</p>
+            :
+            <p>Register this edge node with a new Blue Horizon Exchange user account in the public organization.</p>
+            }
+            {/* <NotificationList attached={true} mgr={note.segmentMgr(this.state.notificationMgrs, 'account')} notificationHeader='Account Setup' errHeader='Account Data Error' /> */}
+            {typeof this.state.error !== 'undefined' &&
+              <Message error>
+                <Message.Header>Authentication Error</Message.Header>
+                <p>{this.state.error.msg}</p>
+              </Message>
+            }
+            {accountForm}
+          </Segment>
         </Segment>
       </div>
     );
