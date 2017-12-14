@@ -127,7 +127,7 @@ class PatternView extends Component {
     } = this.props;
     this.setState({ephemeral: {submitting: true}});
     // CB hell... would prefer promise-sequential
-    accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, accountForm.expectExistingAccount, this.state.selectedPattern.split('/')[1])
+    accountFormDataSubmit(configuration.exchange_api, accountForm.fields.account.deviceid, accountForm, accountForm.expectExistingAccount, this.state.selectedPattern.split('/')[1])
         .then((res) => {
           // Need to wait for account form fetch to finish
           setTimeout(() => {
