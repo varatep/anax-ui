@@ -51,22 +51,48 @@ const parseMSWLSplit = (mswl) => {
       msHash[currentOrg] = [item];
     }
   }
-
+  
   return msHash;
 };
 
-// b/c this is a ro store we don't care about maintaining any local changes to it
+const combineSplit = (hash1, hash2) => {
+  if (typeof hash1 === 'undefined') {
+    hash1 = {};
+  }
+  if (typeof hash2 === 'undefined') {
+    hash2 = {};
+  }
+
+  let newHash = {};
+
+  const hash1Keys = Object.keys(hash1);
+
+  for (let i = 0; i < hash1Keys.length; i++) {
+    newHash[hash1Keys[i]] = hash1[hash1Keys[i]];
+  }
+
+  const parsedHash2 = parseMSWLSplit(hash2);
+
+  const hash2Keys = Object.keys(parsedHash2);
+
+  for (let i = 0; i < hash2Keys.length; i++) {
+    newHash[hash2Keys[i]] = parsedHash2[hash2Keys[i]];
+  }
+
+  return newHash;
+};
+
 export default function(state = initialState, action) {
   switch (action.type) {
     case actionTypes.SERVICES_SET:
       return Object.assign({}, state, action.services);
     case actionTypes.MICROSERVICES_SET:
       return Object.assign({}, state, {
-        microservices: parseMSWLSplit(action.microservices),
+        microservices: combineSplit(state.microservices, action.microservices),
       });
     case actionTypes.WORKLOADS_SET:
       return Object.assign({}, state, {
-        workloads: parseMSWLSplit(action.workloads),
+        workloads: combineSplit(state.workloads, action.workloads),
       });
     default:
       return state;

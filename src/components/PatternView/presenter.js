@@ -474,12 +474,26 @@ class PatternView extends Component {
   generatePatternDetailedSection() {
     const {selectedPattern} = this.state;
     const {organization, username, password} = this.state.credentials;
-    const {onMicroservicesGet, onWorkloadsGet, services} = this.props;
+    const {onMicroservicesGet, onWorkloadsGet, services, configuration} = this.props;
 
     const pattern = this.getPatternInfo(selectedPattern);
 
     if (typeof this.state.fields.microservices === 'undefined' && typeof this.state.fields.workloads === 'undefined') {
-      Promise.all([onMicroservicesGet('staging', organization, username, password), onWorkloadsGet('staging', organization, username, password)])
+
+      // arr of workloads
+      const patternWLs = pattern.workloads;
+      let promises = [onMicroservicesGet(configuration.exchange_api, organization, username, password, organization), onWorkloadsGet(configuration.exchange_api, organization, username, password, organization)];
+
+      let orgHistory = [];
+      for (let i = 0; i < patternWLs.length; i++) {
+        if (patternWLs[i].workloadOrgid !== organization && orgHistory.indexOf(patternWLs[i].workloadOrgid) === -1) {
+          orgHistory.push(patternWLs[i].workloadOrgid);
+          promises.push(onMicroservicesGet(configuration.exchange_api, organization, username, password, patternWLs[i].workloadOrgid));
+          promises.push(onWorkloadsGet(configuration.exchange_api, organization, username, password, patternWLs[i].workloadOrgid));
+        }
+      }
+
+      Promise.all(promises)
           .then(values => {
             this.initiateFieldState();
           })

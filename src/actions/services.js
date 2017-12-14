@@ -21,11 +21,7 @@ export function services() {
   };
 };
 
-export function microservices(env, orgid, username, password) {
-  let exchange_api = 'https://exchange.bluehorizon.network/api/v1';
-  if (env === 'staging')
-    exchange_api = 'https://exchange.staging.bluehorizon.network/api/v1';
-
+export function microservices(exchange_api, orgid, username, password, queryOrg) {
     const params = {
       id: `${orgid}/${username}`,
       token: password,
@@ -33,7 +29,7 @@ export function microservices(env, orgid, username, password) {
     const qs = queryString.stringify(params);
 
   return function(dispatch) {
-    return fetch(`${exchange_api}/orgs/${orgid}/microservices?${qs}`)
+    return fetch(`${exchange_api}/orgs/${queryOrg}/microservices?${qs}`)
         .then((response) => response.json())
         .then((data) => {
           dispatch(setMicroservices(data.microservices));
@@ -45,11 +41,7 @@ export function microservices(env, orgid, username, password) {
   };
 };
 
-export function workloads(env, orgid, username, password) {
-  let exchange_api = 'https://exchange.bluehorizon.network/api/v1';
-  if (env === 'staging')
-    exchange_api = 'https://exchange.staging.bluehorizon.network/api/v1';
-
+export function workloads(exchange_api, orgid, username, password, queryOrg) {
   const params = {
     id: `${orgid}/${username}`,
     token: password,
@@ -57,7 +49,7 @@ export function workloads(env, orgid, username, password) {
   const qs = queryString.stringify(params);
 
   return function(dispatch) {
-    return fetch(`${exchange_api}/orgs/${orgid}/workloads?${qs}`)
+    return fetch(`${exchange_api}/orgs/${queryOrg}/workloads?${qs}`)
         .then((response) => response.json())
         .then((data) => {
           dispatch(setWorkloads(data.workloads));
