@@ -206,7 +206,7 @@ class Dashboard extends Component {
             <Segment key={it.sensor_urls.join('/')}>
 
               {'agreements' in it ?
-                <Header size="medium">{it.agreements.active.length > 0 ? it.agreements.active[0].workload_to_run.url : it.label} <small>v{it.agreements.active[0].workload_to_run.version} by {it.agreements.active[0].workload_to_run.org}</small></Header>
+                <Header size="medium">{it.agreements.active.length > 0 ? it.agreements.active[0].workload_to_run.url : it.label} <small>{it.agreements.active.length > 0 && `${it.agreements.active[0].workload_to_run.version} by ${it.agreements.active[0].workload_to_run.org}`}</small></Header>
                 :
                 <Header size="medium">{it.label}</Header>
               }
