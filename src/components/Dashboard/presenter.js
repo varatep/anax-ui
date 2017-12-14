@@ -205,7 +205,11 @@ class Dashboard extends Component {
           return (
             <Segment key={it.sensor_urls.join('/')}>
 
-              <Header size="medium">{it.label}</Header>
+              {'agreements' in it ?
+                <Header size="medium">{it.agreements.active.length > 0 ? it.agreements.active[0].workload_to_run.url : it.label} <small>v{it.agreements.active[0].workload_to_run.version} by {it.agreements.active[0].workload_to_run.org}</small></Header>
+                :
+                <Header size="medium">{it.label}</Header>
+              }
               <Progress percent={percent} attached="top" color={color} />
               <Label as="span" color={color} attached="top right">{tag}</Label>
 
