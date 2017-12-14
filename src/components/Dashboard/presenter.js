@@ -233,22 +233,22 @@ class Dashboard extends Component {
                             {it.agreements.active[0].agreement_accepted_time > 0 ?
                                 <List.Description><strong>Counterparty accepted at</strong>: {prettyTime(it.agreements.active[0].agreement_accepted_time)}</List.Description>
                                 :
-                                <span></span>
+                                <List.Description><strong>Counterparty accepted at</strong>: unavailable</List.Description>
                             }
                             {it.agreements.active[0].agreement_execution_start_time > 0 ?
                                 <List.Description><strong>Workload pattern deployed at</strong>: {prettyTime(it.agreements.active[0].agreement_execution_start_time)}</List.Description>
                                 :
-                                <span></span>
+                                <List.Description><strong>Workload pattern deployed at</strong>: unavailable</List.Description>
                             }
                             {it.agreements.active[0].agreement_data_received_time > 0 ?
                                 <List.Description><strong>Agreement data received by counterparty at</strong>: {prettyTime(it.agreements.active[0].agreement_data_received_time)}</List.Description>
                                 :
-                                <span></span>
+                                <List.Description><strong>Agreement data received by counterparty at</strong>: unavailable</List.Description>
                             }
                             {it.agreements.active[0].agreement_finalized_time > 0 ?
                                 <List.Description><strong>Agreement finalized at</strong>: {prettyTime(it.agreements.active[0].agreement_finalized_time)}</List.Description>
                                 :
-                                <span></span>
+                                <List.Description><strong>Agreement finalized at</strong>: unavailable</List.Description>
                             }
                             {it.agreements.active[0].agreement_protocol && 
                               <List.Description><strong>Agreement Protocol</strong>: {it.agreements.active[0].agreement_protocol}</List.Description>
@@ -283,7 +283,7 @@ class Dashboard extends Component {
                   </List.Content>
                 </List.Item>
                     :
-                    <span></span>
+                    <span>No active agreement information</span>
                 }
               </List>
             </Segment>
