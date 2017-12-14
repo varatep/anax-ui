@@ -137,26 +137,36 @@ class PatternView extends Component {
                       .then((res) => {
                         onSetDeviceConfigured()
                             .then((res) => {
+                              this.stateFetching(false);
+                              this.stateSubmitting(false);
                               router.push('/dashboard');
                             })
                             .catch((err) => {
                               console.error(err);
+                              this.stateFetching(false);
+                              this.stateSubmitting(false);
                               this.showErr(err);
                             })
                       })
                       .catch((err) => {
                         console.error(err);
+                        this.stateFetching(false);
+                        this.stateSubmitting(false);
                         this.showErr(err);
                       })
                 })
                 .catch((err) => {
                   console.error(err);
+                  this.stateFetching(false);
+                  this.stateSubmitting(false);
                   this.showErr(err);
                 })
           }, 3000);
         })
         .catch(err => {
           console.error(err);
+          this.stateFetching(false);
+          this.stateSubmitting(false);
           this.showErr(err);
         })
   }
