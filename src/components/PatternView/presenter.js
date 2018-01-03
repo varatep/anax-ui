@@ -126,8 +126,9 @@ class PatternView extends Component {
       onSetDeviceConfigured,
     } = this.props;
     this.setState({ephemeral: {submitting: true}});
+
     // CB hell... would prefer promise-sequential
-    accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, accountForm.expectExistingAccount, this.state.selectedPattern.split('/')[1])
+    accountFormDataSubmit(configuration.exchange_api, accountForm.fields.account.deviceid || device.id, accountForm, true, this.state.selectedPattern)
         .then((res) => {
           // Need to wait for account form fetch to finish
           setTimeout(() => {
@@ -137,26 +138,36 @@ class PatternView extends Component {
                       .then((res) => {
                         onSetDeviceConfigured()
                             .then((res) => {
+                              this.stateFetching(false);
+                              this.stateSubmitting(false);
                               router.push('/dashboard');
                             })
                             .catch((err) => {
                               console.error(err);
+                              this.stateFetching(false);
+                              this.stateSubmitting(false);
                               this.showErr(err);
                             })
                       })
                       .catch((err) => {
                         console.error(err);
+                        this.stateFetching(false);
+                        this.stateSubmitting(false);
                         this.showErr(err);
                       })
                 })
                 .catch((err) => {
                   console.error(err);
+                  this.stateFetching(false);
+                  this.stateSubmitting(false);
                   this.showErr(err);
                 })
           }, 3000);
         })
         .catch(err => {
           console.error(err);
+          this.stateFetching(false);
+          this.stateSubmitting(false);
           this.showErr(err);
         })
   }

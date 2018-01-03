@@ -183,9 +183,9 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
           method: 'PUT',
           headers: authHeaders,
           body: JSON.stringify({
-            'token': token,
+            'token': accountForm.fields.account.devicetoken || token,
             'name': accountForm.fields.account.devicename || nodeId,
-            'pattern': '',
+            'pattern': pattern || '',
             'registeredMicroservices': [],
             'msgEndPoint': '',
             'publicKey': '',
@@ -261,7 +261,7 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
           'token': token,
           'organization': accountForm.fields.account.organization,
           'ha_device': false,
-          'pattern': pattern,
+          'pattern': pattern.split('/')[1], // [0] is the org
         })
       }
     )
