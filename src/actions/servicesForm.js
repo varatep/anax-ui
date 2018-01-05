@@ -3,6 +3,7 @@ import * as actionTypes from '../constants/actionTypes';
 import { ANAX_URL_BASE } from '../constants/configuration';
 import * as pays from './servicesRequests';
 import * as _ from 'lodash';
+import HashMap from 'hashmap';
 
 export function servicesFormFieldChange(segment, fieldName, value) {
   return dispatch => dispatch({
@@ -87,4 +88,34 @@ export function servicesFormSubmit(attributes, servicesForm) {
 			});
 		});
   };
+}
+
+// Workload form submit
+export function workloadAttrSubmit(attributes) {
+	const doFetch = (body) => {
+		return fetch(`${ANAX_URL_BASE}/workloadconfig`, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(body),
+		});
+	}
+
+	const promises = _.filter(_.map(attributes.keys(), (attributeKey) => {
+		const attribute = attributes.get(attributeKey);
+		console.log('adding to fetch: ', pays.workloadAttrGen(attribute.workloadUrl, attribute.userInputMappings, attribute.organization));
+		return doFetch(pays.workloadAttrGen(attribute.workloadUrl, attribute.userInputMappings, attribute.organization));
+	}), (pr) => {return !!pr})
+
+	return function(dispatch) {
+		return Promise.all(promises)
+				.then((response) => {
+					_.each(responses, (resp, key) => {
+						if (resp.ok) {
+							console.log('Successful workload configuration', resp);
+						} else {
+							throw error(resp, 'Workload Configuration failed');
+						}
+					});
+				});
+	};
 }
