@@ -252,3 +252,22 @@ export function auralService(sendAudio, metered = false, ram) {
     ]
   };
 }
+
+// Workload Registration Attributes
+
+export function workloadAttrGen(workload_url, userInputMappings, organization) {
+  return {
+    workload_url,
+    organization: organization || 'IBM',
+    workload_version: '[0.0.0,INFINITY)',
+    attributes: [
+      {
+        type: 'UserInputAttributes',
+        label: 'User input variables',
+        publishable: false,
+        host_only: false,
+        mappings: userInputMappings,
+      },
+    ],
+  }
+}

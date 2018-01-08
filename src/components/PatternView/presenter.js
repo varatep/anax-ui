@@ -23,6 +23,7 @@ import {
   Message,
 } from 'semantic-ui-react';
 import moment from 'moment';
+import HashMap from 'hashmap';
 
 const parseLastUpdated = (date) => {
   return moment(date.split('[UTC]')[0]).toString();
@@ -52,12 +53,15 @@ class PatternView extends Component {
         microservices: undefined,
         workloads: undefined,
       },
+      userInputs: new HashMap(),
       errors: undefined,
     };
 
     this.handleAccordionClick = this.handleAccordionClick.bind(this);
     this.handleDropdownChange = this.handleDropdownChange.bind(this);
     this.handleModalFieldChange = this.handleModalFieldChange.bind(this);
+    this.handleUserInputChange = this.handleUserInputChange.bind(this);
+    this.prepareAttributesForAPI = this.prepareAttributesForAPI.bind(this);
     this.initData = this.initData.bind(this);
     this.savePattern = this.savePattern.bind(this);
   }
@@ -124,6 +128,7 @@ class PatternView extends Component {
       device,
       configuration,
       onSetDeviceConfigured,
+      onSetWorkloadConfig,
     } = this.props;
     this.setState({ephemeral: {submitting: true}});
 
@@ -136,11 +141,20 @@ class PatternView extends Component {
                 .then((res) => {
                   deviceFormSubmitBlockchain(deviceForm)
                       .then((res) => {
-                        onSetDeviceConfigured()
+                        onSetWorkloadConfig(this.prepareAttributesForAPI())
                             .then((res) => {
-                              this.stateFetching(false);
-                              this.stateSubmitting(false);
-                              router.push('/dashboard');
+                              onSetDeviceConfigured()
+                                  .then((res) => {
+                                    this.stateFetching(false);
+                                    this.stateSubmitting(false);
+                                    router.push('/dashboard');
+                                  })
+                                  .catch((err) => {
+                                    console.error(err);
+                                    this.stateFetching(false);
+                                    this.stateSubmitting(false);
+                                    this.showErr(err);
+                                  })
                             })
                             .catch((err) => {
                               console.error(err);
@@ -228,7 +242,7 @@ class PatternView extends Component {
   handleModalFieldChange(e, {name, value}) {
     this.setState({credentials: Object.assign({}, this.state.credentials, {
       [name]: value,
-    })}, () => {console.log('set state', this.state)});
+    })}, () => {});
   }
 
   getPatternInfo(originalKey) {
@@ -395,6 +409,73 @@ class PatternView extends Component {
     };
   }
 
+  handleUserInputChange(evt, data) {
+    const tmpHash = this.state.userInputs;
+    const inputClone = tmpHash.get(data.name);
+    inputClone.defaultValue = data.value;
+    tmpHash.set(data.name, inputClone);
+  }
+
+  prepareAttributesForAPI() {
+    let parsedAttributes;
+
+    const userInputs = this.state.userInputs.values();
+
+    console.log('userInputs', userInputs);
+
+    // join attributes into one that have the same originalKey
+    const attrHM = new HashMap();
+    const attrs = _.map(userInputs, (attribute) => {
+      const attrName = attribute.name;
+      if (!attrHM.has(attribute.workloadUrl.split('/')[4])) {
+        attrHM.set(attribute.workloadUrl.split('/')[4], {
+          workloadUrl: attribute.workloadUrl,
+          organization: attribute.originalKey.split('/')[0],
+          userInputMappings: { 
+            [attrName]: attribute.defaultValue 
+          },
+        });
+      } else {
+        const tmpAttr = attrHM.get(attribute.workloadUrl.split('/')[4]);
+        attrHM.delete(attribute.workloadUrl.split('/')[4]);
+        tmpAttr.userInputMappings[attribute.name] = attribute.defaultValue;
+        attrHM.set(attribute.workloadUrl.split('/')[4], tmpAttr);
+      }
+    });
+
+    return attrHM;
+  }
+
+  generateUserInputs(unparsedUserInputs, workloadUrl, originalKey) {
+    if (unparsedUserInputs.length === 0) return <div />;
+    
+    const segments = _.map(unparsedUserInputs, (unparsedInput, idx) => {
+      let tmpHash = this.state.userInputs;
+      if (typeof tmpHash.get(unparsedInput.name) === 'undefined') {
+        tmpHash.set(unparsedInput.name, Object.assign({}, unparsedInput, {workloadUrl, originalKey}));
+      }
+      return (
+        <Form.Input 
+          fluid 
+          focus 
+          label={unparsedInput.label} 
+          key={unparsedInput.name} 
+          onChange={this.handleUserInputChange} 
+          name={unparsedInput.name} 
+          defaultValue={unparsedInput.defaultValue} 
+        />
+      );
+    });
+
+    let segmentRender = <Segment>
+      <Form className="attached fluid" onSubmit={(event) => {event.preventDefault();} } id={unparsedUserInputs[0].originalKey}>
+        {segments}
+      </Form>
+    </Segment>;
+
+    return segmentRender;
+  }
+
   generateWorkloadSegments(workloads, wlKey) {
     let segmentRender = <div />;
     const segments = _.map(Object.keys(workloads), (wlSegmentKey) => {
@@ -414,6 +495,7 @@ class PatternView extends Component {
                 <List.Item><strong>Public</strong>: {workload.public.toString()}</List.Item>
                 <List.Item><strong>Workload URL</strong>: <a href={workload.specRef}>{workload.workloadUrl}</a></List.Item>
               </List>
+              {workload.userInput && workload.userInput.length > 0 && this.generateUserInputs(workload.userInput, workload.workloadUrl, workload.originalKey)}
             </Segment>
           );
         });

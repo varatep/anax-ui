@@ -26,10 +26,11 @@ const mapDispatchToProps = (dispatch) => {
     onWorkloadsGet: bindActionCreators(actions.workloads, dispatch),
     onConfigurationGet: bindActionCreators(actions.configuration, dispatch),
     accountFormDataSubmit: bindActionCreators(actions.accountFormDataSubmit, dispatch),
-    acconutFormFieldChange: bindActionCreators(actions.accountFormFieldChange, dispatch),
+    accountFormFieldChange: bindActionCreators(actions.accountFormFieldChange, dispatch),
     deviceFormSubmit: bindActionCreators(actions.deviceFormSubmit, dispatch),
     deviceFormSubmitBlockchain: bindActionCreators(actions.deviceFormSubmitBlockchain, dispatch),
     onSetDeviceConfigured: bindActionCreators(actions.deviceConfigured, dispatch),
+    onSetWorkloadConfig: bindActionCreators(actions.workloadAttrSubmit, dispatch),
   };
 };
 

@@ -5,7 +5,7 @@ import { attributes } from './attributes';
 import { configuration } from './configuration';
 import { accountFormFieldChange, accountFormMultiFieldChange, accountFormDataSubmit, accountFormPasswordReset, setExpectExistingAccount, checkAccountCredentials, generateNodeToken, createExchangeUserAccount, setExpectExistingToken } from './accountForm';
 import { deviceFormFieldChange, deviceFormMultiFieldChange, deviceFormSubmit, deviceFormSubmitBlockchain } from './deviceForm';
-import { servicesFormFieldChange, servicesFormMultiFieldChange, servicesFormSubmit } from './servicesForm';
+import { servicesFormFieldChange, servicesFormMultiFieldChange, servicesFormSubmit, workloadAttrSubmit } from './servicesForm';
 import { patterns } from './patterns';
 
 // public interface to actions
@@ -33,9 +33,12 @@ export {
   deviceFormMultiFieldChange,
   deviceFormSubmit,
   deviceFormSubmitBlockchain,
+
   servicesFormFieldChange,
   servicesFormMultiFieldChange,
   servicesFormSubmit,
+  workloadAttrSubmit,
+
   workloadConfig,
   microserviceConfig,
   patterns,
