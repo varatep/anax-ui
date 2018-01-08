@@ -108,7 +108,7 @@ export function workloadAttrSubmit(attributes) {
 
 	return function(dispatch) {
 		return Promise.all(promises)
-				.then((response) => {
+				.then((responses) => {
 					_.each(responses, (resp, key) => {
 						if (resp.ok) {
 							console.log('Successful workload configuration', resp);
