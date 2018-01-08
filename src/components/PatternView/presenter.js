@@ -416,11 +416,6 @@ class PatternView extends Component {
     tmpHash.set(data.name, inputClone);
   }
 
-  savePatternTest() {
-    const {onSetWorkloadConfig} = this.props;
-    onSetWorkloadConfig(this.prepareAttributesForAPI());
-  }
-
   prepareAttributesForAPI() {
     let parsedAttributes;
 
@@ -753,7 +748,6 @@ class PatternView extends Component {
         <br />
         {typeof this.state.selectedPattern !== 'undefined' && this.generatePatternDetailedSection()}
         {typeof this.state.selectedPattern !== 'undefined' && <Button onClick={this.savePattern} primary>Confirm</Button>}
-        <Button onClick={this.savePatternTest.bind(this)} primary>Test</Button>
       </div>
     );
   }
