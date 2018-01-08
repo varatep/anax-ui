@@ -93,7 +93,7 @@ export function servicesFormSubmit(attributes, servicesForm) {
 // Workload form submit
 export function workloadAttrSubmit(attributes) {
 	const doFetch = (body) => {
-		return fetch(`${ANAX_URL_BASE}/workloadconfig`, {
+		return fetch(`${ANAX_URL_BASE}/workload/config`, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(body),
