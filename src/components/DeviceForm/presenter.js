@@ -187,7 +187,7 @@ class DeviceForm extends Component {
 
     return (
       <div>
-        <Header size='large'>Device Setup</Header>
+        <Header size='large'>Edge Node Setup</Header>
         {/* <Container fluid>
           <Header size='medium'>Security Considerations</Header>
           <p>Your device is accessible via a default account name and password. It is recommended that you change this password to avoid unwanted access.</p>
@@ -202,8 +202,8 @@ class DeviceForm extends Component {
 
         </Container> */}
         <Segment padded>
-          <Header size='medium'>Device Location</Header>
-          <p>Your device location will be made public by some applications like the <a href={`${envUrl}/map/`} target='_blank'>Horizon Map</a>. Many applications (including the Weather Underground Personal Weather Station publisher and NYU Citygram Sound analysis experiment) require accurate location data to produce useful results.</p>
+          <Header size='medium'>Edge Node Location</Header>
+          <p>Your edge node location will be made public by some applications like the <a href={`${envUrl}/map/`} target='_blank'>Horizon Map</a>. Many applications (including the Weather Underground Personal Weather Station publisher and NYU Citygram Sound analysis experiment) require accurate location data to produce useful results.</p>
 
           <NotificationList attached={true} mgr={note.segmentMgr(this.state.notificationMgrs, 'location')} notificationHeader='Location Setup' errHeader='Location Data Error' />
           <Form className='attached fluid segment' id='location' onSubmit={(event) => {event.preventDefault();}}>
@@ -212,7 +212,7 @@ class DeviceForm extends Component {
             <Form.Input 
               fluid 
               icon='circle thin'
-              label='Location Accuracy (km) - Used to show a location estimation within a certain km instead of the device&#39;s actual location.' 
+              label='Location Accuracy (km) - Used to show a location estimation within a certain km instead of the edge node&#39;s actual location.' 
               name='location.location_accuracy_km' 
               value={this.state.fields.location.location_accuracy_km} 
               onChange={this.handleFieldChange} 
@@ -233,31 +233,31 @@ class DeviceForm extends Component {
         </Segment>
 
         <Segment padded>
-          <Header size='medium'>Moving Device</Header>
-          <p>If your device moves from place to place and is equipped with a GPS sensor, its most current location is useful to some applications. Do you wish to allow applications to read your GPS location data?</p>
+          <Header size='medium'>Moving Edge Node</Header>
+          <p>If your edge node moves from place to place and is equipped with a GPS sensor, its most current location is useful to some applications. Do you wish to allow applications to read your GPS location data?</p>
 
           <Form id='motion'>
             <Checkbox style={{marginBottom: '.75em'}} toggle label='Share GPS location data' name='motion.usegps' defaultChecked={this.state.fields.motion.usegps} onChange={this.handleCheckboxChange} />
           </Form>
 
-          <p><strong>Note</strong>: You needn't have a GPS device at this time to opt-in; if you attach a device at a later time the system will make use of it.</p>
+          <p><strong>Note</strong>: You needn't have a GPS edge node at this time to opt-in; if you attach a edge node at a later time the system will make use of it.</p>
         </Segment>
 
         <Segment padded>
           <Header size='medium'>Blockchain</Header>
-          <p>If enabled, agreements made with your device are recorded on Horizon's Ethereum Blockchain.</p>
+          <p>If enabled, agreements made with your edge node are recorded on Horizon's Ethereum Blockchain.</p>
 
           <Form id='blockchain'>
-            <Checkbox style={{marginBottom: '.75em'}} toggle label='Enable Blockchain for your device' name='blockchain.usebc' defaultChecked={this.state.fields.blockchain.usebc} onChange={this.handleCheckboxChange} />
+            <Checkbox style={{marginBottom: '.75em'}} toggle label='Enable Blockchain for your edge node' name='blockchain.usebc' defaultChecked={this.state.fields.blockchain.usebc} onChange={this.handleCheckboxChange} />
           </Form>
         </Segment>
 
-        <Segment padded disabled>
+        <Segment padded>
           <Header size='medium'>Pattern</Header>
-          <p>If enabled, device registration will use a pattern approach instead of a microservice/workload approach.</p>
+          <p>If enabled, edge node registration will use a pattern approach instead of a microservice/workload approach.</p>
 
           <Message>
-            <p>Pattern usage is currently required for registration.</p>
+            <p>Pattern usage is currently required for registration and enabled by default. Proceed to the next page for pattern configuration.</p>
           </Message>
 
           <Form id='pattern'>
@@ -272,7 +272,7 @@ class DeviceForm extends Component {
 
         <NotificationList attached={false} mgr={note.segmentMgr(this.state.notificationMgrs, 'submit')} notificationHeader='Submission' errHeader='Submission Error' />
         <Button.Group>
-          <Button color='blue' onClick={this.handleSubmit} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Register Device Settings</Button>
+          <Button color='blue' onClick={this.handleSubmit} loading={this.state.ephemeral.submitting} disabled={this.state.ephemeral.submitting}>Continue</Button>
         </Button.Group>
       </div>
     );

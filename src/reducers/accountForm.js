@@ -8,10 +8,13 @@ const initialState = {
 			username: '',
 			email: '',
       devicename: '',
+      deviceid: '',
+      devicetoken: '',
       organization: 'public',
     },
   },
   expectExistingAccount: false,
+  expectExistingToken: false,
 };
 
 // responsible for merging the existing state (state) w/ the state that comes from the action (in action)
@@ -26,6 +29,8 @@ export default function(state, action) {
       return _.merge({}, state, action.updateObj);
     case actionTypes.ACCOUNT_FORM_SET_EXPECT:
       return _.merge({}, state, {expectExistingAccount: action.expectExistingAccount});
+    case actionTypes.ACCOUNT_FORM_SET_EXPECT_TOKEN:
+      return _.merge({}, state, {expectExistingToken: action.expectExistingToken, fields: {account: {username: action.deviceid, password: action.devicetoken}}});
     default:
       return _.merge({}, initialState, state);
   };

@@ -127,7 +127,7 @@ class Dashboard extends Component {
     if (_.isEmpty(this.state.services)) {
       view = (
         <Segment padded>
-          <p>Your device is not configured to execute any services.</p>
+          <p>Your edge node is not configured to execute any services.</p>
           <Button fluid primary color="blue" onClick={() => {router.push('/setup');}}>Begin Setup</Button>
         </Segment>
       );
@@ -205,7 +205,11 @@ class Dashboard extends Component {
           return (
             <Segment key={it.sensor_urls.join('/')}>
 
-              <Header size="medium">{it.label}</Header>
+              {'agreements' in it ?
+                <Header size="medium">{it.agreements.active.length > 0 ? it.agreements.active[0].workload_to_run.url : it.label} <small>{it.agreements.active.length > 0 && `${it.agreements.active[0].workload_to_run.version} by ${it.agreements.active[0].workload_to_run.org}`}</small></Header>
+                :
+                <Header size="medium">{it.label}</Header>
+              }
               <Progress percent={percent} attached="top" color={color} />
               <Label as="span" color={color} attached="top right">{tag}</Label>
 
@@ -229,22 +233,22 @@ class Dashboard extends Component {
                             {it.agreements.active[0].agreement_accepted_time > 0 ?
                                 <List.Description><strong>Counterparty accepted at</strong>: {prettyTime(it.agreements.active[0].agreement_accepted_time)}</List.Description>
                                 :
-                                <span></span>
+                                <List.Description><strong>Counterparty accepted at</strong>: unavailable</List.Description>
                             }
                             {it.agreements.active[0].agreement_execution_start_time > 0 ?
                                 <List.Description><strong>Workload pattern deployed at</strong>: {prettyTime(it.agreements.active[0].agreement_execution_start_time)}</List.Description>
                                 :
-                                <span></span>
+                                <List.Description><strong>Workload pattern deployed at</strong>: unavailable</List.Description>
                             }
                             {it.agreements.active[0].agreement_data_received_time > 0 ?
                                 <List.Description><strong>Agreement data received by counterparty at</strong>: {prettyTime(it.agreements.active[0].agreement_data_received_time)}</List.Description>
                                 :
-                                <span></span>
+                                <List.Description><strong>Agreement data received by counterparty at</strong>: unavailable</List.Description>
                             }
                             {it.agreements.active[0].agreement_finalized_time > 0 ?
                                 <List.Description><strong>Agreement finalized at</strong>: {prettyTime(it.agreements.active[0].agreement_finalized_time)}</List.Description>
                                 :
-                                <span></span>
+                                <List.Description><strong>Agreement finalized at</strong>: unavailable</List.Description>
                             }
                             {it.agreements.active[0].agreement_protocol && 
                               <List.Description><strong>Agreement Protocol</strong>: {it.agreements.active[0].agreement_protocol}</List.Description>
@@ -279,7 +283,7 @@ class Dashboard extends Component {
                   </List.Content>
                 </List.Item>
                     :
-                    <span></span>
+                    <span>No active agreement information</span>
                 }
               </List>
             </Segment>

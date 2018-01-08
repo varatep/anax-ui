@@ -23,6 +23,7 @@ import {
   Message,
 } from 'semantic-ui-react';
 import moment from 'moment';
+import HashMap from 'hashmap';
 
 const parseLastUpdated = (date) => {
   return moment(date.split('[UTC]')[0]).toString();
@@ -52,12 +53,15 @@ class PatternView extends Component {
         microservices: undefined,
         workloads: undefined,
       },
+      userInputs: new HashMap(),
       errors: undefined,
     };
 
     this.handleAccordionClick = this.handleAccordionClick.bind(this);
     this.handleDropdownChange = this.handleDropdownChange.bind(this);
     this.handleModalFieldChange = this.handleModalFieldChange.bind(this);
+    this.handleUserInputChange = this.handleUserInputChange.bind(this);
+    this.prepareAttributesForAPI = this.prepareAttributesForAPI.bind(this);
     this.initData = this.initData.bind(this);
     this.savePattern = this.savePattern.bind(this);
   }
@@ -69,6 +73,7 @@ class PatternView extends Component {
         && this.props.accountForm.fields.account.username !== ''
         && this.props.accountForm.fields.account.password !== ''
         && this.props.accountForm.fields.account.organization !== '')
+
       this.setState({isWaitingCreds: false, credentials: {
         organization: this.props.accountForm.fields.account.organization,
         username: this.props.accountForm.fields.account.username,
@@ -89,6 +94,14 @@ class PatternView extends Component {
           this.showErr(err);
           throw err;
         });
+  }
+
+  stateSubmitting(val) {
+    this.setState({ephemeral: Object.assign({}, this.state.ephemeral, {submitting: val}) });
+  }
+
+  stateFetching(val) {
+    this.setState({ ephemeral: Object.assign({}, this.state.ephemeral, {fetching: val}) });
   }
 
   showErr(err) {
@@ -115,10 +128,12 @@ class PatternView extends Component {
       device,
       configuration,
       onSetDeviceConfigured,
+      onSetWorkloadConfig,
     } = this.props;
+    this.setState({ephemeral: {submitting: true}});
 
     // CB hell... would prefer promise-sequential
-    accountFormDataSubmit(configuration.exchange_api, device.id, accountForm, accountForm.expectExistingAccount, this.state.selectedPattern.split('/')[1])
+    accountFormDataSubmit(configuration.exchange_api, accountForm.fields.account.deviceid || device.id, accountForm, true, this.state.selectedPattern)
         .then((res) => {
           // Need to wait for account form fetch to finish
           setTimeout(() => {
@@ -126,28 +141,47 @@ class PatternView extends Component {
                 .then((res) => {
                   deviceFormSubmitBlockchain(deviceForm)
                       .then((res) => {
-                        onSetDeviceConfigured()
+                        onSetWorkloadConfig(this.prepareAttributesForAPI())
                             .then((res) => {
-                              router.push('/dashboard');
+                              onSetDeviceConfigured()
+                                  .then((res) => {
+                                    this.stateFetching(false);
+                                    this.stateSubmitting(false);
+                                    router.push('/dashboard');
+                                  })
+                                  .catch((err) => {
+                                    console.error(err);
+                                    this.stateFetching(false);
+                                    this.stateSubmitting(false);
+                                    this.showErr(err);
+                                  })
                             })
                             .catch((err) => {
                               console.error(err);
+                              this.stateFetching(false);
+                              this.stateSubmitting(false);
                               this.showErr(err);
                             })
                       })
                       .catch((err) => {
                         console.error(err);
+                        this.stateFetching(false);
+                        this.stateSubmitting(false);
                         this.showErr(err);
                       })
                 })
                 .catch((err) => {
                   console.error(err);
+                  this.stateFetching(false);
+                  this.stateSubmitting(false);
                   this.showErr(err);
                 })
           }, 3000);
         })
         .catch(err => {
           console.error(err);
+          this.stateFetching(false);
+          this.stateSubmitting(false);
           this.showErr(err);
         })
   }
@@ -195,8 +229,12 @@ class PatternView extends Component {
     const {onPatternsGet, configuration} = this.props;
     const {organization, username, password} = this.state.credentials;
 
-    onPatternsGet('staging', organization, username, password)
+    onPatternsGet(configuration.exchange_api, configuration.architecture, organization, username, password)
         .then(values => {
+          this.setState({ephemeral: {fetching: false}, isWaitingCreds: false});
+        })
+        .catch(err => {
+          this.showErr(err);
           this.setState({ephemeral: {fetching: false}, isWaitingCreds: false});
         });
   }
@@ -204,7 +242,7 @@ class PatternView extends Component {
   handleModalFieldChange(e, {name, value}) {
     this.setState({credentials: Object.assign({}, this.state.credentials, {
       [name]: value,
-    })}, () => {console.log('set state', this.state)});
+    })}, () => {});
   }
 
   getPatternInfo(originalKey) {
@@ -371,6 +409,73 @@ class PatternView extends Component {
     };
   }
 
+  handleUserInputChange(evt, data) {
+    const tmpHash = this.state.userInputs;
+    const inputClone = tmpHash.get(data.name);
+    inputClone.defaultValue = data.value;
+    tmpHash.set(data.name, inputClone);
+  }
+
+  prepareAttributesForAPI() {
+    let parsedAttributes;
+
+    const userInputs = this.state.userInputs.values();
+
+    console.log('userInputs', userInputs);
+
+    // join attributes into one that have the same originalKey
+    const attrHM = new HashMap();
+    const attrs = _.map(userInputs, (attribute) => {
+      const attrName = attribute.name;
+      if (!attrHM.has(attribute.workloadUrl.split('/')[4])) {
+        attrHM.set(attribute.workloadUrl.split('/')[4], {
+          workloadUrl: attribute.workloadUrl,
+          organization: attribute.originalKey.split('/')[0],
+          userInputMappings: { 
+            [attrName]: attribute.defaultValue 
+          },
+        });
+      } else {
+        const tmpAttr = attrHM.get(attribute.workloadUrl.split('/')[4]);
+        attrHM.delete(attribute.workloadUrl.split('/')[4]);
+        tmpAttr.userInputMappings[attribute.name] = attribute.defaultValue;
+        attrHM.set(attribute.workloadUrl.split('/')[4], tmpAttr);
+      }
+    });
+
+    return attrHM;
+  }
+
+  generateUserInputs(unparsedUserInputs, workloadUrl, originalKey) {
+    if (unparsedUserInputs.length === 0) return <div />;
+    
+    const segments = _.map(unparsedUserInputs, (unparsedInput, idx) => {
+      let tmpHash = this.state.userInputs;
+      if (typeof tmpHash.get(unparsedInput.name) === 'undefined') {
+        tmpHash.set(unparsedInput.name, Object.assign({}, unparsedInput, {workloadUrl, originalKey}));
+      }
+      return (
+        <Form.Input 
+          fluid 
+          focus 
+          label={unparsedInput.label} 
+          key={unparsedInput.name} 
+          onChange={this.handleUserInputChange} 
+          name={unparsedInput.name} 
+          defaultValue={unparsedInput.defaultValue} 
+        />
+      );
+    });
+
+    let segmentRender = <Segment>
+      <Form className="attached fluid" onSubmit={(event) => {event.preventDefault();} } id={unparsedUserInputs[0].originalKey}>
+        {segments}
+      </Form>
+    </Segment>;
+
+    return segmentRender;
+  }
+
   generateWorkloadSegments(workloads, wlKey) {
     let segmentRender = <div />;
     const segments = _.map(Object.keys(workloads), (wlSegmentKey) => {
@@ -390,6 +495,7 @@ class PatternView extends Component {
                 <List.Item><strong>Public</strong>: {workload.public.toString()}</List.Item>
                 <List.Item><strong>Workload URL</strong>: <a href={workload.specRef}>{workload.workloadUrl}</a></List.Item>
               </List>
+              {workload.userInput && workload.userInput.length > 0 && this.generateUserInputs(workload.userInput, workload.workloadUrl, workload.originalKey)}
             </Segment>
           );
         });
@@ -461,12 +567,26 @@ class PatternView extends Component {
   generatePatternDetailedSection() {
     const {selectedPattern} = this.state;
     const {organization, username, password} = this.state.credentials;
-    const {onMicroservicesGet, onWorkloadsGet, services} = this.props;
+    const {onMicroservicesGet, onWorkloadsGet, services, configuration} = this.props;
 
     const pattern = this.getPatternInfo(selectedPattern);
 
     if (typeof this.state.fields.microservices === 'undefined' && typeof this.state.fields.workloads === 'undefined') {
-      Promise.all([onMicroservicesGet('staging', organization, username, password), onWorkloadsGet('staging', organization, username, password)])
+
+      // arr of workloads
+      const patternWLs = pattern.workloads;
+      let promises = [onMicroservicesGet(configuration.exchange_api, organization, username, password, organization), onWorkloadsGet(configuration.exchange_api, organization, username, password, organization)];
+
+      let orgHistory = [];
+      for (let i = 0; i < patternWLs.length; i++) {
+        if (patternWLs[i].workloadOrgid !== organization && orgHistory.indexOf(patternWLs[i].workloadOrgid) === -1) {
+          orgHistory.push(patternWLs[i].workloadOrgid);
+          promises.push(onMicroservicesGet(configuration.exchange_api, organization, username, password, patternWLs[i].workloadOrgid));
+          promises.push(onWorkloadsGet(configuration.exchange_api, organization, username, password, patternWLs[i].workloadOrgid));
+        }
+      }
+
+      Promise.all(promises)
           .then(values => {
             this.initiateFieldState();
           })
@@ -516,6 +636,18 @@ class PatternView extends Component {
 
     let patternOptions = [];
     const patternKeys = Object.keys(patterns);
+
+    if (patternKeys.length === 0) {
+      return (
+        <Message warning>
+          <Message.Header>
+            No Patterns
+          </Message.Header>
+          <p>There are currently no patterns. Please check back later.</p>
+        </Message>
+      )
+    }
+
     let _this = this;
     for (let i = 0; i < patternKeys.length; i++) {
       const patternsInOrg = _.map(patterns[patternKeys[i]], (pattern) => { // map thru pattern in org
@@ -558,14 +690,17 @@ class PatternView extends Component {
             <p>{JSON.stringify(this.state.errors)}</p>
           </Message>
         }
-        {this.generatePatternSelectionSection()}
+        {typeof this.state.errors === 'undefined' && this.generatePatternSelectionSection()}
       </div>
     };
 
     return (
       <div>
+        <Dimmer inverted active={this.state.ephemeral.submitting}>
+          <Loader />
+        </Dimmer>
         {
-          !this.state.ephemeral.fetching ? readyRender() : <Header>Loading...</Header>
+          !this.state.ephemeral.fetching && !this.state.ephemeral.submitting ? readyRender() : <Header>Loading...</Header>
         }
         {this.state.isWaitingCreds &&
           <Modal

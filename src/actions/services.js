@@ -8,7 +8,7 @@ import {error} from '../util/msgs';
 
 export function services() {
   return function(dispatch) {
-    return fetch(`${ANAX_URL_BASE}/service`)
+    return fetch(`${ANAX_URL_BASE}/microservice/config`)
         .then((response) => response.json())
         .then((data) => {
           dispatch(setServices(data.services));
@@ -21,20 +21,15 @@ export function services() {
   };
 };
 
-export function microservices(env, orgid, username, password) {
-  let exchange_api = 'https://exchange.bluehorizon.network/api/v1';
-  if (env === 'staging')
-    exchange_api = 'https://exchange.staging.bluehorizon.network/api/v1';
-
+export function microservices(exchange_api, orgid, username, password, queryOrg) {
     const params = {
       id: `${orgid}/${username}`,
       token: password,
-      arch: 'arm',
     };
     const qs = queryString.stringify(params);
 
   return function(dispatch) {
-    return fetch(`${exchange_api}/orgs/${orgid}/microservices?${qs}`)
+    return fetch(`${exchange_api}/orgs/${queryOrg}/microservices?${qs}`)
         .then((response) => response.json())
         .then((data) => {
           dispatch(setMicroservices(data.microservices));
@@ -46,20 +41,15 @@ export function microservices(env, orgid, username, password) {
   };
 };
 
-export function workloads(env, orgid, username, password) {
-  let exchange_api = 'https://exchange.bluehorizon.network/api/v1';
-  if (env === 'staging')
-    exchange_api = 'https://exchange.staging.bluehorizon.network/api/v1';
-
+export function workloads(exchange_api, orgid, username, password, queryOrg) {
   const params = {
     id: `${orgid}/${username}`,
     token: password,
-    arch: 'arm',
   };
   const qs = queryString.stringify(params);
 
   return function(dispatch) {
-    return fetch(`${exchange_api}/orgs/${orgid}/workloads?${qs}`)
+    return fetch(`${exchange_api}/orgs/${queryOrg}/workloads?${qs}`)
         .then((response) => response.json())
         .then((data) => {
           dispatch(setWorkloads(data.workloads));
@@ -72,7 +62,7 @@ export function workloads(env, orgid, username, password) {
 };
 
 export function workloadConfig(workloads) {
-  return fetch(`${ANAX_URL_BASE}/workloadconfig`, {
+  return fetch(`${ANAX_URL_BASE}/workload/config`, {
     method: 'POST',
   })
       .then((response) => response.json())
@@ -85,7 +75,7 @@ export function workloadConfig(workloads) {
 };
 
 export function microserviceConfig(microservices) {
-  return fetch(`${ANAX_URL_BASE}/service`)
+  return fetch(`${ANAX_URL_BASE}/microservice/config`)
       .then((response) => response.json())
       .then((data) => {
         return data;

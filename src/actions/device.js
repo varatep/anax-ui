@@ -5,7 +5,7 @@ import { ANAX_URL_BASE } from '../constants/configuration';
 
 export function device() {
   return function(dispatch) {
-    return fetch(`${ANAX_URL_BASE}/horizondevice`)
+    return fetch(`${ANAX_URL_BASE}/node`)
       .then((response) => {
         if (!response.ok) {
           throw error(response, 'Error retrieving token from anax.');
@@ -21,7 +21,7 @@ export function device() {
 
 export function deviceConfigured() {
   return function(dispatch) {
-    return fetch(`${ANAX_URL_BASE}/horizondevice/configstate`, {
+    return fetch(`${ANAX_URL_BASE}/node/configstate`, {
       method: 'PUT',
       body: JSON.stringify({
         state: 'configured',

@@ -4,15 +4,12 @@ import * as actionTypes from '../constants/actionTypes';
 import { ANAX_URL_BASE } from '../constants/configuration';
 import {error} from '../util/msgs';
 
-export function patterns(env, orgid, username, password) {
-  let exchange_api = 'https://exchange.bluehorizon.network/api/v1';
-  if (env === 'staging')
-    exchange_api = 'https://exchange.staging.bluehorizon.network/api/v1';
+export function patterns(exchange_api, arch, orgid, username, password) {
 
   const params = {
     id: `${orgid}/${username}`,
     token: password,
-    idfilter: '%arm',
+    idfilter: `%${arch}%`,
   };
   const qs = queryString.stringify(params);
 
@@ -30,7 +27,7 @@ export function patterns(env, orgid, username, password) {
 }
 
 export function patchPattern(pattern) {
-  return fetch(`${ANAX_URL_BASE}/horizondevice`, {
+  return fetch(`${ANAX_URL_BASE}/node`, {
     method: 'PATCH',
     headers: {'Content-Type': 'application/json'},
     body: {
