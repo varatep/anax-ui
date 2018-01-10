@@ -119,19 +119,6 @@ class DeviceForm extends Component {
       } else {
         router.push('/setup/services');
       }
-      // deviceFormSubmit(deviceForm).then((success) => {
-      //   deviceFormSubmitBlockchain(deviceForm).then((bcSuccess) => {
-      //     router.push('/setup/services');
-      //   }).catch((bcErr) => {
-      //     const newBCMgr = submitMgr.fns.error('submit', `Blockchain configuration error. ${bcErr.msg}`);
-      //     this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
-      //     this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
-      //   });
-      // }).catch((err) => {
-      //   const newMgr = submitMgr.fns.error('submit', `Location submission error. ${err.msg}`);
-      //   this.setState(mergeState(this.state, {ephemeral: { submitting: false }}));
-      //   this.setState(mergeState(this.state, mgrUpdateGen(newMgr)));
-      // });
     }
   }
 
@@ -261,7 +248,7 @@ class DeviceForm extends Component {
           </Message>
 
           <Form id='pattern'>
-            <Checkbox disabled style={{marginBottom: '.75em'}} toggle label='Use pattern registration' name='pattern.usepattern' defaultChecked={this.state.fields.pattern.usepattern} onChange={this.handleCheckboxChange} />
+            <Checkbox style={{marginBottom: '.75em'}} toggle label='Use pattern registration' name='pattern.usepattern' defaultChecked={this.state.fields.pattern.usepattern} onChange={this.handleCheckboxChange} />
           </Form>
         </Segment>
 
