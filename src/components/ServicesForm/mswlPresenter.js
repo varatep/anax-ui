@@ -326,7 +326,7 @@ class ServicesForm extends Component {
     const { onMicroservicesGet, onWorkloadsGet, onConfigurationGet, configuration } = this.props;
     const { organization, username, password } = this.state.credentials;
 
-    Promise.all([onMicroservicesGet('staging', organization, username, password), onWorkloadsGet('staging', organization, username, password)])
+    Promise.all([onMicroservicesGet(configuration.exchange_api, organization, username, password, organization), onWorkloadsGet(configuration.exchange_api, organization, username, password, organization)])
         .then(values => {
           this.initiateFieldState();
           this.setState({ephemeral: {fetching: false}, isWaitingCreds: false});
@@ -341,7 +341,19 @@ class ServicesForm extends Component {
   }
 
   componentDidMount() {
-    document.title += ' - Microservice and Workload Setup';
+    document.title += ' - Citizen Scientist Setup';
+
+    if (typeof this.props.accountForm.fields.account.organization !== 'undefined'
+        && this.props.accountForm.fields.account.username !== ''
+        && this.props.accountForm.fields.account.password !== ''
+        && this.props.accountForm.fields.account.organization !== '')
+      this.setState({isWaitingCreds: false, credentials: {
+        organization: this.props.accountForm.fields.account.organization,
+        username: this.props.accountForm.fields.account.username,
+        password: this.props.accountForm.fields.account.password,
+      }}, () => {
+        this.initData();
+      });
   }
 
   componentWillMount() {
