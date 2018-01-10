@@ -34,7 +34,10 @@ const mapStateToProps = (state) => {
     deviceForm: state.deviceForm,
     attributes: state.attributes,
     configuration: state.configuration,
+    patterns: state.patterns,
     services: state.services,
+    accountForm: state.accountForm,
+    device: state.device,
   }
 }
 
