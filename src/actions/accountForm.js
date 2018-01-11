@@ -195,7 +195,12 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
       )
       .then((response) => {
         if (!response.ok) {
-          throw error(response, `Error associating device in Exchange with account "${accountForm.fields.account.username}". Please check your credentials and try again or create a new account if you don't already have one.`);
+          if (response.status == 401)
+            throw error(response, `Error associating device in Exchange with account "${accountForm.fields.account.username}". The username and password pair was not valid.`);
+          else if (response.status == 403)
+            throw error(response, `Error associating device in Exchange with account "${accountForm.fields.account.username}". The node is already owned by another user.`);
+          else
+            throw error(response, `Error associating device in Exchange with account "${accountForm.fields.account.username}". Please check your account and node configurations.`);
         } else {
           return response.json();
         }
@@ -267,7 +272,11 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
     )
     .then((response) => {
       if (!response.ok) {
-        throw error(response, 'Error persisting exchange account in anax.');
+        console.log('response back', response);
+        if (response.status == 409)
+          throw error(response, 'Error persisting exchange account in anax. It\'s possible that the node is already configured.');
+        else
+          throw error(response, 'Error persisting exchange account in anax.');
       } else {
         return response.json();
       }
@@ -307,7 +316,7 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
       })
       .catch((error) => {
         // TODO: possible that the registration data b/n the exchange and anax are out of sync so do whatever is necessary to clean up here
-        console.log("Error occurred registering account, device, etc.", error);
+        console.log("Error occurred registering account, node, etc.", error);
         // rethrow
         throw error;
       });

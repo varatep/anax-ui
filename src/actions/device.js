@@ -29,7 +29,7 @@ export function deviceConfigured() {
     })
         .then((response) => {
           if (!response.ok) {
-            throw error(response, 'Error setting configstate to "configured"');
+            throw error(response, 'Error setting configstate to "configured" - please check your node configurations.');
           } else {
             return response.json();
           }
