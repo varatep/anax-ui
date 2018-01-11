@@ -272,7 +272,11 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
     )
     .then((response) => {
       if (!response.ok) {
-        throw error(response, 'Error persisting exchange account in anax.');
+        console.log('response back', response);
+        if (response.status == 409)
+          throw error(response, 'Error persisting exchange account in anax. It\'s possible that the node is already configured.');
+        else
+          throw error(response, 'Error persisting exchange account in anax.');
       } else {
         return response.json();
       }
