@@ -195,9 +195,9 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
       )
       .then((response) => {
         if (!response.ok) {
-          if (response.statusText == 401)
+          if (response.status == 401)
             throw error(response, `Error associating device in Exchange with account "${accountForm.fields.account.username}". The username and password pair was not valid.`);
-          else if (response.statusText == 403)
+          else if (response.status == 403)
             throw error(response, `Error associating device in Exchange with account "${accountForm.fields.account.username}". The node is already owned by another user.`);
           else
             throw error(response, `Error associating device in Exchange with account "${accountForm.fields.account.username}". Please check your account and node configurations.`);
