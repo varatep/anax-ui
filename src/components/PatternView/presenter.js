@@ -54,6 +54,7 @@ class PatternView extends Component {
         workloads: undefined,
       },
       userInputs: new HashMap(),
+      msUserInputs: new HashMap(),
       errors: undefined,
     };
 
@@ -129,6 +130,7 @@ class PatternView extends Component {
       configuration,
       onSetDeviceConfigured,
       onSetWorkloadConfig,
+      onSetMicroserviceConfig,
     } = this.props;
     this.setState({ephemeral: {submitting: true}});
 
@@ -143,6 +145,10 @@ class PatternView extends Component {
                       .then((res) => {
                         onSetWorkloadConfig(this.prepareAttributesForAPI())
                             .then((res) => {
+
+                              // TODO: CONTINUE HERE
+                              onSetMicroserviceConfig()
+
                               onSetDeviceConfigured()
                                   .then((res) => {
                                     this.stateFetching(false);
@@ -416,6 +422,13 @@ class PatternView extends Component {
     tmpHash.set(data.name, inputClone);
   }
 
+  handleMSUserInputChange(evt, data) {
+    const tmpHash = this.state.msUserInputs;
+    const inputClone = tmpHash.get(data.name);
+    inputClone.defaultValue = data.value;
+    tmpHash.set(data.name, inputClone);
+  }
+
   prepareAttributesForAPI() {
     let parsedAttributes;
 
@@ -469,6 +482,36 @@ class PatternView extends Component {
 
     let segmentRender = <Segment>
       <Form className="attached fluid" onSubmit={(event) => {event.preventDefault();} } id={unparsedUserInputs[0].originalKey}>
+        {segments}
+      </Form>
+    </Segment>;
+
+    return segmentRender;
+  }
+
+  generateMSUserInputs(unparsedUserInputs, specRef, originalKey) {
+    if (unparsedUserInputs.length === 0) return <div />;
+
+    const segments = _.map(unparsedUserInputs, (unparsedInput, idx) => {
+      let tmpHash = this.state.userInputs;
+      if (typeof tmpHash.get(unparsedInput.name) == 'undefined') {
+        tmpHash.set(unparsedInput.name, Object.assign({}, unparsedInput, {specRef, originalKey}));
+      }
+      return (
+        <Form.Input
+          fluid
+          focus
+          label={unparsedInput.label}
+          key={unparsedInput.name}
+          onChange={this.handleUserInputChange}
+          name={unparsedInput.name}
+          defaultValue={unparsedInput.defaultValue}
+        />
+      );
+    });
+
+    let segmentRender = <Segment>
+      <Form className="attached fluid" onSubmit={(event) => {event.preventDefault();}} id={unparsedUserInputs[0].originalKey}>
         {segments}
       </Form>
     </Segment>;
@@ -543,6 +586,7 @@ class PatternView extends Component {
                 <List.Item><strong>Public</strong>: {microservice.public.toString()}</List.Item>
                 <List.Item><strong>Spec Ref</strong>: <a href={microservice.specRef}>{microservice.specRef}</a></List.Item>
               </List>
+              {microservice.userInput && microservice.userInput.length > 0 && this.generateMSUserInputs(microservice.userInput, microservice.specRef, microservice.originalKey)}
             </Segment>
           );
         });
