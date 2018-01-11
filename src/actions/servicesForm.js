@@ -119,3 +119,33 @@ export function workloadAttrSubmit(attributes) {
 				});
 	};
 }
+
+// Microservice config
+export function microserviceAttrSubmit(attributes) {
+	const doFetch = (body) => {
+		return fetch(`${ANAX_URL_BASE}/microservice/config`, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(body),
+		});
+	}
+
+	const promises = _.filter(_.map(attributes.keys(), (attributeKey) => {
+		const attribute = attributes.get(attributeKey);
+		console.log('adding to fetch:', pays.microserviceAttrGen(attribute.specRef, attribute.sensor_name, attribute.userInputMappings, attribute.organization));
+		return doFetch(pays.microserviceAttrGen(attribute.specRef, attribute.sensor_name, attribute.userInputMappings, attribute.organization));
+	}), (pr) => {return !!pr})
+
+	return function(dispatch) {
+		return Promise.all(promises)
+				.then((responses) => {
+					_.each(responses, (resp, key) => {
+						if (resp.ok) {
+							console.log('Successful microservice configuration', resp);
+						} else {
+							throw error(resp, 'Microservice Configuration failed');
+						}
+					});
+				});
+	};
+}
