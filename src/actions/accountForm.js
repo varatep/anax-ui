@@ -316,7 +316,7 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
       })
       .catch((error) => {
         // TODO: possible that the registration data b/n the exchange and anax are out of sync so do whatever is necessary to clean up here
-        console.log("Error occurred registering account, device, etc.", error);
+        console.log("Error occurred registering account, node, etc.", error);
         // rethrow
         throw error;
       });
