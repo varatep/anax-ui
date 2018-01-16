@@ -134,7 +134,7 @@ class PatternView extends Component {
     } = this.props;
     this.setState({ephemeral: {submitting: true}});
 
-    // CB hell... would prefer promise-sequential
+    // FIXME: promise pyramid of DOOM
     accountFormDataSubmit(configuration.exchange_api, accountForm.fields.account.deviceid || device.id, accountForm, true, this.state.selectedPattern)
         .then((res) => {
           // Need to wait for account form fetch to finish
@@ -147,19 +147,23 @@ class PatternView extends Component {
                             .then((res) => {
 
                               // TODO: CONTINUE HERE
-                              onSetMicroserviceConfig()
-
-                              onSetDeviceConfigured()
+                              onSetMicroserviceConfig(this.prepareMSAttributesForAPI())
                                   .then((res) => {
-                                    this.stateFetching(false);
-                                    this.stateSubmitting(false);
-                                    router.push('/dashboard');
+                                    onSetDeviceConfigured()
+                                        .then((res) => {
+                                          this.stateFetching(false);
+                                          this.stateSubmitting(false);
+                                          router.push('/dashboard');
+                                        })
+                                        .catch((err) => {
+                                          console.error(err);
+                                          this.stateFetching(false);
+                                          this.stateSubmitting(false);
+                                          this.showErr(err);
+                                        })
                                   })
                                   .catch((err) => {
-                                    console.error(err);
-                                    this.stateFetching(false);
-                                    this.stateSubmitting(false);
-                                    this.showErr(err);
+
                                   })
                             })
                             .catch((err) => {
@@ -429,6 +433,34 @@ class PatternView extends Component {
     tmpHash.set(data.name, inputClone);
   }
 
+  prepareMSAttributesForAPI() {
+    let parsedAttributes;
+
+    const userInputs = this.state.msUserInputs.values();
+
+    const attrHM = new HashMap();
+    const attrs = _.map(userInputs, (attribute) => {
+      const attrName = attribute.name;
+      if (!attrHM.has(attribute.specRef.split('/')[4])) {
+        attrHM.set(attribute.specRef.split('/')[4], {
+          specRef: attribute.specRef,
+          organization: attribute.originalKey.split('/')[0],
+          sensor_name: attribute.specRef.split('/')[4],
+          userInputMappings: {
+            [attrName]: attribute.defaultValue,
+          },
+        });
+      } else {
+        const tmpArr = attrHM.get(attribute.specRef.split('/')[4]);
+        attrHM.delete(attribute.workloadUrl.split('/')[4]);
+        tmpAttr.userInputMappings[attribute.name] = attribute.defaultValue;
+        attrHM.set(attribute.workloadUrl.split('/')[4], tmpAttr);
+      }
+    });
+
+    return attrHM;
+  }
+
   prepareAttributesForAPI() {
     let parsedAttributes;
 
@@ -445,7 +477,7 @@ class PatternView extends Component {
           workloadUrl: attribute.workloadUrl,
           organization: attribute.originalKey.split('/')[0],
           userInputMappings: { 
-            [attrName]: attribute.defaultValue 
+            [attrName]: attribute.defaultValue,
           },
         });
       } else {
@@ -493,7 +525,7 @@ class PatternView extends Component {
     if (unparsedUserInputs.length === 0) return <div />;
 
     const segments = _.map(unparsedUserInputs, (unparsedInput, idx) => {
-      let tmpHash = this.state.userInputs;
+      let tmpHash = this.state.msUserInputs;
       if (typeof tmpHash.get(unparsedInput.name) == 'undefined') {
         tmpHash.set(unparsedInput.name, Object.assign({}, unparsedInput, {specRef, originalKey}));
       }
