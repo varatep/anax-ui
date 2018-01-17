@@ -54,6 +54,7 @@ class PatternView extends Component {
         workloads: undefined,
       },
       userInputs: new HashMap(),
+      msUserInputs: new HashMap(),
       errors: undefined,
     };
 
@@ -129,10 +130,11 @@ class PatternView extends Component {
       configuration,
       onSetDeviceConfigured,
       onSetWorkloadConfig,
+      onSetMicroserviceConfig,
     } = this.props;
     this.setState({ephemeral: {submitting: true}});
 
-    // CB hell... would prefer promise-sequential
+    // FIXME: promise pyramid of DOOM
     accountFormDataSubmit(configuration.exchange_api, accountForm.fields.account.deviceid || device.id, accountForm, true, this.state.selectedPattern)
         .then((res) => {
           // Need to wait for account form fetch to finish
@@ -143,17 +145,25 @@ class PatternView extends Component {
                       .then((res) => {
                         onSetWorkloadConfig(this.prepareAttributesForAPI())
                             .then((res) => {
-                              onSetDeviceConfigured()
+
+                              // TODO: CONTINUE HERE
+                              onSetMicroserviceConfig(this.prepareMSAttributesForAPI())
                                   .then((res) => {
-                                    this.stateFetching(false);
-                                    this.stateSubmitting(false);
-                                    router.push('/dashboard');
+                                    onSetDeviceConfigured()
+                                        .then((res) => {
+                                          this.stateFetching(false);
+                                          this.stateSubmitting(false);
+                                          router.push('/dashboard');
+                                        })
+                                        .catch((err) => {
+                                          console.error(err);
+                                          this.stateFetching(false);
+                                          this.stateSubmitting(false);
+                                          this.showErr(err);
+                                        })
                                   })
                                   .catch((err) => {
-                                    console.error(err);
-                                    this.stateFetching(false);
-                                    this.stateSubmitting(false);
-                                    this.showErr(err);
+
                                   })
                             })
                             .catch((err) => {
@@ -416,6 +426,41 @@ class PatternView extends Component {
     tmpHash.set(data.name, inputClone);
   }
 
+  handleMSUserInputChange(evt, data) {
+    const tmpHash = this.state.msUserInputs;
+    const inputClone = tmpHash.get(data.name);
+    inputClone.defaultValue = data.value;
+    tmpHash.set(data.name, inputClone);
+  }
+
+  prepareMSAttributesForAPI() {
+    let parsedAttributes;
+
+    const userInputs = this.state.msUserInputs.values();
+
+    const attrHM = new HashMap();
+    const attrs = _.map(userInputs, (attribute) => {
+      const attrName = attribute.name;
+      if (!attrHM.has(attribute.specRef.split('/')[4])) {
+        attrHM.set(attribute.specRef.split('/')[4], {
+          specRef: attribute.specRef,
+          organization: attribute.originalKey.split('/')[0],
+          sensor_name: attribute.specRef.split('/')[4],
+          userInputMappings: {
+            [attrName]: attribute.defaultValue,
+          },
+        });
+      } else {
+        const tmpArr = attrHM.get(attribute.specRef.split('/')[4]);
+        attrHM.delete(attribute.workloadUrl.split('/')[4]);
+        tmpAttr.userInputMappings[attribute.name] = attribute.defaultValue;
+        attrHM.set(attribute.workloadUrl.split('/')[4], tmpAttr);
+      }
+    });
+
+    return attrHM;
+  }
+
   prepareAttributesForAPI() {
     let parsedAttributes;
 
@@ -432,7 +477,7 @@ class PatternView extends Component {
           workloadUrl: attribute.workloadUrl,
           organization: attribute.originalKey.split('/')[0],
           userInputMappings: { 
-            [attrName]: attribute.defaultValue 
+            [attrName]: attribute.defaultValue,
           },
         });
       } else {
@@ -469,6 +514,36 @@ class PatternView extends Component {
 
     let segmentRender = <Segment>
       <Form className="attached fluid" onSubmit={(event) => {event.preventDefault();} } id={unparsedUserInputs[0].originalKey}>
+        {segments}
+      </Form>
+    </Segment>;
+
+    return segmentRender;
+  }
+
+  generateMSUserInputs(unparsedUserInputs, specRef, originalKey) {
+    if (unparsedUserInputs.length === 0) return <div />;
+
+    const segments = _.map(unparsedUserInputs, (unparsedInput, idx) => {
+      let tmpHash = this.state.msUserInputs;
+      if (typeof tmpHash.get(unparsedInput.name) == 'undefined') {
+        tmpHash.set(unparsedInput.name, Object.assign({}, unparsedInput, {specRef, originalKey}));
+      }
+      return (
+        <Form.Input
+          fluid
+          focus
+          label={unparsedInput.label}
+          key={unparsedInput.name}
+          onChange={this.handleUserInputChange}
+          name={unparsedInput.name}
+          defaultValue={unparsedInput.defaultValue}
+        />
+      );
+    });
+
+    let segmentRender = <Segment>
+      <Form className="attached fluid" onSubmit={(event) => {event.preventDefault();}} id={unparsedUserInputs[0].originalKey}>
         {segments}
       </Form>
     </Segment>;
@@ -543,6 +618,7 @@ class PatternView extends Component {
                 <List.Item><strong>Public</strong>: {microservice.public.toString()}</List.Item>
                 <List.Item><strong>Spec Ref</strong>: <a href={microservice.specRef}>{microservice.specRef}</a></List.Item>
               </List>
+              {microservice.userInput && microservice.userInput.length > 0 && this.generateMSUserInputs(microservice.userInput, microservice.specRef, microservice.originalKey)}
             </Segment>
           );
         });

@@ -271,3 +271,24 @@ export function workloadAttrGen(workload_url, userInputMappings, organization) {
     ],
   }
 }
+
+// Microservice Registration Attributes
+export function microserviceAttrGen(sensor_url, sensor_name, userInputMappings, organization) {
+  return {
+    sensor_url,
+    sensor_name,
+    sensor_org: organization,
+    sensor_version: '[0.0.0,INFINITY)',
+    auto_upgrade: true,
+    active_upgrade: true,
+    attributes: [
+      {
+        type: 'UserInputAttributes',
+        label: 'User input variables',
+        publishable: false,
+        host_only: false,
+        mappings: userInputMappings,
+      },
+    ],
+  }
+}
