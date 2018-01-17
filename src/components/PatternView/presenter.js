@@ -62,6 +62,7 @@ class PatternView extends Component {
     this.handleDropdownChange = this.handleDropdownChange.bind(this);
     this.handleModalFieldChange = this.handleModalFieldChange.bind(this);
     this.handleUserInputChange = this.handleUserInputChange.bind(this);
+    this.handleMSUserInputChange = this.handleMSUserInputChange.bind(this);
     this.prepareAttributesForAPI = this.prepareAttributesForAPI.bind(this);
     this.initData = this.initData.bind(this);
     this.savePattern = this.savePattern.bind(this);
@@ -451,10 +452,10 @@ class PatternView extends Component {
           },
         });
       } else {
-        const tmpArr = attrHM.get(attribute.specRef.split('/')[4]);
-        attrHM.delete(attribute.workloadUrl.split('/')[4]);
+        const tmpAttr = attrHM.get(attribute.specRef.split('/')[4]);
+        attrHM.delete(attribute.specRef.split('/')[4]);
         tmpAttr.userInputMappings[attribute.name] = attribute.defaultValue;
-        attrHM.set(attribute.workloadUrl.split('/')[4], tmpAttr);
+        attrHM.set(attribute.specRef.split('/')[4], tmpAttr);
       }
     });
 
@@ -535,7 +536,7 @@ class PatternView extends Component {
           focus
           label={unparsedInput.label}
           key={unparsedInput.name}
-          onChange={this.handleUserInputChange}
+          onChange={this.handleMSUserInputChange}
           name={unparsedInput.name}
           defaultValue={unparsedInput.defaultValue}
         />
