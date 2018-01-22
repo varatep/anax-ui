@@ -23,6 +23,7 @@ import {
   Modal,
 } from 'semantic-ui-react';
 import moment from 'moment';
+import HashMap from 'hashmap';
 
 import {
   labelContains,
@@ -58,7 +59,9 @@ class ServicesForm extends Component {
         currentApproach: ALL_APPROACH,
         microservices: undefined,
         workloads: undefined,
-      }
+      },
+      msUserInputs: new HashMap(),
+      wlUserInputs: new HashMap(),
     };
 
     this.handleUserInputChange = this.handleUserInputChange.bind(this);
