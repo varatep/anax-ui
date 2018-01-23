@@ -61,7 +61,7 @@ class ServicesForm extends Component {
         workloads: undefined,
       },
       msUserInputs: new HashMap(),
-      wlUserInputs: new HashMap(),
+      userInputs: new HashMap(),
     };
 
     this.handleUserInputChange = this.handleUserInputChange.bind(this);
@@ -115,6 +115,62 @@ class ServicesForm extends Component {
    */
   prepareMicroservicesForApi(microservices) {
 
+  }
+
+  prepareMSAttributesForAPI() {
+    let parsedAttributes;
+
+    const userInputs = this.state.msUserInputs.values();
+
+    const attrHM = new HashMap();
+    const attrs = _.map(userInputs, (attribute) => {
+      const attrName = attribute.name;
+      if (!attrHM.has(attribute.specRef.split('/')[4])) {
+        attrHM.set(attribute.specRef.split('/')[4], {
+          specRef: attribute.specRef,
+          organization: attribute.originalKey.split('/')[0],
+          sensor_name: attribute.specRef.split('/')[4],
+          userInputMappings: {
+            [attrName]: attribute.defaultValue,
+          },
+        });
+      } else {
+        const tmpAttr = attrHM.get(attribute.specRef.split('/')[4]);
+        attrHM.delete(attribute.specRef.split('/')[4]);
+        tmpAttr.userInputMappings[attribute.name] = attribute.defaultValue;
+        attrHM.set(attribute.specRef.split('/')[4], tmpAttr);
+      }
+    });
+
+    return attrHM;
+  }
+
+  prepareWLAttributesForAPI() {
+    let parsedAttributes;
+
+    const userInputs = this.state.wlUserInputs.values();
+
+    // join attributes into one that have the same originalKey
+    const attrHM = new HashMap();
+    const attrs = _.map(userInputs, (attribute) => {
+      const attrName = attribute.name;
+      if (!attrHM.has(attribute.workloadUrl.split('/')[4])) {
+        attrHM.set(attribute.workloadUrl.split('/')[4], {
+          workloadUrl: attribute.workloadUrl,
+          organization: attribute.originalKey.split('/')[0],
+          userInputMappings: { 
+            [attrName]: attribute.defaultValue,
+          },
+        });
+      } else {
+        const tmpAttr = attrHM.get(attribute.workloadUrl.split('/')[4]);
+        attrHM.delete(attribute.workloadUrl.split('/')[4]);
+        tmpAttr.userInputMappings[attribute.name] = attribute.defaultValue;
+        attrHM.set(attribute.workloadUrl.split('/')[4], tmpAttr);
+      }
+    });
+
+    return attrHM;
   }
 
   getEnabledMicroservices() {
@@ -416,6 +472,7 @@ class ServicesForm extends Component {
                 <List.Item><strong>Public</strong>: {microservice.public.toString()}</List.Item>
                 <List.Item><strong>Spec Ref</strong>: <a href={microservice.specRef}>{microservice.specRef}</a></List.Item>
               </List>
+              {this.generateMSUserInputs(microservice.userInput, microservice.specRef, microservice.originalKey)}
             </Segment>
           );
         });
@@ -466,6 +523,66 @@ class ServicesForm extends Component {
     return [];
   }
 
+  generateMSUserInputs(unparsedUserInputs, specRef, originalKey) {
+    if (unparsedUserInputs.length === 0) return <div />;
+
+    const segments = _.map(unparsedUserInputs, (unparsedInput, idx) => {
+      let tmpHash = this.state.msUserInputs;
+      if (typeof tmpHash.get(unparsedInput.name) == 'undefined') {
+        tmpHash.set(unparsedInput.name, Object.assign({}, unparsedInput, {specRef, originalKey}));
+      }
+      return (
+        <Form.Input
+          fluid
+          focus
+          label={unparsedInput.label}
+          key={unparsedInput.name}
+          onChange={this.handleMSUserInputChange}
+          name={unparsedInput.name}
+          defaultValue={unparsedInput.defaultValue}
+        />
+      );
+    });
+
+    let segmentRender = <Segment>
+      <Form className="attached fluid" onSubmit={(event) => {event.preventDefault();}} id={unparsedUserInputs[0].originalKey}>
+        {segments}
+      </Form>
+    </Segment>;
+
+    return segmentRender;
+  }
+
+  generateUserInputs(unparsedUserInputs, workloadUrl, originalKey) {
+    if (unparsedUserInputs.length === 0) return <div />;
+    
+    const segments = _.map(unparsedUserInputs, (unparsedInput, idx) => {
+      let tmpHash = this.state.userInputs;
+      if (typeof tmpHash.get(unparsedInput.name) === 'undefined') {
+        tmpHash.set(unparsedInput.name, Object.assign({}, unparsedInput, {workloadUrl, originalKey}));
+      }
+      return (
+        <Form.Input 
+          fluid 
+          focus 
+          label={unparsedInput.label} 
+          key={unparsedInput.name} 
+          onChange={this.handleUserInputChange} 
+          name={unparsedInput.name} 
+          defaultValue={unparsedInput.defaultValue} 
+        />
+      );
+    });
+
+    let segmentRender = <Segment>
+      <Form className="attached fluid" onSubmit={(event) => {event.preventDefault();} } id={unparsedUserInputs[0].originalKey}>
+        {segments}
+      </Form>
+    </Segment>;
+
+    return segmentRender;
+  }
+
   /**
    * Generates a renderable user input form
    * @param {object} workload 
@@ -513,6 +630,7 @@ class ServicesForm extends Component {
   _generateRequiredMicroservices(workload) {
     const { microservices } = this.props.services;
     const workloadApiSpec = workload.apiSpec;
+    console.log('workload', workload);
     const msesForSpec = _.map(workloadApiSpec, (spec) => {
       return this._microserviceLookup(spec);
     });
@@ -522,6 +640,9 @@ class ServicesForm extends Component {
         renderArr.push(<Label key={mses[i].label}>{mses[i].label}</Label>)
       }
     });
+
+    console.log('render arr', renderArr)
+    console.log('msesforspec', msesForSpec)
 
     return (
       <List.Item>
@@ -555,7 +676,7 @@ class ServicesForm extends Component {
                 <List.Item><strong>Last Updated</strong>: {parseLastUpdated(workload.lastUpdated)}</List.Item>
                 <List.Item><strong>Public</strong>: {workload.public.toString()}</List.Item>
                 <List.Item><strong>Workload URL</strong>: <a href={workload.specRef}>{workload.workloadUrl}</a></List.Item>
-                {this._generateUserInputs(workload)}
+                {this.generateUserInputs(workload.userInput, workload.workloadUrl, workload.originalKey)}
                 {this._generateRequiredMicroservices(workload)}
               </List>
             </Segment>
