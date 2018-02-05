@@ -254,34 +254,20 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
 
   // anax operation; TODO: perhaps handle the 409 more gently
   let persistExchangeAccount = (token) => {
-    let pstBody = JSON.stringify({
-      'id': accountForm.fields.account.deviceid || nodeId,
-      'name': accountForm.fields.account.devicename || nodeId,
-      'token': token,
-      'organization': accountForm.fields.account.organization,
-      'ha_device': false,
-      'pattern': '',
-    })
-    if (typeof pattern !== 'undefined') {
-      pstBody = JSON.stringify({
-        'id': accountForm.fields.account.deviceid || nodeId,
-        'name': accountForm.fields.account.devicename || nodeId,
-        'token': token,
-        'organization': accountForm.fields.account.organization,
-        'ha_device': false,
-        'pattern': (pattern && pattern.split('/')[1]) || '', // [0] is the org
-      })
-    }
-
-    console.log('pstBody', pstBody)
-
     return fetch(`${ANAX_URL_BASE}/node`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: pstBody,
+        body: JSON.stringify({
+          'id': accountForm.fields.account.deviceid || nodeId,
+          'name': accountForm.fields.account.devicename || nodeId,
+          'token': token,
+          'organization': accountForm.fields.account.organization,
+          'ha_device': false,
+          'pattern': pattern.split('/')[1], // [0] is the org
+        })
       }
     )
     .then((response) => {
