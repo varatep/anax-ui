@@ -243,10 +243,6 @@ class DeviceForm extends Component {
           <Header size='medium'>Pattern</Header>
           <p>If enabled, edge node registration will use a pattern approach instead of a microservice/workload approach.</p>
 
-          <Message>
-            <p>Pattern usage is currently required for registration and enabled by default. Proceed to the next page for pattern configuration.</p>
-          </Message>
-
           <Form id='pattern'>
             <Checkbox style={{marginBottom: '.75em'}} toggle label='Use pattern registration' name='pattern.usepattern' defaultChecked={this.state.fields.pattern.usepattern} onChange={this.handleCheckboxChange} />
           </Form>
