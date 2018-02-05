@@ -112,9 +112,6 @@ class ServicesForm extends Component {
     const {filteredMs, filteredWls} = this.state.filters
     const {msUserInputs, wlUserInputs: userInputs} = this.state
 
-    console.log('prepareWLAttributesForAPI', this.prepareWLAttributesForAPI())
-    console.log('prepareMSAttributesForAPI', this.prepareMSAttributesForAPI())
-
     accountFormDataSubmit(configuration.exchange_api, accountForm.fields.account.deviceid || device.id, accountForm, true)
         .then((res) => {
           // Need to wait for account form fetch to finish
@@ -264,13 +261,9 @@ class ServicesForm extends Component {
       return m.originalKey === currentMS.originalKey
     })[0]
 
-    console.log('currentMs', currentMS, microservices)
-
     if (currentMS.sharable === 'multiple' || currentMS.enabled) return true
 
     const enabledMsesBySpec = this.getEnabledMicroservices(false, true)
-
-    console.log('enabledMsesBySpec', enabledMsesBySpec)
 
     return !_.includes(enabledMsesBySpec, currentMS.specRef)
   }
@@ -409,7 +402,6 @@ class ServicesForm extends Component {
   handleWorkloadEnablement(event, data) {
     const fieldNameSplit = data.name.split('#');
     const workloads = this.state.fields.workloads;
-    console.log('workload enablement', event, data, workloads);
     // TODO: hacky... mutates
     for (let i = 0; i < workloads.length; i++) {
       if (workloads[i].originalKey === fieldNameSplit[0]) {
@@ -556,31 +548,6 @@ class ServicesForm extends Component {
       }}, () => {
         this.initData();
       });
-  }
-
-  componentWillMount() {
-    // const { onMicroservicesGet, onWorkloadsGet, onConfigurationGet, configuration } = this.props;
-    // console.log('props in mswl', this.props);
-
-    // Promise.all([onMicroservicesGet('staging', 'IBM'), onWorkloadsGet('configData.exchange_api', 'IBM')])
-    //     .then(values => {
-    //       this.initiateFieldState();
-    //     })
-
-    // onConfigurationGet()
-    //     .then((configData) => {
-    //       onMicroservicesGet('configData.exchange_api', 'IBM')
-    //           .then((data) => {
-    //             console.log('got data', data);
-    //           });
-    //     // })
-    //     // .catch((err) => {
-    //     //   console.error(err);
-    //     // })
-    // onWorkloadsGet('configData.exchange_api', 'IBM')
-    //           .then((data) => {
-    //             console.log('got data', data);
-    //           });
   }
 
   /**
