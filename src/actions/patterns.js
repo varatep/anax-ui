@@ -9,7 +9,6 @@ export function patterns(exchange_api, arch, orgid, username, password) {
   const params = {
     id: `${orgid}/${username}`,
     token: password,
-    idfilter: `%${arch}%`,
   };
   const qs = queryString.stringify(params);
 
