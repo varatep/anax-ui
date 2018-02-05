@@ -31,6 +31,8 @@ const mapDispatchToProps = (dispatch) => {
     deviceFormSubmit: bindActionCreators(actions.deviceFormSubmit, dispatch),
     deviceFormSubmitBlockchain: bindActionCreators(actions.deviceFormSubmitBlockchain, dispatch),
     onSetDeviceConfigured: bindActionCreators(actions.deviceConfigured, dispatch),
+    onSetWorkloadConfig: bindActionCreators(actions.workloadAttrSubmit, dispatch),
+    onSetMicroserviceConfig: bindActionCreators(actions.microserviceAttrSubmit, dispatch),
   }
 }
 
