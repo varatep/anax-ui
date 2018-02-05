@@ -21,6 +21,7 @@ import {
   Accordion,
   Popup,
   Modal,
+  Message,
 } from 'semantic-ui-react';
 import moment from 'moment';
 import HashMap from 'hashmap';
