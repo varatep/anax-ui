@@ -563,7 +563,7 @@ class ServicesForm extends Component {
           return (
             <Segment padded raised key={microservice.label + '-' + microservice.originalKey}>
               <Header size='medium'>{microservice.label} <small>v{microservice.version}</small></Header>
-              {!this.checkSharableMicroservices(microservice) && <Message>This microservice has been disabled because you have enabled another microservice with a matching specRef. Please disable the other one if you want to proceed.</Message>}
+              {!this.checkSharableMicroservices(microservice) && <Message>This microservice has been disabled because you have enabled another microservice with a matching "Spec Ref". Please disable the other one if you want to proceed.</Message>}
               <Checkbox
                 style={{marginBottom: '.75em'}}
                 toggle
