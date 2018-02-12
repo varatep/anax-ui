@@ -164,7 +164,10 @@ class PatternView extends Component {
                                         })
                                   })
                                   .catch((err) => {
-
+                                    console.error(err);
+                                    this.stateFetching(false);
+                                    this.stateSubmitting(false);
+                                    this.showErr(err);
                                   })
                             })
                             .catch((err) => {

@@ -21,11 +21,14 @@ export function services() {
   };
 };
 
-export function microservices(exchange_api, orgid, username, password, queryOrg) {
+export function microservices(exchange_api, orgid, username, password, queryOrg, arch) {
     const params = {
       id: `${orgid}/${username}`,
       token: password,
     };
+    if (arch && arch !== '') {
+      params.arch = arch
+    }
     const qs = queryString.stringify(params);
 
   return function(dispatch) {
@@ -41,11 +44,14 @@ export function microservices(exchange_api, orgid, username, password, queryOrg)
   };
 };
 
-export function workloads(exchange_api, orgid, username, password, queryOrg) {
+export function workloads(exchange_api, orgid, username, password, queryOrg, arch) {
   const params = {
     id: `${orgid}/${username}`,
     token: password,
   };
+  if (arch && arch !== '') {
+    params.arch = arch
+  }
   const qs = queryString.stringify(params);
 
   return function(dispatch) {

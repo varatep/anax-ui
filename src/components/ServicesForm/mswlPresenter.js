@@ -21,8 +21,10 @@ import {
   Accordion,
   Popup,
   Modal,
+  Message,
 } from 'semantic-ui-react';
 import moment from 'moment';
+import HashMap from 'hashmap';
 
 import {
   labelContains,
@@ -58,10 +60,14 @@ class ServicesForm extends Component {
         currentApproach: ALL_APPROACH,
         microservices: undefined,
         workloads: undefined,
-      }
+      },
+      msUserInputs: new HashMap(),
+      userInputs: new HashMap(),
+      errors: undefined,
     };
 
     this.handleUserInputChange = this.handleUserInputChange.bind(this);
+    this.handleMSUserInputChange = this.handleMSUserInputChange.bind(this);
     this.handleWorkloadEnablement = this.handleWorkloadEnablement.bind(this);
     this.handleMicroserviceEnablement = this.handleMicroserviceEnablement.bind(this);
     this.handleModalFieldChange = this.handleModalFieldChange.bind(this);    
@@ -69,7 +75,25 @@ class ServicesForm extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  stateSubmitting(val) {
+    this.setState({ephemeral: Object.assign({}, this.state.ephemeral, {submitting: val}) });
+  }
+
+  stateFetching(val) {
+    this.setState({ ephemeral: Object.assign({}, this.state.ephemeral, {fetching: val}) });
+  }
+
+  showErr(err) {
+    this.setState({errors: err});
+  }
+
+  removeErrs() {
+    this.setState({errors: undefined});
+  }
+
   handleSubmit() {
+    this.setState({ephemeral: {submitting: true}})
+    this.removeErrs()
     const {
       accountFormDataSubmit,
       accountFormFieldChange,
@@ -81,44 +105,216 @@ class ServicesForm extends Component {
       device,
       configuration,
       onSetDeviceConfigured,
-    } = this.props;
-    const {microservices, workloads} = this.state.fields;
-    const {microservices:filteredMs, workloads:filteredWls} = this.state.filters;
+      onSetWorkloadConfig,
+      onSetMicroserviceConfig,
+    } = this.props
+    const {microservices, workloads} = this.state.fields
+    const {filteredMs, filteredWls} = this.state.filters
+    const {msUserInputs, wlUserInputs: userInputs} = this.state
 
-    console.log('State on submit', this.state);
-
-  }
-
-  /**
-   * Return a hashmap of enabled workloads in their organization
-   * @param {Array} workloads array of objects containing an originalKey
-   * 
-   * Sample object: {
-                "workload_url": "https://bluehorizon.network/workloads/netspeed",
-                "organization": "IBM",
-                "workload_version": "[0.0.0,INFINITY)",
-                "variables": {
-                  "HZN_TARGET_SERVER": "random"
-                }
-              }
-   */
-  prepareWorkloadsForApi(workloads) {
+    accountFormDataSubmit(configuration.exchange_api, accountForm.fields.account.deviceid || device.id, accountForm, true)
+        .then((res) => {
+          // Need to wait for account form fetch to finish
+          setTimeout(() => {
+            deviceFormSubmit(deviceForm)
+                .then((res) => {
+                  deviceFormSubmitBlockchain(deviceForm)
+                      .then((res) => {
+                        onSetWorkloadConfig(this.prepareWLAttributesForAPI())
+                            .then((res) => {
+                              onSetMicroserviceConfig(this.prepareMSAttributesForAPI())
+                                  .then((res) => {
+                                    onSetDeviceConfigured()
+                                        .then((res) => {
+                                          this.stateFetching(false);
+                                          this.stateSubmitting(false);
+                                          router.push('/dashboard');
+                                        })
+                                        .catch((err) => {
+                                          this.handleSubmitErr(err)
+                                        })
+                                  })
+                                  .catch((err) => {
+                                    this.handleSubmitErr(err)
+                                  })
+                            })
+                            .catch((err) => {
+                              this.handleSubmitErr(err)
+                            })
+                      })
+                      .catch((err) => {
+                        this.handleSubmitErr(err)
+                      })
+                })
+                .catch((err) => {
+                  this.handleSubmitErr(err)
+                })
+          }, 3000);
+        })
+        .catch(err => {
+          this.handleSubmitErr(err)
+        })
     
   }
 
-  /**
-   * Return a hashmap of enabled microservices in their organization
-   * @param {Array} microservices array of objects containing an originalKey
-   */
-  prepareMicroservicesForApi(microservices) {
-
+  handleSubmitErr(err) {
+    console.error(err)
+    this.stateFetching(false)
+    this.stateSubmitting(false)
+    this.showErr(err)
+    this.forceUpdate()
   }
 
-  getEnabledMicroservices() {
-    const {microservices} = this.state.fields;
-    return _.filter(microservices, (ms) => {
-      return ms.enabled;
+  prepareMSAttributesForAPI() {
+    let parsedAttributes;
+
+    const userInputs = this.state.msUserInputs.values()
+    const enabledMicroservices = this.getEnabledMicroservices(true)
+    const fullEnabledMicroservices = this.getEnabledMicroservices()
+    const attrHM = new HashMap();
+    const attrs = _.map(userInputs, (attribute) => {
+      if (!enabledMicroservices.includes(attribute.originalKey)) return
+      const attrName = attribute.name;
+      const key = attribute.originalKey
+      if (!attrHM.has(key)) {
+        attrHM.set(key, {
+          specRef: attribute.specRef,
+          organization: attribute.originalKey.split('/')[0],
+          sensor_name: attribute.specRef.split('/')[4],
+          userInputMappings: {
+            [attrName]: attribute.defaultValue,
+          },
+        });
+      } else {
+        const tmpAttr = attrHM.get(key);
+        attrHM.delete(key);
+        tmpAttr.userInputMappings[attribute.name] = attribute.defaultValue;
+        attrHM.set(key, tmpAttr);
+      }
     });
+
+    _.forEach(fullEnabledMicroservices, (m) => {
+      if (!attrHM.keys().includes(m.originalKey)) {
+        attrHM.set(m.originalKey, {
+          specRef: m.specRef,
+          organization: m.originalKey.split('/')[0],
+          sensor_name: m.specRef.split('/')[4],
+          userInputMappings: {},
+        })
+      }
+    })
+
+    return attrHM;
+  }
+
+  prepareWLAttributesForAPI() {
+    let parsedAttributes;
+
+    const userInputs = this.state.userInputs.values()
+    const enabledWorkloads = this.getEnabledWorkloads(true)
+    const fullEnabledWorkloads = this.getEnabledWorkloads()
+    // join attributes into one that have the same originalKey
+    const attrHM = new HashMap();
+    const attrs = _.map(userInputs, (attribute) => {
+      if (!enabledWorkloads.includes(attribute.originalKey)) return
+      const attrName = attribute.name;
+      const key = attribute.originalKey
+      if (!attrHM.has(key)) {
+        attrHM.set(key, {
+          workloadUrl: attribute.workloadUrl,
+          organization: attribute.originalKey.split('/')[0],
+          userInputMappings: { 
+            [attrName]: attribute.defaultValue,
+          },
+        });
+      } else {
+        const tmpAttr = attrHM.get(key);
+        attrHM.delete(key);
+        tmpAttr.userInputMappings[attribute.name] = attribute.defaultValue;
+        attrHM.set(key, tmpAttr);
+      }
+    });
+
+    _.forEach(fullEnabledWorkloads, (w) => {
+      if (!attrHM.keys().includes(w.originalKey)) {
+        attrHM.set(w.originalKey, {
+          workloadUrl: w.workloadUrl,
+          organization: w.originalKey.split('/')[0],
+          userInputMappings: {},
+        })
+      }
+    })
+
+    return attrHM;
+  }
+
+  /**
+   * Checks if there are any other microservices w/ same specRef are already enabled.
+   * Returns true if checkbox should be usable / enabled. Returns false if checkbox should be disabled.
+   * @param {object} currentMS current microservice
+   */
+  checkSharableMicroservices(currentMS) {
+    const {microservices} = this.state.fields
+
+    // can abstract this into a separate method
+    currentMS = _.filter(microservices, (m) => {
+      return m.originalKey === currentMS.originalKey
+    })[0]
+
+    if (currentMS.sharable === 'multiple' || currentMS.enabled) return true
+
+    const enabledMsesBySpec = this.getEnabledMicroservices(false, true)
+
+    return !_.includes(enabledMsesBySpec, currentMS.specRef)
+  }
+
+  getEnabledMicroservices(byOriginalKey = false, bySpecRef = false) {
+    const {microservices} = this.state.fields
+
+    if (byOriginalKey) {
+      return _.chain(microservices)
+          .filter((m) => {
+            return m.enabled
+          })
+          .map((m) => {
+            return m.originalKey
+          })
+          .value()
+    }
+
+    if (bySpecRef) {
+      return _.chain(microservices)
+          .filter((m) => {
+            return m.enabled
+          })
+          .map((m) => {
+            return m.specRef
+          })
+          .value()
+    }
+
+    return _.filter(microservices, (ms) => {
+      return ms.enabled
+    })
+  }
+
+  getEnabledWorkloads(byOriginalKey = false) {
+    const {workloads} = this.state.fields
+
+    if (byOriginalKey) {
+      return _.chain(workloads)
+          .filter((wl) => {
+            return wl.enabled
+          })
+          .map((w) => {
+            return w.originalKey
+          })
+          .value()
+    }
+
+    return _.filter(workloads, (wl) => {
+      return wl.enabled
+    })
   }
 
   getPossibleWorkloads() {
@@ -164,7 +360,6 @@ class ServicesForm extends Component {
         orgHash[extractOrg(possibleWorkloads[i])] = tmpObj;
       }
     }
-    console.log('org hash', orgHash);
 
     return orgHash;
   }
@@ -185,29 +380,18 @@ class ServicesForm extends Component {
    * @param {SyntheticEvent} event 
    * @param {object} data 
    */
-  handleUserInputChange(event, data) {
+  handleUserInputChange(evt, data) {
+    const tmpHash = this.state.userInputs;
+    const inputClone = tmpHash.get(data.originalKey + '/' + data.name);
+    inputClone.defaultValue = data.value;
+    tmpHash.set(data.originalKey + '/' + data.name, inputClone);
+  }
 
-    // check for missing props
-    if (typeof data === 'undefined') return;
-
-    const fieldNameSplit = data.name.split('#');
-    const workloads = this.state.fields.workloads;
-    // TODO: this is hacky and mutates... fix ASAP
-    for (let i = 0; i < workloads.length; i++) {
-      if (workloads[i].originalKey === fieldNameSplit[0]) {
-        for (let j = 0; j < workloads[i].userInput.length; j++) {
-          if (workloads[i].userInput[j].name === fieldNameSplit[1]) {
-            let tmpUserInput = workloads[i].userInput[j];
-            if (data.type === 'checkbox') {
-              tmpUserInput.defaultValue = data.checked;
-            } else if (data.type === 'text') {
-              tmpUserInput.defaultValue = data.value;
-            }
-          }
-        }
-      }
-    }
-    this.setState({fields: {...this.state.fields, workloads}});
+  handleMSUserInputChange(evt, data) {
+    const tmpHash = this.state.msUserInputs;
+    const inputClone = tmpHash.get(data.originalKey + '/' + data.name);
+    inputClone.defaultValue = data.value;
+    tmpHash.set(data.originalKey + '/' + data.name, inputClone);
   }
 
   /**
@@ -216,8 +400,6 @@ class ServicesForm extends Component {
    * @param {object} data 
    */
   handleWorkloadEnablement(event, data) {
-    console.log('workload enablement', event, data);
-    
     const fieldNameSplit = data.name.split('#');
     const workloads = this.state.fields.workloads;
     // TODO: hacky... mutates
@@ -319,54 +501,53 @@ class ServicesForm extends Component {
       microservices: microserviceFields,
       workloads: workloadFields,
     }});
-    console.log('set state for field', this.state.fields)
   }
   
   initData() {
     const { onMicroservicesGet, onWorkloadsGet, onConfigurationGet, configuration } = this.props;
     const { organization, username, password } = this.state.credentials;
 
-    Promise.all([onMicroservicesGet('staging', organization, username, password), onWorkloadsGet('staging', organization, username, password)])
+    let promises = [
+      onMicroservicesGet(configuration.exchange_api, organization, username, password, organization, configuration.architecture),
+      onWorkloadsGet(configuration.exchange_api, organization, username, password, organization, configuration.architecture),
+    ]
+
+    if (organization !== 'IBM') {
+      promises.push(onMicroservicesGet(configuration.exchange_api, organization, username, password, 'IBM', configuration.architecture))
+      promises.push(onWorkloadsGet(configuration.exchange_api, organization, username, password, 'IBM', configuration.architecture))
+    }
+
+    Promise.all(promises)
         .then(values => {
           this.initiateFieldState();
           this.setState({ephemeral: {fetching: false}, isWaitingCreds: false});
         })
+        .catch(err => {
+          this.setState({ephemeral: {fetching: false}, isWaitingCreds: true});
+          this.showErr(err)
+        })
   }
 
   handleModalFieldChange(e, {name, value}) {
-    console.log({[name]: value})
     this.setState({credentials: Object.assign({}, this.state.credentials, {
       [name]: value,
-    })}, () => {console.log('set state', this.state)});
+    })});
   }
 
   componentDidMount() {
-    document.title += ' - Microservice and Workload Setup';
-  }
+    document.title += ' - Citizen Scientist Setup';
 
-  componentWillMount() {
-    // const { onMicroservicesGet, onWorkloadsGet, onConfigurationGet, configuration } = this.props;
-    // console.log('props in mswl', this.props);
-
-    // Promise.all([onMicroservicesGet('staging', 'IBM'), onWorkloadsGet('configData.exchange_api', 'IBM')])
-    //     .then(values => {
-    //       this.initiateFieldState();
-    //     })
-
-    // onConfigurationGet()
-    //     .then((configData) => {
-    //       onMicroservicesGet('configData.exchange_api', 'IBM')
-    //           .then((data) => {
-    //             console.log('got data', data);
-    //           });
-    //     // })
-    //     // .catch((err) => {
-    //     //   console.error(err);
-    //     // })
-    // onWorkloadsGet('configData.exchange_api', 'IBM')
-    //           .then((data) => {
-    //             console.log('got data', data);
-    //           });
+    if (typeof this.props.accountForm.fields.account.organization !== 'undefined'
+        && this.props.accountForm.fields.account.username !== ''
+        && this.props.accountForm.fields.account.password !== ''
+        && this.props.accountForm.fields.account.organization !== '')
+      this.setState({isWaitingCreds: false, credentials: {
+        organization: this.props.accountForm.fields.account.organization,
+        username: this.props.accountForm.fields.account.username,
+        password: this.props.accountForm.fields.account.password,
+      }}, () => {
+        this.initData();
+      });
   }
 
   /**
@@ -380,14 +561,16 @@ class ServicesForm extends Component {
       if (msKey === msSegmentKey) {
          segmentRender = _.map(microservices[msSegmentKey], (microservice, idx) => {
           return (
-            <Segment padded raised key={microservice.label}>
+            <Segment padded raised key={microservice.label + '-' + microservice.originalKey}>
               <Header size='medium'>{microservice.label} <small>v{microservice.version}</small></Header>
+              {!this.checkSharableMicroservices(microservice) && <Message>This microservice has been disabled because you have enabled another microservice with a matching "Spec Ref". Please disable the other one if you want to proceed.</Message>}
               <Checkbox
                 style={{marginBottom: '.75em'}}
                 toggle
-                label={this.state.fields.microservices[idx].enabled ? 'enabled' : 'disabled'}
+                label={this.state.fields && _.find(this.state.fields.microservices, (m) => {return m.originalKey === microservice.originalKey}).enabled ? 'enabled' : 'disabled'}
                 name={`${microservice.originalKey}#enablement`}
                 onChange={this.handleMicroserviceEnablement}
+                disabled={!this.checkSharableMicroservices(microservice)}
               />
               <Label attached='top right'>
                 <Icon name='user' />
@@ -401,12 +584,12 @@ class ServicesForm extends Component {
                 <List.Item><strong>Public</strong>: {microservice.public.toString()}</List.Item>
                 <List.Item><strong>Spec Ref</strong>: <a href={microservice.specRef}>{microservice.specRef}</a></List.Item>
               </List>
+              {this.generateMSUserInputs(microservice.userInput, microservice.specRef, microservice.originalKey)}
             </Segment>
           );
         });
       }
     });
-    console.log('segments', segments)
     return segmentRender;
   }
 
@@ -440,7 +623,6 @@ class ServicesForm extends Component {
         let requiredMicroservices = [];
         for (let j = 0; j < microservicesInOrg.length; j++) {
           if (microservicesInOrg[j].specRef === spec.specRef
-              && microservicesInOrg[j].version === spec.version
               && microservicesInOrg[j].arch === spec.arch) 
                 requiredMicroservices.push(microservicesInOrg[j]);
         }
@@ -449,6 +631,67 @@ class ServicesForm extends Component {
     }
 
     return [];
+  }
+
+  generateMSUserInputs(unparsedUserInputs, specRef, originalKey) {
+    if (unparsedUserInputs.length === 0) return <div />;
+
+    const segments = _.map(unparsedUserInputs, (unparsedInput, idx) => {
+      let tmpHash = this.state.msUserInputs;
+      if (typeof tmpHash.get(originalKey + '/' + unparsedInput.name) == 'undefined') {
+        tmpHash.set(originalKey + '/' + unparsedInput.name, Object.assign({}, unparsedInput, {specRef, originalKey}));
+      }
+      return (
+        <Form.Input
+          fluid
+          focus
+          label={unparsedInput.label}
+          key={unparsedInput.name}
+          onChange={this.handleMSUserInputChange}
+          name={unparsedInput.name}
+          originalKey={originalKey}
+          defaultValue={unparsedInput.defaultValue}
+        />
+      );
+    });
+
+    let segmentRender = <Segment>
+      <Form className="attached fluid" onSubmit={(event) => {event.preventDefault();}} id={unparsedUserInputs[0].originalKey}>
+        {segments}
+      </Form>
+    </Segment>;
+
+    return segmentRender;
+  }
+
+  generateUserInputs(unparsedUserInputs, workloadUrl, originalKey) {
+    if (unparsedUserInputs.length === 0) return <div />;
+    const segments = _.map(unparsedUserInputs, (unparsedInput, idx) => {
+      let tmpHash = this.state.userInputs;
+      if (typeof tmpHash.get(originalKey + '/' + unparsedInput.name) === 'undefined') {
+        tmpHash.set(originalKey + '/' + unparsedInput.name, Object.assign({}, unparsedInput, {workloadUrl, originalKey}));
+      }
+      return (
+        <Form.Input 
+          fluid 
+          focus 
+          label={unparsedInput.label} 
+          key={unparsedInput.name} 
+          onChange={this.handleUserInputChange} 
+          name={unparsedInput.name}
+          originalKey={originalKey}
+          defaultValue={unparsedInput.defaultValue} 
+        />
+      );
+    });
+
+    let segmentRender = <Segment>
+      <Form className="attached fluid" onSubmit={(event) => {event.preventDefault();} } id={unparsedUserInputs[0].originalKey}>
+        {segments}
+      </Form>
+    </Segment>;
+
+    return segmentRender;
   }
 
   /**
@@ -504,13 +747,13 @@ class ServicesForm extends Component {
     let renderArr = [];
     const msRender = _.map(msesForSpec, (mses) => {
       for (let i = 0; i < mses.length; i++) {
-        renderArr.push(<Label key={mses[i].label}>{mses[i].label}</Label>)
+        renderArr.push(<Label key={mses[i].label}>{mses[i].label} in {mses[i].originalKey.split('/')[0]}</Label>)
       }
     });
 
     return (
       <List.Item>
-        <strong>Required microservices</strong>: {renderArr}
+        <strong>Required microservices</strong>: {renderArr.length > 0 ? renderArr : 'none'}
       </List.Item>
     );
   }
@@ -521,12 +764,12 @@ class ServicesForm extends Component {
       if (wlKey === wlSegmentKey) {
          segmentRender = _.map(workloads[wlSegmentKey], (workload, idx) => {
           return (
-            <Segment padded raised key={workload.label}>
+            <Segment padded raised key={workload.label + '-' + workload.originalKey}>
               <Header size='medium'>{workload.label} <small>v{workload.version}</small></Header>
               <Checkbox
                 style={{marginBottom: '.75em'}}
                 toggle
-                label={workload.enabled ? 'enabled' : 'disabled'}
+                label={this.state.fields && _.find(this.state.fields.workloads, (w) => {return w.originalKey === workload.originalKey}).enabled ? 'enabled' : 'disabled'}
                 name={`${workload.originalKey}#enablement`}
                 onChange={this.handleWorkloadEnablement}
               />
@@ -540,7 +783,7 @@ class ServicesForm extends Component {
                 <List.Item><strong>Last Updated</strong>: {parseLastUpdated(workload.lastUpdated)}</List.Item>
                 <List.Item><strong>Public</strong>: {workload.public.toString()}</List.Item>
                 <List.Item><strong>Workload URL</strong>: <a href={workload.specRef}>{workload.workloadUrl}</a></List.Item>
-                {this._generateUserInputs(workload)}
+                {this.generateUserInputs(workload.userInput, workload.workloadUrl, workload.originalKey)}
                 {this._generateRequiredMicroservices(workload)}
               </List>
             </Segment>
@@ -557,9 +800,8 @@ class ServicesForm extends Component {
     if (this.state.filters.currentApproach === MICROSERVICE_APPROACH) {
       workloads = this.getPossibleWorkloads();
     }
-    console.log('filteredWorkloads', workloads);
+
     const orgSections = _.map(Object.keys(workloads), (wlKey) => {
-      console.log('wlkey', wlKey)
       return (
         <Segment vertical key={wlKey}>
           <Header size='small'>{wlKey}</Header>
@@ -573,9 +815,16 @@ class ServicesForm extends Component {
 
   render() {
     const { services } = this.props;
-    const readyRender = () => (
-      <div>
+    const readyRender = () => {
+      return (<div>
         <Header size='large'>Services Selection</Header>
+
+        {typeof this.state.errors !== 'undefined' &&
+          <Message error>
+            <Message.Header>An error has occurred</Message.Header>
+            <p>{JSON.stringify(this.state.errors)}</p>
+          </Message>
+        }
 
         <FilterSegment updateCurrentApproach={this.updateCurrentApproach.bind(this)} />
         <br />
@@ -600,12 +849,17 @@ class ServicesForm extends Component {
               <Button primary onClick={this.handleSubmit}>Submit</Button>
             </div> : <Header>Loading...</Header>
           }
-      </div>
-    );
+      </div>)
+    }
 
     return (
       <div>
-        {readyRender()}
+        <Dimmer inverted active={this.state.ephemeral.submitting}>
+          <Loader />
+        </Dimmer>
+        {
+          !this.state.ephemeral.fetching && !this.state.ephemeral.submitting ? readyRender() : <Header>Loading...</Header>
+        }
         {
           this.state.isWaitingCreds &&
             <Modal
