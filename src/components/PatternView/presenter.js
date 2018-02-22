@@ -389,8 +389,9 @@ class PatternView extends Component {
     let filteredMSArr = [];
     for (let i = 0; i < filteredWLKeys.length; i++) {
       // array of workloads
-      const filteredOrgWLs = workloads[filteredWLKeys];
+      const filteredOrgWLs = workloads[filteredWLKeys[i]];
       for (let j = 0; j < filteredOrgWLs.length; j++) {
+        if (typeof filteredOrgWLs[j] === 'undefined') continue;
         const microservicesForWL = this.getRequiredMicroservices(filteredOrgWLs[j]);
         filteredMSArr = filteredMSArr.concat(microservicesForWL);
       }
@@ -648,23 +649,35 @@ class PatternView extends Component {
   generatePatternDetailedSection() {
     const {selectedPattern} = this.state;
     const {organization, username, password} = this.state.credentials;
-    const {onMicroservicesGet, onWorkloadsGet, services, configuration} = this.props;
+    const {onMicroservicesGet, onWorkloadsGet, services, configuration, patterns:ptns} = this.props;
 
     const pattern = this.getPatternInfo(selectedPattern);
 
     if (typeof this.state.fields.microservices === 'undefined' && typeof this.state.fields.workloads === 'undefined') {
 
+      const orgsToPull = []
+      const ptnOrgs = Object.keys(ptns)
+      // go thru pattern orgs
+      for (let a = 0; a < ptnOrgs.length; a++) {
+        // go thru patterns
+        const ptnKeys = ptns[ptnOrgs[a]]
+        for (let i =0; i < ptnKeys.length; i++) {
+          // go thru workloads in pattern
+          for (let j = 0; j < ptnKeys[i].workloads.length; j++) {
+            if (orgsToPull.indexOf(ptnKeys[i].workloads[j].workloadOrgid) === -1) {
+              orgsToPull.push(ptnKeys[i].workloads[j].workloadOrgid)
+            }
+          }
+        }
+      }
+
       // arr of workloads
       const patternWLs = pattern.workloads;
-      let promises = [onMicroservicesGet(configuration.exchange_api, organization, username, password, organization), onWorkloadsGet(configuration.exchange_api, organization, username, password, organization)];
+      let promises = [];
 
-      let orgHistory = [];
-      for (let i = 0; i < patternWLs.length; i++) {
-        if (patternWLs[i].workloadOrgid !== organization && orgHistory.indexOf(patternWLs[i].workloadOrgid) === -1) {
-          orgHistory.push(patternWLs[i].workloadOrgid);
-          promises.push(onMicroservicesGet(configuration.exchange_api, organization, username, password, patternWLs[i].workloadOrgid));
-          promises.push(onWorkloadsGet(configuration.exchange_api, organization, username, password, patternWLs[i].workloadOrgid));
-        }
+      for (let i = 0; i < orgsToPull.length; i++) {
+          promises.push(onMicroservicesGet(configuration.exchange_api, organization, username, password, orgsToPull[i]));
+          promises.push(onWorkloadsGet(configuration.exchange_api, organization, username, password, orgsToPull[i]));
       }
 
       Promise.all(promises)
