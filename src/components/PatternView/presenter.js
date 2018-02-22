@@ -24,6 +24,7 @@ import {
 } from 'semantic-ui-react';
 import moment from 'moment';
 import HashMap from 'hashmap';
+import semver from 'compare-versions';
 
 const parseLastUpdated = (date) => {
   return moment(date.split('[UTC]')[0]).toString();
@@ -322,7 +323,7 @@ class PatternView extends Component {
         let requiredMicroservices = [];
         for (let j = 0; j < microservicesInOrg.length; j++) {
           if (microservicesInOrg[j].specRef === spec.specRef
-              && microservicesInOrg[j].version === spec.version
+              && semver(microservicesInOrg[j].version.toString(), spec.version.toString()) === 0
               && microservicesInOrg[j].arch === spec.arch) 
                 requiredMicroservices.push(microservicesInOrg[j]);
         }
@@ -367,7 +368,7 @@ class PatternView extends Component {
           for (let k = 0; k < workloadsInOrg.length; k++) {
             if (workloadsInOrg[k].arch === compWorkload.workloadArch &&
                 workloadsInOrg[k].workloadUrl === compWorkload.workloadUrl &&
-                workloadsInOrg[k].version === compWorkload.workloadVersion) {
+                semver(workloadsInOrg[k].version.toString(), compWorkload.workloadVersion.toString()) === 0) {
                   wlToAdd = workloadsInOrg[k];
                 }
           }
