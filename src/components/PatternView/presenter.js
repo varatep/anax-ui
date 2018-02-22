@@ -286,6 +286,7 @@ class PatternView extends Component {
     let highestPriority = "101";
     let versionForPriority = undefined;
     for (let i = 0; i < workloadVersions.length; i++) {
+      if (typeof workloadVersions[i].priority.priority_value === 'undefined') return workloadVersions[i].version;
       if (workloadVersions[i].priority.priority_value < highestPriority) {
         highestPriority = workloadVersions[i].priority.priority_value;
         versionForPriority = workloadVersions[i].version;
@@ -322,10 +323,14 @@ class PatternView extends Component {
         const microservicesInOrg = microservices[msKeys[i]];
         let requiredMicroservices = [];
         for (let j = 0; j < microservicesInOrg.length; j++) {
-          if (microservicesInOrg[j].specRef === spec.specRef
+          try {
+            if (microservicesInOrg[j].specRef === spec.specRef
               && semver(microservicesInOrg[j].version.toString(), spec.version.toString()) === 0
               && microservicesInOrg[j].arch === spec.arch) 
                 requiredMicroservices.push(microservicesInOrg[j]);
+          } catch (e) {
+            console.error('Error parsing semver {0}, so ignoring microservice {1}: ', e, spec.specRef)
+          }
         }
         return requiredMicroservices;
       }
