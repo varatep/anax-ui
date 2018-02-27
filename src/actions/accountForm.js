@@ -115,18 +115,12 @@ export function accountFormMultiFieldChange(segment, updateObj) {
 export function checkAccountCredentials(exchange_url_base, organization, username, password) {
   return function(dispatch) {
 
-    const params = {
-      username: `${organization}/${username}`,
-      password,
-    };
-    const qs = queryString.stringify(params);
-
     const authHeaders = {
       'Authorization': authHeaderValue(`${organization}/${username}`, password),
       'Content-Type': 'application/json',
     }
 
-    return fetch(`${exchange_url_base}/orgs/${organization}/users/${username}?${qs}`, {
+    return fetch(`${exchange_url_base}/orgs/${organization}/users/${username}`, {
       method: 'GET',
       headers: authHeaders,
     })
