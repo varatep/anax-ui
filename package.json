@@ -53,6 +53,7 @@
     "webpack-manifest-plugin": "1.1.0"
   },
   "dependencies": {
+    "compare-versions": "^3.1.0",
     "fbjs": "^0.8.16",
     "hashmap": "^2.3.0",
     "lodash": "^4.17.2",

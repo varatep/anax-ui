@@ -3,6 +3,7 @@ import queryString from 'query-string';
 import * as actionTypes from '../constants/actionTypes';
 import { ANAX_URL_BASE } from '../constants/configuration';
 import {error} from '../util/msgs';
+import authHeaderValue from '../util/authHeaderValue';
 
 // TODO: factor our common fetch ... then functionality here and in device
 
@@ -31,8 +32,16 @@ export function microservices(exchange_api, orgid, username, password, queryOrg,
     }
     const qs = queryString.stringify(params);
 
+    const authHeaders = {
+      'Authorization': authHeaderValue(`${orgid}/${username}`, password),
+      'Content-Type': 'application/json',
+    }
+
   return function(dispatch) {
-    return fetch(`${exchange_api}/orgs/${queryOrg}/microservices?${qs}`)
+    return fetch(`${exchange_api}/orgs/${queryOrg}/microservices?${qs}`, {
+      method: 'GET',
+      headers: authHeaders,
+    })
         .then((response) => response.json())
         .then((data) => {
           dispatch(setMicroservices(data.microservices));
@@ -54,8 +63,16 @@ export function workloads(exchange_api, orgid, username, password, queryOrg, arc
   }
   const qs = queryString.stringify(params);
 
+  const authHeaders = {
+    'Authorization': authHeaderValue(`${orgid}/${username}`, password),
+    'Content-Type': 'application/json',
+  }
+
   return function(dispatch) {
-    return fetch(`${exchange_api}/orgs/${queryOrg}/workloads?${qs}`)
+    return fetch(`${exchange_api}/orgs/${queryOrg}/workloads?${qs}`, {
+      method: 'GET',
+      headers: authHeaders,
+    })
         .then((response) => response.json())
         .then((data) => {
           dispatch(setWorkloads(data.workloads));

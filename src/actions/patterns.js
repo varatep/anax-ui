@@ -3,6 +3,7 @@ import queryString from 'query-string';
 import * as actionTypes from '../constants/actionTypes';
 import { ANAX_URL_BASE } from '../constants/configuration';
 import {error} from '../util/msgs';
+import authHeaderValue from '../util/authHeaderValue';
 
 export function patterns(exchange_api, arch, orgid, username, password) {
 
@@ -12,8 +13,16 @@ export function patterns(exchange_api, arch, orgid, username, password) {
   };
   const qs = queryString.stringify(params);
 
+  const authHeaders = {
+    'Authorization': authHeaderValue(`${orgid}/${username}`, password),
+    'Content-Type': 'application/json',
+  }
+
   return function(dispatch) {
-    return fetch(`${exchange_api}/orgs/${orgid}/patterns?${qs}`)
+    return fetch(`${exchange_api}/orgs/${orgid}/patterns?${qs}`, {
+      method: 'GET',
+      headers: authHeaders,
+    })
         .then((response) => response.json())
         .then((data) => {
           dispatch(setPatterns(data.patterns));

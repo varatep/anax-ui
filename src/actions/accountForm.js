@@ -3,6 +3,7 @@ import * as actionTypes from '../constants/actionTypes';
 import { ANAX_URL_BASE } from '../constants/configuration';
 import queryString from 'query-string';
 import {device as deviceFetch} from './device';
+import authHeaderValue from '../util/authHeaderValue';
 
 export function setExpectExistingAccount(expectExistingAccount) {
   return function(dispatch) {
@@ -39,10 +40,14 @@ export function generateNodeToken() {
 }
 
 export function createExchangeUserAccount(exchange_url_base, organization, username, password, email) {
+
+  const authHeaders = {
+    'Authorization': authHeaderValue(`${organization}/${username}`, password),
+    'Content-Type': 'application/json',
+  }
   return function(dispatch) {
     return fetch(`${exchange_url_base}/orgs/${encodeURIComponent(organization)}/users/${encodeURIComponent(username)}`, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         password,
         email,
@@ -110,15 +115,14 @@ export function accountFormMultiFieldChange(segment, updateObj) {
 export function checkAccountCredentials(exchange_url_base, organization, username, password) {
   return function(dispatch) {
 
-    const params = {
-      username: `${organization}/${username}`,
-      password,
-    };
-    const qs = queryString.stringify(params);
+    const authHeaders = {
+      'Authorization': authHeaderValue(`${organization}/${username}`, password),
+      'Content-Type': 'application/json',
+    }
 
-    return fetch(`${exchange_url_base}/orgs/${organization}/users/${username}?${qs}`, {
+    return fetch(`${exchange_url_base}/orgs/${organization}/users/${username}`, {
       method: 'GET',
-      headers: {'Content-Type': 'application/json'},
+      headers: authHeaders,
     })
         .then((response) => {
           if (!response.ok) {
@@ -141,13 +145,16 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
   let registerExchangeAccount = () => {
     // TODO: expected that we're creating a new account here; use GET first to check (since existing is 400, not 409) and create a visible error
 
+    const authHeaders = {
+      'Authorization': authHeaderValue(`${accountForm.fields.account.organization}/${accountForm.fields.account.username}`, accountForm.fields.account.password),
+      'Content-Type': 'application/json',
+    }
+
     // return promise
     return fetch(`${exchange_url_base}/orgs/${encodeURIComponent(accountForm.fields.account.organization)}/users/${encodeURIComponent(accountForm.fields.account.username)}`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: authHeaders,
         body: JSON.stringify({
           'password': accountForm.fields.account.password,
           'email': accountForm.fields.account.email
@@ -336,7 +343,3 @@ export function accountFormDataSubmit(exchange_url_base, nodeId, accountForm, ex
       });
   };
 };
-
-function authHeaderValue(username, password) {
-  return `Basic ${username}:${password}`;
-}
