@@ -405,8 +405,8 @@ class PatternView extends Component {
     // remove duplicate mses
     let tracker = {};
     for (let i = 0; i < filteredMSArr.length; i++) {
-      if (typeof tracker[filteredMSArr[i].specRef] === 'undefined') {
-        tracker[filteredMSArr[i].specRef] = filteredMSArr[i];
+      if (typeof tracker[filteredMSArr[i].originalKey] === 'undefined') {
+        tracker[filteredMSArr[i].originalKey] = filteredMSArr[i];
       }
     }
 
@@ -781,7 +781,6 @@ class PatternView extends Component {
   render() {
 
     const readyRender = () => {
-      console.log('error state', this.state.errors);
       return <div>
         {typeof this.state.errors !== 'undefined' &&
           <Message error>
